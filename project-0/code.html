@@ -1,67 +1,70 @@
 <!DOCTYPE html>
-background: rgba(110,168,254,.06);
-border-radius: 8px;
-min-height: 22px;
-}
-
-
-footer {
-margin-top: 32px; color: var(--muted); font-size: .95rem;
-}
-code { background: #0d0f14; padding: 2px 6px; border-radius: 6px; }
-</style>
-</head>
-<body>
-<main class="container" role="main">
-<header>
-<h1>Three-Part Template</h1>
-<p>Each section has editable text <em>before</em> the image. The third is an animated GIF.</p>
-</header>
 
 
 <!-- Section 1 -->
 <section class="section card" aria-labelledby="s1-title">
 <div class="heading">
-<div class="badge" aria-hidden="true">1</div>
-<h2 id="s1-title" class="title">Section One — Static Image</h2>
+<h2 id="s1-title" class="title">1. Selfie: The Wrong Way vs. The Right Way</h2>
 </div>
 
 
-<!-- Text BEFORE the image -->
-<p class="lead" contenteditable="true" data-placeholder="Type your introduction or notes here (text appears before the image)…"></p>
+<!-- Text BEFORE the comparison images -->
+<p class="lead" contenteditable="true" data-placeholder="Describe what you’re comparing (this text appears before both images)"></p>
+
+
+<div class="two-up" role="group" aria-label="Image comparison">
+<figure>
+<div class="figure-wrap">
+<img class="media" src="images/6367A9C4-1A7F-4ECB-B132-EA9D9A954DA3.JPG" alt="Left image description" loading="lazy" />
+</div>
+<figcaption contenteditable="true" data-placeholder="Caption for left image (A)"></figcaption>
+</figure>
 
 
 <figure>
-<img class="media" src="images/photo-1.jpg" alt="Describe image one" loading="lazy" />
-<figcaption contenteditable="true" data-placeholder="Optional caption for Section 1 (below image)"></figcaption>
+<div class="figure-wrap">
+<img class="media" src="images/3BD82594-9699-45EC-957B-931D293111B5.JPG" alt="Right image description" loading="lazy" />
+</div>
+<figcaption contenteditable="true" data-placeholder="Caption for right image (B)"></figcaption>
 </figure>
+</div>
 </section>
 
 
-<!-- Section 2 -->
+<!-- Section 2 (Side-by-Side Comparison) -->
 <section class="section card" aria-labelledby="s2-title">
 <div class="heading">
-<div class="badge" aria-hidden="true">2</div>
-<h2 id="s2-title" class="title">Section Two — Static Image</h2>
+<h2 id="s2-title" class="title">2. Architectural Perspective Compression</h2>
 </div>
 
 
-<!-- Text BEFORE the image -->
-<p class="lead" contenteditable="true" data-placeholder="Add context or explanation here before the image loads…"></p>
+<!-- Text BEFORE the comparison images -->
+<p class="lead" contenteditable="true" data-placeholder="Describe what you’re comparing (this text appears before both images)"></p>
+
+
+<div class="two-up" role="group" aria-label="Image comparison">
+<figure>
+<div class="figure-wrap">
+<img class="media" src="images/0D2BC572-0289-4D45-AAB0-6067DC33B69D.JPG" alt="Left image description" loading="lazy" />
+</div>
+<figcaption contenteditable="true" data-placeholder="Caption for left image (A)"></figcaption>
+</figure>
 
 
 <figure>
-<img class="media" src="images/photo-2.jpg" alt="Describe image two" loading="lazy" />
-<figcaption contenteditable="true" data-placeholder="Optional caption for Section 2 (below image)"></figcaption>
+<div class="figure-wrap">
+<img class="media" src="images/5C1F6645-7FF6-4B38-A1CE-0DE6AB11DCEE.JPG" alt="Right image description" loading="lazy" />
+</div>
+<figcaption contenteditable="true" data-placeholder="Caption for right image (B)"></figcaption>
 </figure>
+</div>
 </section>
 
 
 <!-- Section 3 (GIF) -->
 <section class="section card" aria-labelledby="s3-title">
 <div class="heading">
-<div class="badge" aria-hidden="true">3</div>
-<h2 id="s3-title" class="title">Section Three — Animated GIF</h2>
+<h2 id="s3-title" class="title">3. The Dolly Zoom</h2>
 </div>
 
 
@@ -70,18 +73,11 @@ code { background: #0d0f14; padding: 2px 6px; border-radius: 6px; }
 
 
 <figure>
-<img class="media" src="images/animation.gif" alt="Describe the animation" loading="lazy" />
+<img class="media" src="images/IMG_9405.gif" alt="Describe the animation" loading="lazy" />
 <figcaption contenteditable="true" data-placeholder="Optional caption for the GIF (below image)"></figcaption>
 </figure>
 </section>
 
 
-<footer>
-<p>
-Tip: The editable text you type here won’t persist after a refresh unless you save the HTML or wire up storage.
-Replace image paths in the <code>src</code> attributes. For best results, keep large images optimized.
-</p>
-</footer>
-</main>
 </body>
 </html>
