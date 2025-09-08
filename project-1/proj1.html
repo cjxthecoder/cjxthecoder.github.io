@@ -25,9 +25,9 @@
   <p class="lead" contenteditable="false" 
      data-placeholder="Describe what you’re comparing (this text appears before both images)">
     The first strategy is to perform a naive search on what translations align the different image plates the best. To compute the similarity, we can use the normalized cross-correlation (NCC) formula for 2 images of the same size: [#formula]. Since we want to only compare the top (blue) & bottom (red) plates with the center (green) plate, we can start by moving the image down by H/3 units. For any given displacements (x1, y1) and (x2, y2) where y1 >= 0 and y2 <= 0, the resulting intersection of all 3 images is given by the following:
-
+      <br>
       [#image]
-
+      <br>
       Therefore, if we only want to compare the blue and green plates, we can add a second displacement (0, -H/3) to limit the comparison area to the center plate. Likewise, when comparing the red and green plates, we can have the second displacement be (0, H/3).
   </p>
 </section>
@@ -43,7 +43,7 @@
   <p class="lead" contenteditable="false" 
      data-placeholder="Describe what you’re comparing (this text appears before both images)">
     In the previous section, we have seen that while naive search works on small images, it becomes computationally inefficient on larger ones. Is there a way to extend what works on smaller images so that it will still work on larger ones?
-
+    <br><br>
     The answer is yes.
   </p>
 </section>
