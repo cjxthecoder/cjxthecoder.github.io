@@ -4,10 +4,10 @@
 <!-- Section 1 -->
 <section class="section card" aria-labelledby="s2-title">
   <div class="heading">
-    <h2 id="s2-title" class="title">Project 1: Introduction</h2>
+    <h2 id="s2-title" class="title">Project 1: Colorizing the Prokudin-Gorskii photo collection</h2>
   </div>
 
-  <!-- Text BEFORE the comparison images -->
+ <!-- Body text -->
   <p class="lead" contenteditable="false" 
      data-placeholder="Describe what you’re comparing (this text appears before both images)">
     Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
@@ -15,19 +15,19 @@
 </section>
 
 
-<!-- Section 2 (Side-by-Side Comparison) -->
+<!-- Section 2 -->
 <section class="section card" aria-labelledby="s2-title">
   <div class="heading">
     <h2 id="s2-title" class="title">NCC & Naive alignment</h2>
   </div>
 
-  <!-- Text BEFORE the comparison images -->
+  <!-- Body text -->
   <p class="lead" contenteditable="false" 
      data-placeholder="Describe what you’re comparing (this text appears before both images)">
     The first strategy is to perform a naive search on what translations align the different image plates the best. To compute the similarity, we can use the normalized cross-correlation (NCC) formula for 2 images of the same size: [#formula]. Since we want to only compare the top (blue) & bottom (red) plates with the center (green) plate, we can start by moving the image down by H/3 units. For any given displacements (x1, y1) and (x2, y2) where y1 >= 0 and y2 <= 0, the resulting intersection of all 3 images is given by the following:
       <br>
       <figure>
-      <img class="media" src="images/crop3.png" alt="Describe the animation" loading="lazy"/>
+      <img class="media" src="images/proj1.png" alt="Describe the animation" loading="lazy"/>
       </figure>
       <br>
       Therefore, if we only want to compare the blue and green plates, we can add a second displacement (0, -H/3) to limit the comparison area to the center plate. Likewise, when comparing the red and green plates, we can have the second displacement be (0, H/3). Once the best displacements for the blue & red plates are computed, we can use the formula above to compute the final composite of the 3 plates.
@@ -35,13 +35,13 @@
 </section>
 
 
-<!-- Section 3 (GIF) -->
+<!-- Section 3 -->
 <section class="section card" aria-labelledby="s2-title">
   <div class="heading">
-    <h2 id="s2-title" class="title">Naive search</h2>
+    <h2 id="s2-title" class="title">Pyramid search</h2>
   </div>
 
-  <!-- Text BEFORE the comparison images -->
+  <!-- Body text -->
   <p class="lead" contenteditable="false" 
      data-placeholder="Describe what you’re comparing (this text appears before both images)">
     In the previous section, we saw that while naive search works well on small images, it becomes computationally inefficient on larger ones. Is there a way to extend what works on smaller images so that it will still work on larger ones?
