@@ -1,54 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Project 1</title>
+<meta charset="UTF-8" />
+<title>Project 1</title>
 </head>
 <body>
 
-  <h1>Project 1: Colorizing the Prokudin-Gorskii photo collection</h1>
+<h1>Project 1: Colorizing the Prokudin-Gorskii photo collection</h1>
 
-  <!-- Section 1 -->
-  <h2>Introduction</h2>
-  <p>
-    The Prokudin-Gorskii photo collection consists of 3 digitalized glass plate images each taken in grayscale with a blue, green, and red filter (ordered from top to bottom). To obtain a colorized version of the original image, we can align the images and use the pixel brightness (normalized to [0, 255]) from each image as the value of its respective color channel. This project aims to perform the aligning and compositing process automatically given any image containing the 3 glass plates in BGR order.
-  </p>
-  <div align="center">
-    <img src="intro.png" alt="Introduction">
-  </div>
-  <hr>
+<!-- Section 1 -->
+<h2>Introduction</h2>
+<p>
+The Prokudin-Gorskii photo collection consists of 3 digitalized glass plate images each taken in grayscale with a blue, green, and red filter (ordered from top to bottom). To obtain a colorized version of the original image, we can align the images and use the pixel brightness (normalized to [0, 255]) from each image as the value of its respective color channel. This project aims to perform the aligning and compositing process automatically given any image containing the 3 glass plates in BGR order.
+</p>
+<div align="center">
+<img src="intro.png" alt="Introduction">
+</div>
+<hr>
 
-  <!-- Section 2 -->
-  <h2>NCC & Preprocessing</h2>
-  <p>
-    To begin the alignment process, we need a function that can compute a similarity score between 2 images. Motivated by the fact that given <i>a + b = c</i>, <i>ab</i> attains its highest value at <i>a = b = c/2</i>, we can use the normalized cross-correlation formula
-  </p>
-  <div align="center">
-    <img src="equation.png" alt="Description of image 2">
-  </div>
-  <p>
-    for 2 vectors <strong>x</strong> and <strong>y</strong>. Since grayscale images are represented by 2d arrays, we can first flatten the 2 images we want to compare, before using them as the input vectors. A caveat of this method is that is both images should have the same size. However, we can approximate the crop dimensions for just the blue and red plates, and find the best displacements with respect to the green plate. The final step would require us to find the intersection of 3 rectangles, which is given by the following formula:
-  </p>
-  <hr>
+<!-- Section 2 -->
+<h2>NCC & Preprocessing</h2>
+<p>
+To begin the alignment process, we need a function that can compute a similarity score between 2 images. Motivated by the fact that given <i>a + b = c</i>, <i>ab</i> attains its highest value at <i>a = b = c/2</i>, we can use the normalized cross-correlation
+</p>
+<div align="center">
+<img src="images/equation.png" alt="Description of image 2">
+</div>
+<p>
+for 2 vectors <strong>x</strong> and <strong>y</strong>. Since grayscale images are represented by 2d arrays, we can first flatten the 2 images we want to compare, before using them as the input vectors. A caveat of this method is that is both images should have the same size. However, we can approximate the crop dimensions for just the blue and red plates, and find the best displacements with respect to the green plate. The final step would require us to find the intersection of 3 rectangles, which is given by the following formula:
+</p>
+<div align="center">
+<img src="images/proj1.png" alt="Description of image 2">
+</div>
+<hr>
 
-  <!-- Section 3 -->
-  <h2>Subheading 3</h2>
-  <p>
-    We can improve the NCC step using edge detection technqiues to find the crop of each image. The easiest way is to use the Sobel kernel
-  </p>
-  <div align="center">
-    <img src="image3.jpg" alt="Description of image 3" width="400">
-  </div>
-  <hr>
+<!-- Section 3 -->
+<h2>Naive Search</h2>
+<p>
+We can improve the NCC step using edge detection technqiues to find the crop of each image. The easiest way is to use the Sobel kernel
+</p>
+<div align="center">
+<img src="image3.jpg" alt="Description of image 3" width="400">
+</div>
+<hr>
 
-  <!-- Section 4 -->
-  <h2>Subheading 4</h2>
-  <p>
-    This is some body text for subheading 4. Summarize outcomes or provide references.
-  </p>
-  <div align="center">
-    <img src="image4.jpg" alt="Description of image 4" width="400">
-  </div>
+<!-- Section 4 -->
+<h2>Image Pyramid</h2>
+<p>
+This is some body text for subheading 4. Summarize outcomes or provide references.
+</p>
+<div align="center">
+<img src="image4.jpg" alt="Description of image 4" width="400">
+</div>
+
+<!-- Section 5 -->
+<h2>Cropping with Sobel</h2>
+<p>
+This is some body text for subheading 4. Summarize outcomes or provide references.
+</p>
+<div align="center">
+<img src="image5.jpg" alt="Description of image 5" width="400">
+</div>
 
 </body>
 </html>
