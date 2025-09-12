@@ -37,16 +37,40 @@ for 2 vectors <strong>x</strong> and <strong>y</strong>. After normalizing each 
 <!-- Section 3 -->
 <h2>Naive Search</h2>
 <p>
-To find the best shift, the simplest way is to compute the NCC for every possible shift within the full image. However, not only is this ineffcient, the best shift would also just be (0, 0) for any image, since the crop would just be a copy of the original crop. To solve this issue, we need to limit how much the height can shift when aligning.<br>
+To find the best shift, the simplest way is to compute the NCC for every possible shift within the full image. However, not only is this ineffcient, the best shift would also just be (0, 0) for any image, since the crop would just be a copy of the original crop. To solve this issue, we need to limit how much the height can shift when aligning. Define <i>W</i> and <i>H</i> to be the width and height of the full image respectively, assume, for approximations, that each plate takes up exactly a third of the full image.<br>
 <br>
-Assume, for approximations, each image takes up exactly a third of the image. Considering only the top/blue plate, we can start by setting upper limit for the top edge to be <i>(0 + H/3) / 2 = H/6</i>, and the bottom edge to be <i>(2H / 3 + 1) / 2 = 5H / 6</i>. This means the top edge should be at least be shifted down by <i>H/6 - 0 = H/6</i>, and the bottom edge by <i>5H / 6 - H/3 = H/2</i>. Therefore, a good place to start is a displacement of <i>(0, (H/6 + H/2) / 2) = (0, H/3)</i> with a search range of <i>H/6</i>. For the bottom/red plate, the equivalent displacement is just <i>(0, -H/3)</i> with the same search range.<br>
+Considering only the top/blue plate, we can start by setting upper limit for the top edge to be <i>(0 + H/3) / 2 = H/6</i>, and the bottom edge to be <i>(2H / 3 + 1) / 2 = 5H / 6</i>. This means the top edge should be at least be shifted down by <i>H/6 - 0 = H/6</i>, and the bottom edge by <i>5H / 6 - H/3 = H/2</i>. Therefore, a good place to start is a displacement of <i>(0, (H/6 + H/2) / 2) = (0, H/3)</i> with a search range of <i>H/6</i>. For the bottom/red plate, the equivalent displacement is just <i>(0, -H/3)</i> with the same search range.<br>
 <br>
-Using a starting crop of <i>(H/16, </i>
+Using a starting crop of {<i>(W/16, H/16), (W - W/16, H/3 - H/16)</i>} for the blue plate and a starting crop of {<i>(W/16, H/16 + 2H / 3), (W - W/16, H - H/16)</i>} for the blue plate, we can obtain the following best shifts:
 </p>
-<div align="center">
-<img src="image3.jpg" alt="Description of image 3" width="400">
+
+<div class="two-up" style="display:flex;" role="group" aria-label="Image comparison">
+
+<figure style="flex:1; text-align:center;">
+<div class="figure-wrap">
+<img class="media" src="images/cathedralNaive.jpg"
+alt="cathedralNaive.jpg" loading="lazy" width="25%"/>
 </div>
-<hr>
+<figcaption>Best shift: (-2, 336), (1, -334)</figcaption>
+</figure>
+
+<figure style="flex:1; text-align:center;">
+<div class="figure-wrap">
+<img class="media" src="cathedralNaive.jpg"
+alt="cathedralNaive.jpg" loading="lazy" width="25%"/>
+</div>
+<figcaption>Best shift: (-2, 344), (1, -335)</figcaption>
+</figure>
+
+<figure style="flex:1; text-align:center;">
+<div class="figure-wrap">
+<img class="media" src="images/tobolskNaive.jpg"
+alt="tobolskNaive.jpg" loading="lazy" width="25%"/>
+</div>
+<figcaption>Best shift: (-3, 338), (1, -337)</figcaption>
+</figure>
+
+</div>
 
 <!-- Section 4 -->
 <h2>Image Pyramid</h2>
@@ -60,7 +84,7 @@ This is some body text for subheading 4. Summarize outcomes or provide reference
 <!-- Section 5 -->
 <h2>Cropping with Sobel</h2>
 <p>
-This is some body text for subheading 4. Summarize outcomes or provide references.
+This is some body text for subheading 5. Summarize outcomes or provide references.
 </p>
 <div align="center">
 <img src="image5.jpg" alt="Description of image 5" width="400">
