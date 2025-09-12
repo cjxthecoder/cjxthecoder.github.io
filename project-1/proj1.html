@@ -27,7 +27,7 @@ To begin the alignment process, we need a function that can compute a similarity
 <img src="images/equation.png" alt="Description of image 2">
 </div>
 <p>
-for 2 vectors <strong>x</strong> and <strong>y</strong>. Since grayscale images are represented by 2d arrays, we can first flatten the 2 images we want to compare, before using them as the input vectors. A caveat of this method is that is both images should have the same size. However, we can approximate the crop dimensions for just the blue and red plates, and find the best displacements with respect to the green plate. The final step would require us to find the intersection of 3 rectangles, which is given by the following formula:
+for 2 vectors <strong>x</strong> and <strong>y</strong>. After normalizing each image with the L<sup>2</sup> norm, the dot product will ensure that the score will be the highest when the features of both images are the most similar. Since grayscale images are represented by 2d arrays, we can first flatten the 2 images we want to compare, before using them as the input vectors. A caveat of this method is that is both images should have the same size. However, we can approximate the crop dimensions for just the blue and red plates, and find the best displacements with respect to the green plate. The final step would require us to find the intersection of 3 rectangles, which is illusrated below:
 </p>
 <div align="center">
 <img src="images/proj1.png" alt="Description of image 2">
@@ -37,7 +37,11 @@ for 2 vectors <strong>x</strong> and <strong>y</strong>. Since grayscale images 
 <!-- Section 3 -->
 <h2>Naive Search</h2>
 <p>
-We can improve the NCC step using edge detection technqiues to find the crop of each image. The easiest way is to use the Sobel kernel
+To find the best shift, the simplest way is to compute the NCC for every possible shift within the full image. However, not only is this ineffcient, the best shift would also just be (0, 0) for any image, since the crop would just be a copy of the original crop. To solve this issue, we need to limit how much the height can shift when aligning.<br>
+<br>
+Assume, for approximations, each image takes up exactly a third of the image. Considering only the top/blue plate, we can start by setting upper limit for the top edge to be <i>(0 + H/3) / 2 = H/6</i>, and the bottom edge to be <i>(2H / 3 + 1) / 2 = 5H / 6</i>. This means the top edge should be at least be shifted down by <i>H/6 - 0 = H/6</i>, and the bottom edge by <i>5H / 6 - H/3 = H/2</i>. Therefore, a good place to start is a displacement of <i>(0, (H/6 + H/2) / 2) = (0, H/3)</i> with a search range of <i>H/6</i>. For the bottom/red plate, the equivalent displacement is just <i>(0, -H/3)</i> with the same search range.<br>
+<br>
+Using a starting crop of <i>(H/16, </i>
 </p>
 <div align="center">
 <img src="image3.jpg" alt="Description of image 3" width="400">
