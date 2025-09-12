@@ -88,9 +88,24 @@ Unfortunately, because each crop has a height of <i>(7W / 8)</i> &times; <i>(5H 
 Instead of searching over the entire image, we can scale down the image and find the best shiftat a much smaller size. Once the most accurate displacement (<i>x</i><sub>lowest</sub>, <i>y</i><sub>lowest</sub>) is calculated for the lowest sized image, we can perform another search at the image 2x the size. Only this time, we start at (<i>2x</i><sub>lowest</sub>, <i>2y</i><sub>lowest</sub>), and only search over a window of [-2, 2] for pixel corrections. Once the best displacement at the layer above the lowest scale is computed, we can multiply the result again by 2 and pass it to the image in the next layer above. The limited window is used because each downscaled coordinate could have only come from a total of 4 different coordaintes, so the best coordinate on the higher scale is only limited to [-1, 1] of the interpolated coordinate. An additional pixel in the search range is used to ensure further reduce the effect of noise on the best placement at the lowest scale. To further optimze this approrach without storing all downscale images at once, we can modify the best displacement function to have a recursive call.<br>
 <br>
 Instead of directly computing the best displacement on the full image, we only calculate if the given with is below a certain threshold. For images above this threshold, we can first downscale the image by 2x, pass it back to the function, and the returned shifts scaled up by 2x to return the best shifts on the input image. This means that the best shifts in the base case (<i>x</i><sub>lowest</sub>, <i>y</i><sub>lowest</sub>) will be scaled up and used in the previous recursive call, which is the scaled image 1 layer above. This will continue until we return to the top level call, and at that point, the returned shifts will be within 1 or 2 pixels of the best overall displacement. The last thing to keep in mind is to downscale the cropping box as well, which is simple to do since it is computed on the full image and one can simply divide its coordinates by 2 for each recurive call. In practice, setting W<sub>min</sub> = 72 gives the best tradeoff between the search size and the number of rescales. With these optimzations in place, the computing time is now much faster:
-</p>
-<div align="center">
-<img src="image4.jpg" alt="Description of image 4" width="400">
+
+<div class="image-grid" 
+     style="display:flex; flex-wrap:wrap; justify-content:center; text-align:center;">
+  
+  <figcaption>cathedral.jpg</figcaption>
+  <figure style="flex: 1 0 20%; margin:12px;">
+    <img src="images/cathdral.jpg" alt="cathedral.jpg" width="100%">
+    <figcaption>Best shift: (-2, 336), (1, -334)<br>0.033945s</figcaption>
+  </figure>
+
+  <figcaption>church.jpg</figcaption>
+  <figure style="flex: 1 0 20%; margin:12px;">
+    <img src="images/church.jpg" alt="church.jpg" width="100%">
+    <figcaption>Caption 1</figcaption>
+  </figure>
+
+  <!-- Repeat for all 16 images -->
+  
 </div>
 
 <!-- Section 5 -->
