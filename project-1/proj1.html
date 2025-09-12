@@ -11,7 +11,7 @@
 <!-- Section 1 -->
 <h2>Introduction</h2>
 <p>
-The Prokudin-Gorskii photo collection consists of 3 digitalized glass plate images each taken in grayscale with a blue, green, and red filter (ordered from top to bottom). To obtain a colorized version of the original image, we can align the images and use the pixel brightness (normalized to [0, 255]) from each image as the value of its respective color channel. This project aims to perform the aligning and compositing process automatically given any image containing the 3 glass plates in BGR order.
+The Prokudin-Gorskii photo collection consists of 3 digitalized glass plate images, each taken in grayscale with a blue, green, and red filter (ordered from top to bottom). To obtain a colorized version of the original image, we can align the images and use the pixel brightness (normalized to [0, 255]) from each image as the value of its respective color channel. This project aims to perform the aligning and compositing process automatically, given any image containing the 3 glass plates in BGR order.
 </p>
 <div align="center">
 <img src="intro.png" alt="Introduction">
@@ -27,7 +27,7 @@ To begin the alignment process, we need a function that can compute a similarity
 <img src="images/equation.png" alt="Description of image 2">
 </div>
 <p>
-for 2 vectors <strong>x</strong> and <strong>y</strong>. After normalizing each image with the L<sup>2</sup> norm, the dot product will ensure that the score will be the highest when the features of both images are the most similar. Since grayscale images are represented by 2d arrays, we can first flatten the 2 images we want to compare, before using them as the input vectors. A caveat of this method is that is both images should have the same size. However, we can approximate the crop dimensions for just the blue and red plates, and find the best displacements with respect to the green plate. The final step would require us to find the intersection of 3 rectangles, which is illusrated below:
+for 2 vectors <strong>x</strong> and <strong>y</strong>. After normalizing each image with the L<sup>2</sup> norm, the dot product will ensure that the score will be the highest when the features of both images are the most similar. Since grayscale images are represented by 2d arrays, we can first flatten the 2 images we want to compare, before using them as the input vectors. A caveat of this method is that both images should be the same size. However, we can approximate the crop dimensions for just the blue and red plates and find the best displacements with respect to the green plate. The final step would require us to find the intersection of 3 rectangles, which is illustrated below:
 </p>
 <div align="center">
 <img src="images/proj1.png" alt="Description of image 2" width="50%">
@@ -37,9 +37,9 @@ for 2 vectors <strong>x</strong> and <strong>y</strong>. After normalizing each 
 <!-- Section 3 -->
 <h2>Naive Search</h2>
 <p>
-To find the best shift, the simplest way is to compute the NCC for every possible shift within the full image. However, not only is this ineffcient, the best shift would also just be (0, 0) for any image, since the crop would just be a copy of the original crop. To solve this issue, we need to limit how much the height can shift when aligning. Define <i>W</i> and <i>H</i> to be the width and height of the full image respectively, assume, for approximations, that each plate takes up exactly a third of the full image.<br>
+To find the best shift, the simplest way is to compute the NCC for every possible shift within the full image. However, not only is this inefficient, but the best shift would also just be (0, 0) for any image, since the crop would just be a copy of the original crop. To solve this issue, we need to limit how much the height can shift when aligning. Define <i>W</i> and <i>H</i> to be the width and height of the full image.  Assume, for approximations, that each plate takes up exactly a third of the full image.<br>
 <br>
-Considering only the top/blue plate, we can start by setting upper limit for the top edge to be <i>(0 + H/3) / 2 = H/6</i>, and the bottom edge to be <i>(2H / 3 + 1) / 2 = 5H / 6</i>. This means the top edge should be at least be shifted down by <i>H/6 - 0 = H/6</i>, and the bottom edge by <i>5H / 6 - H/3 = H/2</i>. Therefore, a good place to start is a displacement of <i>(0, (H/6 + H/2) / 2) = (0, H/3)</i> with a search range of [<i>-H/6</i>, <i>H/6</i>]. For the bottom/red plate, the equivalent displacement is just <i>(0, -H/3)</i> with the same search range.<br>
+Considering only the top/blue plate, we can start by setting the upper limit for the top edge to be <i>(0 + H/3) / 2 = H/6</i>, and the bottom edge to be <i>(2H / 3 + 1) / 2 = 5H / 6</i>. This means the top edge should be at least shifted down by <i>H/6 - 0 = H/6</i>, and the bottom edge by <i>5H / 6 - H/3 = H/2</i>. Therefore, a good place to start is a displacement of <i>(0, (H/6 + H/2) / 2) = (0, H/3)</i> with a search range of [<i>-H/6</i>, <i>H/6</i>]. For the bottom/red plate, the equivalent displacement is just <i>(0, -H/3)</i> with the same search range.<br>
 <br>
 Using a starting crop of {<i>(W/16, H/16), (W - W/16, H/3 - H/16)</i>} for the blue plate and a starting crop of {<i>(W/16, 2H / 3 + H/16), (W - W/16, H - H/16)</i>} for the blue plate, we can obtain the following best shifts:
 </p>
@@ -75,7 +75,7 @@ alt="tobolskNaive.jpg" loading="lazy" width="25%"/>
 <!-- Section 4 -->
 <h2>Image Pyramid</h2>
 <p>
-Unfortunately, because each crop has a dimension of <i>(7W / 8)</i> &times; <i>(5H / 24)</i>, the total number of NCC computations for each alignment is <i>((W - 7W / 8) + 1)</i> &times; <i>((H/3 - 5H / 24) + 1)</i> = <i>(W / 8 + 1)</i> &times; <i>(H / 8 + 1)</i> = <i>O(HW)</i>. Since each NCC computation requires <i>O(HW)</i> operations, aligning an image of dimensions <i>W</i> &times; <i>H</i> takes <i>O((HW)<sup>2</sup>)</i> time. Because the .tif files are about 9 &times; 9 = 81 times bigger than the .jpg files in dimension, performing the same search on these files will require 81<sup>2</sup> &approx; 6500x more time to compute, or 9-11 hours instead of 5-6 seconds. A more efficent method is required.
+Unfortunately, because each crop has a dimension of <i>(7W / 8)</i> &times; <i>(5H / 24)</i>, the total number of NCC computations for each alignment is <i>((W - 7W / 8) + 1)</i> &times; <i>((H/3 - 5H / 24) + 1)</i> = <i>(W / 8 + 1)</i> &times; <i>(H / 8 + 1)</i> = <i>O(HW)</i>. Since each NCC computation requires <i>O(HW)</i> operations, aligning an image of dimensions <i>W</i> &times; <i>H</i> takes <i>O((HW)<sup>2</sup>)</i> time. Because the .tif files are about 9 &times; 9 = 81 times bigger than the .jpg files in dimension, performing the same search on these files will require 81<sup>2</sup> &approx; 6500x more time to compute, or 9-11 hours instead of 5-6 seconds. A more efficient method is required.
 </p>
 <div align="center">
 <img src="image4.jpg" alt="Description of image 4" width="400">
