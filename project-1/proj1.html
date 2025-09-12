@@ -29,7 +29,7 @@ The Prokudin-Gorskii photo collection consists of 3 digitalized glass plate imag
 To begin the alignment process, we need a function that can compute a similarity score between 2 images. Motivated by the fact that given <i>a + b = c</i>, <i>ab</i> attains its highest value at <i>a = b = c/2</i>, we can use the normalized cross-correlation
 </p>
 <div align="center">
-<img src="images/equation.png" alt="equation.png" width="50%">
+<img src="images/equation.png" alt="equation.png" width="25%">
 </div>
 <p>
 for 2 vectors <strong>x</strong> and <strong>y</strong>. After normalizing each image with the L<sup>2</sup> norm, the dot product will ensure that the score will be the highest when the features of both images are the most similar. Since grayscale images are represented by 2d arrays, we can first flatten the 2 images we want to compare, before using them as the input vectors. A caveat of this method is that both images should be the same size. However, we can approximate the crop dimensions for just the blue and red plates and find the best displacements with respect to the green plate. The final step would require us to find the intersection of 3 rectangles, which is illustrated below:
@@ -42,11 +42,11 @@ for 2 vectors <strong>x</strong> and <strong>y</strong>. After normalizing each 
 <!-- Section 3 -->
 <h2>Naive Search</h2>
 <p>
-To find the best shift, the simplest way is to compute the NCC for every possible shift within the full image. However, not only is this inefficient, but the best shift would also just be (0, 0) for any image, since the crop would just be a copy of the original crop. To solve this issue, we need to limit how much the height can shift when aligning. Define <i>W</i> and <i>H</i> to be the width and height of the full image.  Assume, for approximations, that each plate takes up exactly a third of the full image.<br>
+To find the best shift, the simplest way is to compute the NCC for every possible shift within the full image. However, not only is this inefficient, but the best shift would also just be (0, 0) for any image, since the crop would just be a copy of the original crop. To solve this issue, we need to limit how much the height can shift when aligning. Define <i>W</i> and <i>H</i> to be the width and height of the full image. Assume, for approximations, that each plate takes up exactly a third of the full image.<br>
 <br>
-Considering only the top/blue plate, we can start by setting the upper limit for the top edge to be <i>(0 + H/3) / 2 = H/6</i>, and the bottom edge to be <i>(2H / 3 + H) / 2 = 5H / 6</i>. This means the top edge should be at least shifted down by <i>H/6 - 0 = H/6</i>, and the bottom edge by <i>5H / 6 - H/3 = H/2</i>. Therefore, a good place to start is a displacement of <i>(0, (H/6 + H/2) / 2) = (0, H/3)</i> with a search range of [<i>-H/6</i>, <i>H/6</i>]. For the bottom/red plate, the equivalent displacement is just <i>(0, -H/3)</i> with the same search range.<br>
+Considering only the top/blue plate, we can start by setting the upper limit for the top edge to be <i>(0 + H/3) / 2 = H/6</i>, and the bottom edge to be <i>(2H / 3 + H) / 2 = 5H / 6</i>. This means the top edge should be at least shifted down by <i>H/6 - 0 = H/6</i>, and the bottom edge by <i>5H / 6 - H/3 = H/2</i>. Therefore, a good place to start is a displacement of <i>(0, (H/6 + H/2) / 2) = (0, H/3)</i> with a search range of [<i>-H/6</i>, <i>H/6</i>]. For the bottom/red plate, the equivalent displacement is just <i>(0, -H/3)</i> with the same search range. Any shifts that brings the crop outside the original image will be ignored.<br>
 <br>
-Using a starting crop of {<i>(W/16, H/16), (W - W/16, H/3 - H/16)</i>} for the blue plate and {<i>(W/16, 2H / 3 + H/16), (W - W/16, H - H/16)</i>} for the red plate, where the tuples are the upper left and lower right corner pixels in (<i>x</i>, <i>y</i>) form, we can obtain the following best shifts:
+Using a starting crop of {<i>(W/16, H/16), (W - W/16, H/3 - H/16)</i>} for the blue plate and {<i>(W/16, 2H / 3 + H/16), (W - W/16, H - H/16)</i>} for the red plate, where the tuples are the upper left and lower right corner pixels in (<i>x</i>, <i>y</i>) coordinates, we can obtain the following best shifts:
 </p>
 
 <div class="two-up" style="display:flex;" role="group" aria-label="Image comparison">
@@ -83,9 +83,9 @@ alt="tobolskNaive.jpg" loading="lazy" width="50%"/>
 <!-- Section 4 -->
 <h2>Image Pyramid</h2>
 <p>
-Unfortunately, because each crop has a dimension of <i>(7W / 8)</i> &times; <i>(5H / 24)</i>, the total number of NCC computations for each alignment is <i>((W - 7W / 8) + 1)</i> &times; <i>((H/3 - 5H / 24) + 1)</i> = <i>(W / 8 + 1)</i> &times; <i>(H / 8 + 1)</i> = <i>O(HW)</i>. Since each NCC computation requires <i>O(HW)</i> operations, aligning an image of dimensions <i>W</i> &times; <i>H</i> takes <i>O((HW)<sup>2</sup>)</i> time using the naive search above. Because the .tif files are about 9 times bigger than the .jpg files in both dimensions, performing the same search on these files will take more than 6500x more time to compute (hours instead of seconds). A more efficient method is required.<br>
+Unfortunately, because each crop has a height of <i>(7W / 8)</i> &times; <i>(5H / 24)</i>, the total number of NCC computations for each alignment is <i>((W - 7W / 8) + 1)</i> &times; <i>((H/3 - 5H / 24) + 1)</i> = <i>(W / 8 + 1)</i> &times; <i>(H / 8 + 1)</i> = <i>O(HW)</i>. Since each NCC computation requires <i>O(HW)</i> operations, aligning an image of dimensions <i>W</i> &times; <i>H</i> takes <i>O((HW)<sup>2</sup>)</i> time using the naive search above. Because the .tif files are about 9 times bigger than the .jpg files in both dimensions, performing the same search on these files will take more than 6500x more time to compute (hours instead of seconds). Even if the width is fixed, it would still require more than 9<sup>3</sup> &approx; 720x more time on .tif files. A more efficient method is required.<br>
 <br>
-Instead of searching over the entire image, we can scale down the image to an appopriate size and
+Instead of searching over the entire image, we can scale down the image and find the best shiftat a much smaller size. Once the most accurate displacement (<i>x</i><sub>lowest</sub>, <i>y</i><sub>lowest</sub>) is calculated for the lowest sized image, we can perform another search at the image 2x the size. Only this time, we start at (<i>2x</i><sub>lowest</sub>, <i>2y</i><sub>lowest</sub>), and only search over a window of [-2, 2] for pixel corrections. The limited window is used because each downscaled coordinate could have only come from a total of 4 different coordaintes, so the best coordinate on the higher scale is only limited to [-1, 1] of the interpolated coordinate. An additional pixel in the search range is used to ensure further reduce the effect of noise on the best placement at the lowest scale. To further optimze this approrach without storing all downscale images at once, we can modify the best displacement function to have a recursive call:
 </p>
 <div align="center">
 <img src="image4.jpg" alt="Description of image 4" width="400">
