@@ -14,7 +14,7 @@
 The Prokudin-Gorskii photo collection consists of 3 digitalized glass plate images, each taken in grayscale with a blue, green, and red filter (ordered from top to bottom). To obtain a colorized version of the original image, we can align the images and use the pixel brightness (normalized to [0, 255]) from each image as the value of its respective color channel. This project aims to perform the aligning and compositing process automatically, given any image containing the 3 glass plates in BGR order.
 </p>
 <div align="center">
-<img src="intro.png" alt="Introduction">
+<img src="intro.png" alt="intro.png">
 </div>
 <hr>
 
@@ -24,13 +24,13 @@ The Prokudin-Gorskii photo collection consists of 3 digitalized glass plate imag
 To begin the alignment process, we need a function that can compute a similarity score between 2 images. Motivated by the fact that given <i>a + b = c</i>, <i>ab</i> attains its highest value at <i>a = b = c/2</i>, we can use the normalized cross-correlation
 </p>
 <div align="center">
-<img src="images/equation.png" alt="Description of image 2">
+<img src="images/equation.png" alt="equation.png" width="50%">
 </div>
 <p>
 for 2 vectors <strong>x</strong> and <strong>y</strong>. After normalizing each image with the L<sup>2</sup> norm, the dot product will ensure that the score will be the highest when the features of both images are the most similar. Since grayscale images are represented by 2d arrays, we can first flatten the 2 images we want to compare, before using them as the input vectors. A caveat of this method is that both images should be the same size. However, we can approximate the crop dimensions for just the blue and red plates and find the best displacements with respect to the green plate. The final step would require us to find the intersection of 3 rectangles, which is illustrated below:
 </p>
 <div align="center">
-<img src="images/proj1.png" alt="Description of image 2" width="50%">
+<img src="images/proj1.png" alt="proj1.png" width="50%">
 </div>
 <hr>
 
@@ -49,7 +49,7 @@ Using a starting crop of {<i>(W/16, H/16), (W - W/16, H/3 - H/16)</i>} for the b
 <figure style="flex:1; text-align:center;">
 <div class="figure-wrap">
 <img class="media" src="images/cathedralNaive.jpg"
-alt="cathedralNaive.jpg" loading="lazy" width="25%"/>
+alt="cathedralNaive.jpg" loading="lazy" width="50%"/>
 </div>
 <figcaption>Best shift: (-2, 336), (1, -334)<br>5.054158s</figcaption>
 </figure>
@@ -57,7 +57,7 @@ alt="cathedralNaive.jpg" loading="lazy" width="25%"/>
 <figure style="flex:1; text-align:center;">
 <div class="figure-wrap">
 <img class="media" src="cathedralNaive.jpg"
-alt="cathedralNaive.jpg" loading="lazy" width="25%"/>
+alt="cathedralNaive.jpg" loading="lazy" width="50%"/>
 </div>
 <figcaption>Best shift: (-2, 344), (1, -335)<br>5.890041s</figcaption>
 </figure>
@@ -65,7 +65,7 @@ alt="cathedralNaive.jpg" loading="lazy" width="25%"/>
 <figure style="flex:1; text-align:center;">
 <div class="figure-wrap">
 <img class="media" src="images/tobolskNaive.jpg"
-alt="tobolskNaive.jpg" loading="lazy" width="25%"/>
+alt="tobolskNaive.jpg" loading="lazy" width="50%"/>
 </div>
 <figcaption>Best shift: (-3, 338), (1, -337)<br>5.436964s</figcaption>
 </figure>
