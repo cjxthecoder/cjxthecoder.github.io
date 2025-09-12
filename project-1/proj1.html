@@ -7,6 +7,11 @@
 <body>
 
 <h1>Project 1: Colorizing the Prokudin-Gorskii photo collection</h1>
+<div align="center">
+<p>
+by lesley330404
+</p>
+</div>
 
 <!-- Section 1 -->
 <h2>Introduction</h2>
@@ -39,15 +44,16 @@ for 2 vectors <strong>x</strong> and <strong>y</strong>. After normalizing each 
 <p>
 To find the best shift, the simplest way is to compute the NCC for every possible shift within the full image. However, not only is this inefficient, but the best shift would also just be (0, 0) for any image, since the crop would just be a copy of the original crop. To solve this issue, we need to limit how much the height can shift when aligning. Define <i>W</i> and <i>H</i> to be the width and height of the full image.  Assume, for approximations, that each plate takes up exactly a third of the full image.<br>
 <br>
-Considering only the top/blue plate, we can start by setting the upper limit for the top edge to be <i>(0 + H/3) / 2 = H/6</i>, and the bottom edge to be <i>(2H / 3 + 1) / 2 = 5H / 6</i>. This means the top edge should be at least shifted down by <i>H/6 - 0 = H/6</i>, and the bottom edge by <i>5H / 6 - H/3 = H/2</i>. Therefore, a good place to start is a displacement of <i>(0, (H/6 + H/2) / 2) = (0, H/3)</i> with a search range of [<i>-H/6</i>, <i>H/6</i>]. For the bottom/red plate, the equivalent displacement is just <i>(0, -H/3)</i> with the same search range.<br>
+Considering only the top/blue plate, we can start by setting the upper limit for the top edge to be <i>(0 + H/3) / 2 = H/6</i>, and the bottom edge to be <i>(2H / 3 + H) / 2 = 5H / 6</i>. This means the top edge should be at least shifted down by <i>H/6 - 0 = H/6</i>, and the bottom edge by <i>5H / 6 - H/3 = H/2</i>. Therefore, a good place to start is a displacement of <i>(0, (H/6 + H/2) / 2) = (0, H/3)</i> with a search range of [<i>-H/6</i>, <i>H/6</i>]. For the bottom/red plate, the equivalent displacement is just <i>(0, -H/3)</i> with the same search range.<br>
 <br>
-Using a starting crop of {<i>(W/16, H/16), (W - W/16, H/3 - H/16)</i>} for the blue plate and a starting crop of {<i>(W/16, 2H / 3 + H/16), (W - W/16, H - H/16)</i>} for the blue plate, we can obtain the following best shifts:
+Using a starting crop of {<i>(W/16, H/16), (W - W/16, H/3 - H/16)</i>} for the blue plate and {<i>(W/16, 2H / 3 + H/16), (W - W/16, H - H/16)</i>} for the red plate, where the tuples are the upper left and lower right corner pixels in (<i>x</i>, <i>y</i>) form, we can obtain the following best shifts:
 </p>
 
 <div class="two-up" style="display:flex;" role="group" aria-label="Image comparison">
 
 <figure style="flex:1; text-align:center;">
 <div class="figure-wrap">
+<figcaption>cathedral.jpg</figcaption>
 <img class="media" src="images/cathedralNaive.jpg"
 alt="cathedralNaive.jpg" loading="lazy" width="50%"/>
 </div>
@@ -56,6 +62,7 @@ alt="cathedralNaive.jpg" loading="lazy" width="50%"/>
 
 <figure style="flex:1; text-align:center;">
 <div class="figure-wrap">
+<figcaption>monastery.jpg</figcaption>
 <img class="media" src="images/monasteryNaive.jpg"
 alt="monasteryNaive.jpg" loading="lazy" width="50%"/>
 </div>
@@ -64,6 +71,7 @@ alt="monasteryNaive.jpg" loading="lazy" width="50%"/>
 
 <figure style="flex:1; text-align:center;">
 <div class="figure-wrap">
+<figcaption>tobolsk.jpg</figcaption>
 <img class="media" src="images/tobolskNaive.jpg"
 alt="tobolskNaive.jpg" loading="lazy" width="50%"/>
 </div>
@@ -75,7 +83,9 @@ alt="tobolskNaive.jpg" loading="lazy" width="50%"/>
 <!-- Section 4 -->
 <h2>Image Pyramid</h2>
 <p>
-Unfortunately, because each crop has a dimension of <i>(7W / 8)</i> &times; <i>(5H / 24)</i>, the total number of NCC computations for each alignment is <i>((W - 7W / 8) + 1)</i> &times; <i>((H/3 - 5H / 24) + 1)</i> = <i>(W / 8 + 1)</i> &times; <i>(H / 8 + 1)</i> = <i>O(HW)</i>. Since each NCC computation requires <i>O(HW)</i> operations, aligning an image of dimensions <i>W</i> &times; <i>H</i> takes <i>O((HW)<sup>2</sup>)</i> time. Because the .tif files are about 9 &times; 9 = 81 times bigger than the .jpg files in dimension, performing the same search on these files will require 81<sup>2</sup> &approx; 6500x more time to compute, or 9-11 hours instead of 5-6 seconds. A more efficient method is required.
+Unfortunately, because each crop has a dimension of <i>(7W / 8)</i> &times; <i>(5H / 24)</i>, the total number of NCC computations for each alignment is <i>((W - 7W / 8) + 1)</i> &times; <i>((H/3 - 5H / 24) + 1)</i> = <i>(W / 8 + 1)</i> &times; <i>(H / 8 + 1)</i> = <i>O(HW)</i>. Since each NCC computation requires <i>O(HW)</i> operations, aligning an image of dimensions <i>W</i> &times; <i>H</i> takes <i>O((HW)<sup>2</sup>)</i> time using the naive search above. Because the .tif files are about 9 times bigger than the .jpg files in both dimensions, performing the same search on these files will take more than 6500x more time to compute (hours instead of seconds). A more efficient method is required.<br>
+<br>
+Instead of searching over the entire image, we can scale down the image to an appopriate size and
 </p>
 <div align="center">
 <img src="image4.jpg" alt="Description of image 4" width="400">
