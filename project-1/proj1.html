@@ -71,7 +71,7 @@ Using a starting crop of {<i>(W/16, H/16), (W - W/16, H/3 - H/16)</i>} for the b
 
 </div>
 
-Unfortunately, because each crop has a height of <i>(7W / 8)</i> &times; <i>(5H / 24)</i>, the total number of NCC computations for each alignment is <i>((W - 7W / 8) + 1)</i> &times; <i>((H/3 - 5H / 24) + 1)</i> = <i>(W / 8 + 1)</i> &times; <i>(H / 8 + 1)</i> = <i>O(HW)</i>. Since each NCC computation requires <i>O(HW)</i> operations, aligning an image of dimensions <i>W</i> &times; <i>H</i> takes <i>O((HW)<sup>2</sup>)</i> time using the naive search above. Because the .tif files are about 9 times bigger than the .jpg files in both dimensions, performing the same search on these files will take more than 6500x more times longer to compute. Even if we don't crop horizontally at all, it would still have a complexity of <i>O(H<sup>2</sup>W)</i> and require more than 9<sup>3</sup> &approx; 720x more time on .tif files. A more efficient method is required.
+Unfortunately, because each crop has a height of <i>(7W / 8)</i> &times; <i>(5H / 24)</i>, the total number of NCC computations for each alignment is <i>((W - 7W / 8) + 1)</i> &times; <i>((H/3 - 5H / 24) + 1)</i> = <i>(W / 8 + 1)</i> &times; <i>(H / 8 + 1)</i> = <i>O(HW)</i>. Since each NCC computation requires <i>O(HW)</i> operations, aligning an image of dimensions <i>W</i> &times; <i>3W</i> takes <i>O(W<sup>2</sup>)</i> time using the naive search above. Because the .tif files are about 9 times bigger than the .jpg files in both dimensions, performing the same search on these files will take more than 6500x more times longer to compute. Even if we don't crop horizontally at all, it would still have a complexity of <i>O(W<sup>3</sup>)</i> and require more than 9<sup>3</sup> &approx; 720x more time on .tif files. A more efficient method is required.
 <hr>
 
 <!-- Section 4 -->
@@ -184,16 +184,10 @@ Now, we will only calculate the best displacement if the given width is below a 
 </figure>
 
 </div>
-<hr>
-
-<!-- Section 5 -->
-<h2>Cropping with Sobel</h2>
 <p>
-This is some body text for subheading 5. Summarize outcomes or provide references.
+Even for small images, the pyramid method achived over an 100x speedup, while for large images, the compute time is faster than using naive search to align 1 image. More concretely, because the image is downscaled by 2x at each layer of the pyramid, the total image area is less than 1 + (1/2)<sup>2</sup> + (1/4)<sup>2</sup> + (1/8)<sup>2</sup> + ... = 1 + 1/4 + 1/16 + 1/64 + ... &lt; 4/3 of the original. Since the search at the lowest scale is limited to W &leq; 72, the total time complexity is only <i>4(3W)W / 3</i> + smaller terms = <i>O(W<sup>2</sup>)</i>, at least a full width factor faster than the naive method.
 </p>
-<div align="center">
-<img src="image5.jpg" alt="Description of image 5" width="400">
-</div>
+<hr>
 
 </body>
 </html>
