@@ -51,7 +51,7 @@ Using a starting crop of {<i>(W/16, H/16), (W - W/16, H/3 - H/16)</i>} for the b
 <img class="media" src="images/cathedralNaive.jpg"
 alt="cathedralNaive.jpg" loading="lazy" width="25%"/>
 </div>
-<figcaption>Best shift: (-2, 336), (1, -334)</figcaption>
+<figcaption>Best shift: (-2, 336), (1, -334)<br>5.054158s</figcaption>
 </figure>
 
 <figure style="flex:1; text-align:center;">
@@ -59,7 +59,7 @@ alt="cathedralNaive.jpg" loading="lazy" width="25%"/>
 <img class="media" src="cathedralNaive.jpg"
 alt="cathedralNaive.jpg" loading="lazy" width="25%"/>
 </div>
-<figcaption>Best shift: (-2, 344), (1, -335)</figcaption>
+<figcaption>Best shift: (-2, 344), (1, -335)<br>5.890041s</figcaption>
 </figure>
 
 <figure style="flex:1; text-align:center;">
@@ -67,7 +67,7 @@ alt="cathedralNaive.jpg" loading="lazy" width="25%"/>
 <img class="media" src="images/tobolskNaive.jpg"
 alt="tobolskNaive.jpg" loading="lazy" width="25%"/>
 </div>
-<figcaption>Best shift: (-3, 338), (1, -337)</figcaption>
+<figcaption>Best shift: (-3, 338), (1, -337)<br>5.436964s</figcaption>
 </figure>
 
 </div>
@@ -75,7 +75,7 @@ alt="tobolskNaive.jpg" loading="lazy" width="25%"/>
 <!-- Section 4 -->
 <h2>Image Pyramid</h2>
 <p>
-Unfortunately, because each crop has a dimension of <i>(7W / 8)</i> &times; <i>(5H / 24)</i>, the total number of NCC computations for each alignment is <i>((W - 7W / 8) + 1)</i> &times; <i>((H/3 - 5H / 24) + 1)</i> = <i>(W / 8 + 1)</i> &times; <i>(H / 8 + 1)</i> = <i>O(HW / 64)</i>. Since 1 dot product, 2 elementwise divisions, and 2 matrix norms must be computed, we have <i>HW + 2HW + 4HW = 7HW</i> operations for each NCC computation. Therefore, to align an image of dimensions <i>W</i> &times; <i>H</i>, we have a time complexity of <i>O(7(HW)<sup>2</sup> / 64)</i>.
+Unfortunately, because each crop has a dimension of <i>(7W / 8)</i> &times; <i>(5H / 24)</i>, the total number of NCC computations for each alignment is <i>((W - 7W / 8) + 1)</i> &times; <i>((H/3 - 5H / 24) + 1)</i> = <i>(W / 8 + 1)</i> &times; <i>(H / 8 + 1)</i> = <i>O(HW)</i>. Since each NCC computation requires <i>O(HW)</i> operations, aligning an image of dimensions <i>W</i> &times; <i>H</i> takes <i>O((HW)<sup>2</sup>)</i> time. Because the .tif files are about 9 &times; 9 = 81 times bigger than the .jpg files in dimension, performing the same search on these files will require 81<sup>2</sup> &approx; 6500x more time to compute, or 9-11 hours instead of 5-6 seconds. A more efficent method is required.
 </p>
 <div align="center">
 <img src="image4.jpg" alt="Description of image 4" width="400">
