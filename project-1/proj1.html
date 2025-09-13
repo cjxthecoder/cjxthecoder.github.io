@@ -14,7 +14,7 @@ by Daniel Cheng
 </div>
 
 <div align="center">
-<img src="images/intro.jpg" alt="intro.jpg" width="50%">
+<img src="images/emirCrop.png" alt="emirCrop.png" width="50%">
 </div>
 
 <!-- Section 1 -->
@@ -255,29 +255,40 @@ The vertical borders can be computed using a similar strategy, except that we ne
 </div>
 
 <p>
-Once the best displacemnts for the blue and red plate are found, the final step is to find a way to merge the 3 crops, which can be done in the following steps: First, find the intersecion of all shifted crops. Second, shift them back to their starting position using the inverse of the displacement. Finally, shift the pixels from the starting positions back to the center using the best displacement, and combine the 3 crops into their respective RGB channels. As a failsafe for bad starting crops, the normal overlap method (discussed in the NCC & Preprocessing section) will be used instead. The results are striking:
+Once the best displacements for the blue and red plate are found, the final step is to find a way to merge the 3 crops, which can be done in the following steps: First, find the intersection of all shifted crops. Second, shift them back to their starting position using the inverse of the displacement. Finally, shift the pixels from the starting positions back to the center using the best displacement, and combine the 3 crops into their respective RGB channels. As a failsafe for bad starting crops, the normal overlap method (discussed in the NCC & Preprocessing section) will be used instead. At the cost of doubling the runtime due to convolution, the images are now much cleaner:
 </p>
 
 <div style="display:flex; flex-wrap:wrap; justify-content:center; text-align:center;">
 
 <figure style="flex: 1 0 20%; margin:12px;">
-<img src="images/xb.png" alt="xb.png" width="100%">
-<figcaption style="margin-bottom:6px;">Blue plate</figcaption>
+<figcaption style="margin-bottom:6px;">cathedralCrop.jpg</figcaption>
+<img src="images/cathedralCrop.jpg" alt="cathedralCrop.jpg" width="50%">
+<figcaption style="margin-bottom:6px;">Best shift: (-2, 336), (1, -334)
+<br>0.054221s</figcaption>
 </figure>
 
 <figure style="flex: 1 0 20%; margin:12px;">
-<img src="images/xg.png" alt="xg.png" width="100%">
-<figcaption style="margin-bottom:6px;">Green plate</figcaption>
+<figcaption style="margin-bottom:6px;">church.tif</figcaption>
+<img src="images/churchCrop.jpg" alt="churchCrop.jpg" width="50%">
+<figcaption style="margin-bottom:6px;">Best shift: (-4, 3177), (-8, -3169)<br>6.210625s</figcaption>
 </figure>
 
 <figure style="flex: 1 0 20%; margin:12px;">
-<img src="images/xr.png" alt="xr.png" width="100%">
-<figcaption style="margin-bottom:6px;">Red plate</figcaption>
+<figcaption style="margin-bottom:6px;">canal.tif</figcaption>
+<img src="images/canalCrop.jpg" alt="canalCrop.jpg" width="50%">
+<figcaption style="margin-bottom:6px;">Best shift: (-16, 3155), (6, -3147)<br>6.660678s</figcaption>
 </figure>
 
 </div>
 
+<p>
+The title image was computed with a best displacement of (-23, 3159), (17, -3152) in 6.26317s.
+</p>
 <hr>
+
+<div align="center">
+<a href="https://cjxthecoder.github.io">cjxthecoder</a> | <a href="https://www.linkedin.com/in/daniel-cheng-71b475279">Linkedin</a>
+</div>
 
 </body>
 </html>
