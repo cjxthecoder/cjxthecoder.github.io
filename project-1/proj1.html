@@ -217,7 +217,7 @@ Although having a fixed cropping dimension worked for aligning the images, becau
 with the base image, and add the results together. This will produce a composite of the detected edges along the <i>x</i>- and <i>y</i>-axis. The next step is to reconstruct the borders of each plate from the image. Because Sobel is distance-invariant, we can convolve the kernel on only the valid patches, resulting in the new image having dimensions <i>(W - 1)</i> &times; <i>(H - 1)</i>.
 </p>
 <div align="center">
-<img src="images/edges" alt="edges.png" width="50%">
+<img src="images/edges.png" alt="edges.png" width="50%">
 <figcaption style="margin-bottom:6px;">sobelX &starf; img + sobelY &starf; img</figcaption>
 </div>
 <p>
@@ -227,23 +227,23 @@ Now, we can take the average of each row, and those with the lowest and highest 
 <img src="images/y.png" alt="y.png" width="50%">
 </div>
 <p>
-The vertical borders can be computed using a similar strategy, except that we need to split the column averages into 3 subsections based on the values found in the previous part. This will ensure that we are able to find the vertical edges of each image plate. Although the center/green plate is not used in the alignment process, its borders will be needed to compute the final crop of the composited image.
+The vertical borders can be computed using a similar strategy, except that we need to split the column averages into 3 subsections based on the values found in the previous part. This will ensure that we are able to find the vertical edges of each plate image. Although the center/green plate is not used in the alignment process, its borders will be needed to compute the final crop of the composited image.
 </p>
 
 <div style="display:flex; flex-wrap:wrap; justify-content:center; text-align:center;">
 
 <figure style="flex: 1 0 20%; margin:12px;">
-<img src="images/xb.png" alt="xb.png" width="50%">
+<img src="images/xb.png" alt="xb.png" width="100%">
 <figcaption style="margin-bottom:6px;">Blue plate</figcaption>
 </figure>
 
 <figure style="flex: 1 0 20%; margin:12px;">
-<img src="images/xg.png" alt="xg.png" width="50%">
+<img src="images/xg.png" alt="xg.png" width="100%">
 <figcaption style="margin-bottom:6px;">Green plate</figcaption>
 </figure>
 
 <figure style="flex: 1 0 20%; margin:12px;">
-<img src="images/xr.png" alt="xr.png" width="50%">
+<img src="images/xr.png" alt="xr.png" width="100%">
 <figcaption style="margin-bottom:6px;">Red plate</figcaption>
 </figure>
 
@@ -252,6 +252,29 @@ The vertical borders can be computed using a similar strategy, except that we ne
 <div align="center">
 <img src="images/borders.png" alt="borders.png" width="50%">
 <figcaption style="margin-bottom:6px;">All computed borders & subarray boundries</figcaption>
+</div>
+
+<p>
+Once the best displacemnts for the blue and red plate are found, the final step is to find a way to merge the 3 crops, which can be done in the following steps: First, find the intersecion of all shifted crops. Second, shift them back to their starting position using the inverse of the displacement. Finally, shift the pixels from the starting positions back to the center using the best displacement, and combine the 3 crops into their respective RGB channels. As a failsafe for bad starting crops, the normal overlap method (discussed in the NCC & Preprocessing section) will be used instead. The results are striking:
+</p>
+
+<div style="display:flex; flex-wrap:wrap; justify-content:center; text-align:center;">
+
+<figure style="flex: 1 0 20%; margin:12px;">
+<img src="images/xb.png" alt="xb.png" width="100%">
+<figcaption style="margin-bottom:6px;">Blue plate</figcaption>
+</figure>
+
+<figure style="flex: 1 0 20%; margin:12px;">
+<img src="images/xg.png" alt="xg.png" width="100%">
+<figcaption style="margin-bottom:6px;">Green plate</figcaption>
+</figure>
+
+<figure style="flex: 1 0 20%; margin:12px;">
+<img src="images/xr.png" alt="xr.png" width="100%">
+<figcaption style="margin-bottom:6px;">Red plate</figcaption>
+</figure>
+
 </div>
 
 <hr>
