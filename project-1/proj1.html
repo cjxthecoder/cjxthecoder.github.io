@@ -14,7 +14,7 @@ by Daniel Cheng
 </div>
 
 <div align="center">
-<img src="images/emirCrop.png" alt="emirCrop.png" width="50%">
+<img src="images/emirCrop.jpg" alt="emirCrop.jpg" width="50%">
 </div>
 
 <!-- Section 1 -->
@@ -255,13 +255,13 @@ The vertical borders can be computed using a similar strategy, except that we ne
 </div>
 
 <p>
-Once the best displacements for the blue and red plate are found, the final step is to find a way to merge the 3 crops, which can be done in the following steps: First, find the intersection of all shifted crops. Second, shift them back to their starting position using the inverse of the displacement. Finally, shift the pixels from the starting positions back to the center using the best displacement, and combine the 3 crops into their respective RGB channels. As a failsafe for bad starting crops, the normal overlap method (discussed in the NCC & Preprocessing section) will be used instead. At the cost of doubling the runtime due to convolution, the images are now much cleaner:
+Once the best displacements for the blue and red plates are found, the final step is to find a way to merge the 3 crops, which can be done in the following steps: First, find the intersection of all shifted crops. Second, shift them back to their starting position using the inverse of the displacement. Finally, shift the pixels from the starting positions back to the center using the best displacement, and combine the 3 crops into their respective RGB channels. As a failsafe for bad starting crops, the normal overlap method (discussed in the NCC & Preprocessing section) will be used instead. At the cost of doubling the runtime due to convolution, the images are now much cleaner:
 </p>
 
 <div style="display:flex; flex-wrap:wrap; justify-content:center; text-align:center;">
 
 <figure style="flex: 1 0 20%; margin:12px;">
-<figcaption style="margin-bottom:6px;">cathedralCrop.jpg</figcaption>
+<figcaption style="margin-bottom:6px;">cathedral.jpg</figcaption>
 <img src="images/cathedralCrop.jpg" alt="cathedralCrop.jpg" width="50%">
 <figcaption style="margin-bottom:6px;">Best shift: (-2, 336), (1, -334)
 <br>0.054221s</figcaption>
