@@ -47,7 +47,7 @@ To find the best shift, the simplest way is to compute the NCC for every possibl
 <br>
 Define <i>W</i> and <i>H</i> to be the width and height of the full image, and assume, for approximations, that each plate takes up exactly a third of the full image. Considering only the top/blue plate, we can start by setting the upper limit for the top edge to be <i>(0 + H/3) / 2 = H/6</i>, and the bottom edge to be <i>(2H / 3 + H) / 2 = 5H / 6</i>. This means the top edge should be at least shifted down by <i>H/6 - 0 = H/6</i>, and the bottom edge by <i>5H / 6 - H/3 = H/2</i>. Therefore, a good place to start is a displacement of <i>(0, (H/6 + H/2) / 2) = (0, H/3)</i> with a search range of [<i>-H/6</i>, <i>H/6</i>]. For the bottom/red plate, the equivalent displacement is just <i>(0, -H/3)</i> with the same search range. Any shifts that bring the crop outside the original image will be ignored.<br>
 <br>
-Using a starting crop of {<i>(W/16, H/16), (W - W/16, H/3 - H/16)</i>} for the blue plate and {<i>(W/16, 2H / 3 + H/16), (W - W/16, H - H/16)</i>} for the red plate, where the tuples are the upper left and lower right corner pixels in (<i>x</i>, <i>y</i>) coordinates, we can obtain the following best shifts (B, R):
+Using a starting crop of {<i>(W/16, H/16), R(W - W/16, H/3 - H/16)</i>} for the blue plate and {<i>(W/16, 2H / 3 + H/16), R(W - W/16, H - H/16)</i>} for the red plate, where the tuples are the upper left and lower right corner pixels in (<i>x</i>, <i>y</i>) coordinates, we can obtain the following best shifts:
 </p>
 
 <div style="display:flex; flex-wrap:wrap; justify-content:center; text-align:center;">
@@ -55,19 +55,19 @@ Using a starting crop of {<i>(W/16, H/16), (W - W/16, H/3 - H/16)</i>} for the b
 <figure style="flex: 1 0 20%; margin:12px;">
 <figcaption style="margin-bottom:6px;">cathedralNaive.jpg</figcaption>
 <img src="images/cathedralNaive.jpg" alt="cathedralNaive.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: (-2, 336), (1, -334)<br>5.070914s</figcaption>
+<figcaption style="margin-bottom:6px;">Best shift: B(-2, 336), R(1, -334)<br>5.070914s</figcaption>
 </figure>
 
 <figure style="flex: 1 0 20%; margin:12px;">
 <figcaption style="margin-bottom:6px;">monasteryNaive.jpg</figcaption>
 <img src="images/monasteryNaive.jpg" alt="monasteryNaive.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: (-2, 344), (1, -335)<br>5.107604s</figcaption>
+<figcaption style="margin-bottom:6px;">Best shift: B(-2, 344), R(1, -335)<br>5.107604s</figcaption>
 </figure>
 
 <figure style="flex: 1 0 20%; margin:12px;">
 <figcaption style="margin-bottom:6px;">tobolskNaive.jpg</figcaption>
 <img src="images/tobolskNaive.jpg" alt="tobolskNaive.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: (-3, 338), (1, -337)<br>5.857907s</figcaption>
+<figcaption style="margin-bottom:6px;">Best shift: B(-3, 338), R(1, -337)<br>5.857907s</figcaption>
 </figure>
 
 </div>
@@ -95,97 +95,97 @@ Now, we will only calculate the best displacement if the given width is below a 
 <figure style="flex: 1 0 20%; margin:12px;">
 <figcaption style="margin-bottom:6px;">cathedral.jpg</figcaption>
 <img src="images/cathedral.jpg" alt="cathedral.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: (-2, 336), (1, -334)<br>0.033945s</figcaption>
+<figcaption style="margin-bottom:6px;">Best shift: B(-2, 336), R(1, -334)<br>0.033945s</figcaption>
 </figure>
 
 <figure style="flex: 1 0 20%; margin:12px;">
 <figcaption style="margin-bottom:6px;">church.tif</figcaption>
 <img src="images/church.jpg" alt="church.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: (-4, 3177), (-8, -3169)<br>3.423309s</figcaption>
+<figcaption style="margin-bottom:6px;">Best shift: B(-4, 3177), R(-8, -3169)<br>3.423309s</figcaption>
 </figure>
 
 <figure style="flex: 1 0 20%; margin:12px;">
 <figcaption style="margin-bottom:6px;">emir.tif</figcaption>
 <img src="images/emir.jpg" alt="emir.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: (-24, 3160), (17, -3152)<br>3.36728s</figcaption>
+<figcaption style="margin-bottom:6px;">Best shift: B(-24, 3160), R(17, -3152)<br>3.36728s</figcaption>
 </figure>
 
 <figure style="flex: 1 0 20%; margin:12px;">
 <figcaption style="margin-bottom:6px;">harvesters.tif</figcaption>
 <img src="images/harvesters.jpg" alt="harvesters.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: (-17, 3159), (-3, -3153)<br>3.393377s</figcaption>
+<figcaption style="margin-bottom:6px;">Best shift: B(-17, 3159), R(-3, -3153)<br>3.393377s</figcaption>
 </figure>
 
 <figure style="flex: 1 0 20%; margin:12px;">
 <figcaption style="margin-bottom:6px;">icon.tif</figcaption>
 <img src="images/icon.jpg" alt="icon.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: (-17, 3204), (5, -3196)<br>3.401831s</figcaption>
+<figcaption style="margin-bottom:6px;">Best shift: B(-17, 3204), R(5, -3196)<br>3.401831s</figcaption>
 </figure>
 
 <figure style="flex: 1 0 20%; margin:12px;">
 <figcaption style="margin-bottom:6px;">italil.tif</figcaption>
 <img src="images/italil.jpg" alt="italil.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: (-21, 3193), (15, -3192)<br>3.3279s</figcaption>
+<figcaption style="margin-bottom:6px;">Best shift: B(-21, 3193), R(15, -3192)<br>3.3279s</figcaption>
 </figure>
 
 <figure style="flex: 1 0 20%; margin:12px;">
 <figcaption style="margin-bottom:6px;">lastochikino.tif</figcaption>
 <img src="images/lastochikino.jpg" alt="lastochikino.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: (2, 3244), (-7, -3163)<br>3.270373s</figcaption>
+<figcaption style="margin-bottom:6px;">Best shift: B(2, 3244), R(-7, -3163)<br>3.270373s</figcaption>
 </figure>
 
 <figure style="flex: 1 0 20%; margin:12px;">
 <figcaption style="margin-bottom:6px;">lugano.tif</figcaption>
 <img src="images/lugano.jpg" alt="lugano.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: (16, 3203), (-13, -3192)<br>3.317115s</figcaption>
+<figcaption style="margin-bottom:6px;">Best shift: B(16, 3203), R(-13, -3192)<br>3.317115s</figcaption>
 </figure>
 
 <figure style="flex: 1 0 20%; margin:12px;">
 <figcaption style="margin-bottom:6px;">melons.tif</figcaption>
 <img src="images/melons.jpg" alt="melons.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: (-11, 3159), (3, -3145)<br>3.387267s</figcaption>
+<figcaption style="margin-bottom:6px;">Best shift: B(-11, 3159), R(3, -3145)<br>3.387267s</figcaption>
 </figure>
 
 <figure style="flex: 1 0 20%; margin:12px;">
 <figcaption style="margin-bottom:6px;">monastery.jpg</figcaption>
 <img src="images/monastery.jpg" alt="monastery.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: (-2, 344), (1, -335)<br>0.032784s</figcaption>
+<figcaption style="margin-bottom:6px;">Best shift: B(-2, 344), R(1, -335)<br>0.032784s</figcaption>
 </figure>
 
 <figure style="flex: 1 0 20%; margin:12px;">
 <figcaption style="margin-bottom:6px;">self_portrait.tif</figcaption>
 <img src="images/self_portrait.jpg" alt="self_portrait.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: (-29, 3172), (8, -3153)<br>3.446271s</figcaption>
+<figcaption style="margin-bottom:6px;">Best shift: B(-29, 3172), R(8, -3153)<br>3.446271s</figcaption>
 </figure>
 
 <figure style="flex: 1 0 20%; margin:12px;">
 <figcaption style="margin-bottom:6px;">siren.tif</figcaption>
 <img src="images/siren.jpg" alt="siren.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: (6, 3201), (-18, -3203)<br>3.37681s</figcaption>
+<figcaption style="margin-bottom:6px;">Best shift: B(6, 3201), R(-18, -3203)<br>3.37681s</figcaption>
 </figure>
 
 <figure style="flex: 1 0 20%; margin:12px;">
 <figcaption style="margin-bottom:6px;">three_generations.tif</figcaption>
 <img src="images/three_generations.jpg" alt="three_generations.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: (-14, 3157), (-3, -3150)<br>3.285443s</figcaption>
+<figcaption style="margin-bottom:6px;">Best shift: B(-14, 3157), R(-3, -3150)<br>3.285443s</figcaption>
 </figure>
 
 <figure style="flex: 1 0 20%; margin:12px;">
 <figcaption style="margin-bottom:6px;">tobolsk.jpg</figcaption>
 <img src="images/tobolsk.jpg" alt="tobolsk.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: (-3, 338), (1, -337)<br>0.031668s</figcaption>
+<figcaption style="margin-bottom:6px;">Best shift: B(-3, 338), R(1, -337)<br>0.031668s</figcaption>
 </figure>
 
 <figure style="flex: 1 0 20%; margin:12px;">
 <figcaption style="margin-bottom:6px;"><a href="https://www.loc.gov/item/2018681257">canal.tif</a></figcaption>
 <img src="images/canal.jpg" alt="canal.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: (-18, 3156), (6, -3147)<br>3.386601s</figcaption>
+<figcaption style="margin-bottom:6px;">Best shift: B(-18, 3156), R(6, -3147)<br>3.386601s</figcaption>
 </figure>
 
 <figure style="flex: 1 0 20%; margin:12px;">
 <figcaption style="margin-bottom:6px;"><a href="https://www.loc.gov/item/2018679143">capri.tif</a></figcaption>
 <img src="images/capri.jpg" alt="capri.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: (16, 3206), (-8, -3192)<br>3.325347s</figcaption>
+<figcaption style="margin-bottom:6px;">Best shift: B(16, 3206), R(-8, -3192)<br>3.325347s</figcaption>
 </figure>
 
 </div>
@@ -263,26 +263,26 @@ Once the best displacements for the blue and red plates are found, the final ste
 <figure style="flex: 1 0 20%; margin:12px;">
 <figcaption style="margin-bottom:6px;">cathedral.jpg</figcaption>
 <img src="images/cathedralCrop.jpg" alt="cathedralCrop.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: (-2, 336), (1, -334)
+<figcaption style="margin-bottom:6px;">Best shift: B(-2, 336), R(1, -334)
 <br>0.054221s</figcaption>
 </figure>
 
 <figure style="flex: 1 0 20%; margin:12px;">
 <figcaption style="margin-bottom:6px;">church.tif</figcaption>
 <img src="images/churchCrop.jpg" alt="churchCrop.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: (-4, 3177), (-8, -3169)<br>6.210625s</figcaption>
+<figcaption style="margin-bottom:6px;">Best shift: B(-4, 3177), R(-8, -3169)<br>6.210625s</figcaption>
 </figure>
 
 <figure style="flex: 1 0 20%; margin:12px;">
 <figcaption style="margin-bottom:6px;">canal.tif</figcaption>
 <img src="images/canalCrop.jpg" alt="canalCrop.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: (-16, 3155), (6, -3147)<br>6.660678s</figcaption>
+<figcaption style="margin-bottom:6px;">Best shift: B(-16, 3155), R(6, -3147)<br>6.660678s</figcaption>
 </figure>
 
 </div>
 
 <p>
-The title image was computed with a best displacement of (-23, 3159), (17, -3152) in 6.26317s.
+The title image was computed with a best shift of B(-23, 3159), R(17, -3152) in 6.26317s.
 </p>
 <hr>
 
