@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Image Processing Report</title>
+  <!-- Plain HTML template (no CSS). Replace placeholder text and image sources. -->
+</head>
+<body>
+  <header>
+    <h1>Project 2: Fun with Filters and Frequencies</h1>
+    <p><strong>Author:</strong> Your Name</p>
+    <p><strong>Date:</strong> YYYY-MM-DD</p>
+    <p><strong>Course/Assignment:</strong> Course Name — Project/Report Title</p>
+  </header>
+
+  <nav>
+    <h2>Table of Contents</h2>
+    <ol>
+      <li><a href="#part1">Part 1: Filters and Edges</a>
+        <ol>
+          <li><a href="#part1-1">1.1 Convolution (NumPy) vs SciPy</a></li>
+          <li><a href="#part1-2">1.2 Partial Derivatives, Gradient Magnitude, Binarized Edges</a></li>
+          <li><a href="#part1-3">1.3 Gaussian &amp; DoG Filters; Cameraman Results</a></li>
+        </ol>
+      </li>
+      <li><a href="#part2">Part 2: Applications</a>
+        <ol>
+          <li><a href="#part2-1">2.1 Unsharp Mask (Taj Mahal + one more)</a></li>
+          <li><a href="#part2-2">2.2 Hybrid Images (Derek+Nutmeg + two others)</a></li>
+          <li><a href="#part2-3">2.3 &amp; 2.4 Gaussian/Laplacian Stacks; Figure 3.42(a–l); Two Custom Blends</a></li>
+        </ol>
+      </li>
+    </ol>
+  </nav>
+
+  <main>
+    <!-- =========================== -->
+    <!-- Part 1: Filters and Edges   -->
+    <!-- =========================== -->
+    <section id="part1">
+      <h2>Part 1: Filters and Edges</h2>
+
+      <!-- 1.1 -->
+      <article id="part1-1">
+        <h3>Part 1.1. Convolution Implementations (NumPy only) vs SciPy</h3>
+        <p>
+          <strong>Goal:</strong> Describe your NumPy-only convolution implementation and compare results with <em>scipy.signal.convolve2d</em>. Discuss runtime characteristics and boundary handling.
+        </p>
+        <h4>Method Description</h4>
+        <p>[Explain how your convolution handles kernel flipping, strides, and channels (if applicable).]</p>
+        <h4>Boundary Handling</h4>
+        <p>[Describe padding mode(s) (e.g., zero, reflect, replicate) and how they compare to SciPy’s modes.]</p>
+        <h4>Runtime Comparison</h4>
+        <p>[Summarize timing measurements and observations.]</p>
+        <figure>
+          <img src="path/to/example_input.png" alt="Example input image" />
+          <figcaption>Example input used for comparisons.</figcaption>
+        </figure>
+        <figure>
+          <img src="path/to/numpy_conv_output.png" alt="Output from NumPy convolution" />
+          <figcaption>NumPy-only convolution result.</figcaption>
+        </figure>
+        <figure>
+          <img src="path/to/scipy_conv_output.png" alt="Output from SciPy convolve2d" />
+          <figcaption>SciPy <code>convolve2d</code> result (matching mode/boundaries).</figcaption>
+        </figure>
+        <p><strong>Discussion:</strong> [Comment on similarities/differences, numerical precision, and border artifacts.]</p>
+      </article>
+
+      <!-- 1.2 -->
+      <article id="part1-2">
+        <h3>Part 1.2. Partial Derivatives, Gradient Magnitude, and Binarized Edge Image</h3>
+        <p>
+          <strong>Goal:</strong> Show derivative images in x and y, compute the gradient magnitude, and present a binarized edge map. Justify any thresholding or denoising choices.
+        </p>
+        <figure>
+          <img src="path/to/partial_dx.png" alt="Partial derivative in x" />
+          <figcaption>Partial derivative in x.</figcaption>
+        </figure>
+        <figure>
+          <img src="path/to/partial_dy.png" alt="Partial derivative in y" />
+          <figcaption>Partial derivative in y.</figcaption>
+        </figure>
+        <figure>
+          <img src="path/to/grad_mag.png" alt="Gradient magnitude image" />
+          <figcaption>Gradient magnitude image.</figcaption>
+        </figure>
+        <figure>
+          <img src="path/to/binary_edges.png" alt="Binarized edge image" />
+          <figcaption>Binarized edge image with chosen threshold(s).</figcaption>
+        </figure>
+        <p><strong>Tradeoffs &amp; Justification:</strong> [Explain choice of thresholds, smoothing, and how you balanced noise vs completeness of edges.]</p>
+      </article>
+
+      <!-- 1.3 -->
+      <article id="part1-3">
+        <h3>Part 1.3. Gaussian &amp; DoG Filters; Cameraman Comparisons</h3>
+        <p>
+          <strong>Goal:</strong> Construct Gaussian filters using <em>cv2.getGaussianKernel</em>, build Difference-of-Gaussians (DoG), visualize the filters, apply Gaussian smoothing and DoG to the cameraman image, and compare with finite difference results.
+        </p>
+        <h4>Filter Visualizations</h4>
+        <figure>
+          <img src="path/to/gaussian_filter_viz.png" alt="Gaussian filter visualization" />
+          <figcaption>Gaussian filter visualization.</figcaption>
+        </figure>
+        <figure>
+          <img src="path/to/dog_filter_viz.png" alt="DoG filter visualization" />
+          <figcaption>Difference-of-Gaussians (DoG) visualization.</figcaption>
+        </figure>
+        <h4>Applications to Cameraman</h4>
+        <figure>
+          <img src="path/to/cameraman_gaussian.png" alt="Cameraman after Gaussian smoothing" />
+          <figcaption>Cameraman after Gaussian smoothing.</figcaption>
+        </figure>
+        <figure>
+          <img src="path/to/cameraman_dog.png" alt="Cameraman after DoG filtering" />
+          <figcaption>Cameraman after DoG filtering.</figcaption>
+        </figure>
+        <figure>
+          <img src="path/to/cameraman_finite_diff.png" alt="Cameraman finite difference results" />
+          <figcaption>Finite difference method results for comparison.</figcaption>
+        </figure>
+        <p><strong>Comparison &amp; Discussion:</strong> [Analyze differences in edge localization, noise sensitivity, and parameter effects.]</p>
+      </article>
+    </section>
+
+    <!-- ======================== -->
+    <!-- Part 2: Applications     -->
+    <!-- ======================== -->
+    <section id="part2">
+      <h2>Part 2: Applications</h2>
+
+      <!-- 2.1 -->
+      <article id="part2-1">
+        <h3>Part 2.1. Unsharp Mask</h3>
+        <p>
+          <strong>Goal:</strong> Implement unsharp masking. Explain how it relates to blur filters and high-frequency components. Show blurred, high-frequency, and sharpened versions of the Taj Mahal image and another image of your choice. Demonstrate varying the sharpening amount.
+        </p>
+        <h4>Taj Mahal</h4>
+        <figure>
+          <img src="path/to/taj_blurred.png" alt="Taj Mahal blurred" />
+          <figcaption>Blurred version (Taj Mahal).</figcaption>
+        </figure>
+        <figure>
+          <img src="path/to/taj_highfreq.png" alt="Taj Mahal high-frequency component" />
+          <figcaption>High-frequency component (Taj Mahal).</figcaption>
+        </figure>
+        <figure>
+          <img src="path/to/taj_sharpened_low.png" alt="Taj Mahal sharpened (low amount)" />
+          <figcaption>Sharpened result (low amount).</figcaption>
+        </figure>
+        <figure>
+          <img src="path/to/taj_sharpened_med.png" alt="Taj Mahal sharpened (medium amount)" />
+          <figcaption>Sharpened result (medium amount).</figcaption>
+        </figure>
+        <figure>
+          <img src="path/to/taj_sharpened_high.png" alt="Taj Mahal sharpened (high amount)" />
+          <figcaption>Sharpened result (high amount).</figcaption>
+        </figure>
+        <h4>Additional Image</h4>
+        <figure>
+          <img src="path/to/other_blurred.png" alt="Additional image blurred" />
+          <figcaption>Blurred version (additional image).</figcaption>
+        </figure>
+        <figure>
+          <img src="path/to/other_highfreq.png" alt="Additional image high-frequency component" />
+          <figcaption>High-frequency component (additional image).</figcaption>
+        </figure>
+        <figure>
+          <img src="path/to/other_sharpened.png" alt="Additional image sharpened" />
+          <figcaption>Sharpened result (additional image).</figcaption>
+        </figure>
+        <p><strong>Explanation:</strong> [Summarize the unsharp mask formula, role of blur radius/sigma, and artifact considerations.]</p>
+      </article>
+
+      <!-- 2.2 -->
+      <article id="part2-2">
+        <h3>Part 2.2. Hybrid Images</h3>
+        <p>
+          <strong>Goal:</strong> Create three hybrid images (including Derek + Nutmeg and two others). For one hybrid, show the full pipeline; for the others, show originals and final hybrid only.
+        </p>
+        <h4>Full Pipeline Hybrid (Detailed)</h4>
+        <figure>
+          <img src="path/to/hybrid1_originalA.png" alt="Original A (aligned)" />
+          <figcaption>Original A (aligned).</figcaption>
+        </figure>
+        <figure>
+          <img src="path/to/hybrid1_originalB.png" alt="Original B (aligned)" />
+          <figcaption>Original B (aligned).</figcaption>
+        </figure>
+        <figure>
+          <img src="path/to/hybrid1_fftA.png" alt="Fourier transform of A" />
+          <figcaption>Fourier transform (A).</figcaption>
+        </figure>
+        <figure>
+          <img src="path/to/hybrid1_fftB.png" alt="Fourier transform of B" />
+          <figcaption>Fourier transform (B).</figcaption>
+        </figure>
+        <figure>
+          <img src="path/to/hybrid1_filteredA.png" alt="Filtered A" />
+          <figcaption>Filtered result (A).</figcaption>
+        </figure>
+        <figure>
+          <img src="path/to/hybrid1_filteredB.png" alt="Filtered B" />
+          <figcaption>Filtered result (B).</figcaption>
+        </figure>
+        <figure>
+          <img src="path/to/hybrid1_cutoff.png" alt="Cutoff frequency visualization/justification" />
+          <figcaption>Cutoff frequency choice and justification.</figcaption>
+        </figure>
+        <figure>
+          <img src="path/to/hybrid1_final.png" alt="Final hybrid image" />
+          <figcaption>Final hybrid image (detailed pipeline).</figcaption>
+        </figure>
+
+        <h4>Additional Hybrids (Brief)</h4>
+        <figure>
+          <img src="path/to/hybrid2_originals.png" alt="Originals for Hybrid 2" />
+          <figcaption>Original images for Hybrid 2.</figcaption>
+        </figure>
+        <figure>
+          <img src="path/to/hybrid2_final.png" alt="Hybrid 2 final" />
+          <figcaption>Hybrid 2 — final result.</figcaption>
+        </figure>
+        <figure>
+          <img src="path/to/hybrid3_originals.png" alt="Originals for Hybrid 3" />
+          <figcaption>Original images for Hybrid 3.</figcaption>
+        </figure>
+        <figure>
+          <img src="path/to/hybrid3_final.png" alt="Hybrid 3 final" />
+          <figcaption>Hybrid 3 — final result.</figcaption>
+        </figure>
+      </article>
+
+      <!-- 2.3 + 2.4 -->
+      <article id="part2-3">
+        <h3>Part 2.3 &amp; 2.4. Gaussian/Laplacian Stacks; Figure 3.42(a–l); Custom Blends</h3>
+        <p>
+          <strong>Goal:</strong> Visualize Gaussian and Laplacian stacks for the Orange + Apple images, recreate outcomes similar to Figure 3.42(a)–(l), and include two custom blends (one with an irregular mask).
+        </p>
+        <h4>Gaussian &amp; Laplacian Stacks (Orange + Apple)</h4>
+        <figure>
+          <img src="path/to/orapple_gaussian_stack.png" alt="Gaussian stack visualization" />
+          <figcaption>Gaussian stack visualization (Orange + Apple).</figcaption>
+        </figure>
+        <figure>
+          <img src="path/to/orapple_laplacian_stack.png" alt="Laplacian stack visualization" />
+          <figcaption>Laplacian stack visualization (Orange + Apple).</figcaption>
+        </figure>
+        <h4>Recreated Figure 3.42(a–l)</h4>
+        <figure>
+          <img src="path/to/figure342_grid.png" alt="Grid of results analogous to Fig. 3.42(a–l)" />
+          <figcaption>Outcomes analogous to Figure 3.42(a–l).</figcaption>
+        </figure>
+        <h4>Custom Blended Images</h4>
+        <figure>
+          <img src="path/to/custom_blend1.png" alt="Custom blended image with irregular mask" />
+          <figcaption>Custom blend #1 (irregular mask).</figcaption>
+        </figure>
+        <figure>
+          <img src="path/to/custom_blend2.png" alt="Custom blended image (straight mask)" />
+          <figcaption>Custom blend #2.</figcaption>
+        </figure>
+        <p><strong>Notes &amp; Discussion:</strong> [Describe masks, blending levels, feathering choices, and artifacts.]</p>
+      </article>
+    </section>
+  </main>
+
+  <footer>
+    <p><strong>References:</strong> [List any papers, libraries, and datasets used.]</p>
+  </footer>
+</body>
+</html>
