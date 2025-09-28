@@ -132,43 +132,25 @@ Instead of applying 2 convolutions to the image, we can take advantage of the fa
 <article id="part2-1">
 <h3>Part 2.1. Unsharp Mask</h3>
 <p>
-<strong>Goal:</strong> Implement unsharp masking. Explain how it relates to blur filters and high-frequency components. Show blurred, high-frequency, and sharpened versions of the Taj Mahal image and another image of your choice. Demonstrate varying the sharpening amount.
+Using convolution, we can also sharpen a blurry image with similar technique. Recall that a Gaussian filter removes the highest frequencies in a signal. This means that subtracting the filtered image from the original would leave all of the highest frequencies from the base image. We can then add this difference to the original to highlight the highest frequencies of the image, then clip it to [0, 255] to preserve brightness. Using the following Taj Mahal image:
 </p>
-<h4>Taj Mahal</h4>
-<figure>
-<img src="images/taj_blurred.png" alt="Taj Mahal blurred" />
-<figcaption>Blurred version (Taj Mahal).</figcaption>
-</figure>
-<figure>
-<img src="images/taj_highfreq.png" alt="Taj Mahal high-frequency component" />
-<figcaption>High-frequency component (Taj Mahal).</figcaption>
-</figure>
-<figure>
-<img src="images/taj_sharpened_low.png" alt="Taj Mahal sharpened (low amount)" />
-<figcaption>Sharpened result (low amount).</figcaption>
-</figure>
-<figure>
-<img src="images/taj_sharpened_med.png" alt="Taj Mahal sharpened (medium amount)" />
-<figcaption>Sharpened result (medium amount).</figcaption>
-</figure>
-<figure>
-<img src="images/taj_sharpened_high.png" alt="Taj Mahal sharpened (high amount)" />
-<figcaption>Sharpened result (high amount).</figcaption>
-</figure>
-<h4>Additional Image</h4>
-<figure>
-<img src="images/other_blurred.png" alt="Additional image blurred" />
-<figcaption>Blurred version (additional image).</figcaption>
-</figure>
-<figure>
-<img src="images/other_highfreq.png" alt="Additional image high-frequency component" />
-<figcaption>High-frequency component (additional image).</figcaption>
-</figure>
-<figure>
-<img src="images/other_sharpened.png" alt="Additional image sharpened" />
-<figcaption>Sharpened result (additional image).</figcaption>
-</figure>
-<p><strong>Explanation:</strong> [Summarize the unsharp mask formula, role of blur radius/sigma, and artifact considerations.]</p>
+<div align="center">
+<img src="images/taj.jpg" alt="taj.jpg" width="50%">
+</div>
+<p>
+We can obtain the blurred and high frequency versions of this image as follows:
+</p>
+<div align="center">
+<img src="images/lpvshp.png" alt="lpvshp.png" width="50%">
+</div>
+<p>
+Now, we can add the second image to the original to get a sharpened version.
+<div align="center">
+<img src="images/orgsharp.png" alt="orgsharp.png" width="50%">
+</div>
+<p>
+In general, we can change the sharpening amount my multiplying the high-pass filtered image by a constant. Below is a demonstration of various sharpening amounts from 0.25 to 4:
+</p>
 </article>
 
 <!-- 2.2 -->
