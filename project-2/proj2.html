@@ -26,6 +26,7 @@
 <h3>Part 1.1: Convolutions from Scratch!</h3>
 <p>
 Using the definition of convolution:
+</p>
 
 <pre><code>
 for result_i in range(result.shape[0]):
@@ -38,34 +39,37 @@ for result_i in range(result.shape[0]):
 return result
 </code></pre>
 
-where <code>ffker</code> is the <i>xy</i>-flipped kernel and <code>result</code> is the output 2D array, we can slightly speed up the computation by replacing the 2 inner for-loops with <code>result[result_i, result_j] = np.dot(img_flat, ffker.flatten())</code>, where <code>img_flat</code> is the flattened 1D array of the current patch of <code>img</code> based on the position of the kernel. Although this optimztion produces a noticable speed-up compared to using 4 for-loops, the fastest way is still to use <code>scipy.signal.convolve2d</code>. Below is a timing comparsion of the 3 methods above using a 5x5 kernel:
+<p>
+where <code>ffker</code> is the <i>xy</i>-flipped kernel and <code>result</code> is the output 2D array, we can slightly speed up the computation by replacing the 2 inner for-loops with <code>result[result_i, result_j] = np.dot(img_flat, ffker.flatten())</code>, where <code>img_flat</code> is the flattened 1D array of the current patch of <code>img</code> based on the position of the kernel. Although this optimization produces a noticeable speed-up compared to using 4 for-loops, the fastest way is still to use <code>scipy.signal.convolve2d</code>. Below is a timing comparison of the 3 methods above using a 5x5 kernel:
+</p>
 
-<
+<div align="center">
+<img src="images/scipy.png" alt="scipy.png" width="50%">
+</div>
 
+<p>
+To demonstrate an application of convolution, we can convolve an image with the <strong>box filter</strong>, a kernel with entries that sum to 1 that contains only 1 unique value. We can also convolve with the difference operators <img src="images/diff_op.png" alt="diff_op.png" width="50%"> for edge detection. Each kernel computes the difference in the <i>x</i>- or <i>y</i>-direction, so edges where the brightness of the pixel changes significantly will show up as white and black pixels on the output. Using <code>box_9x9</code> = <i>J<sub>9</sub> / 9<sup>2</sup></i> as the box filter, we get the following results:
+</p>
+
+<div align="center">
+<img src="images/one.png" alt="one.png" width="50%">
+</div>
+
+</article>
 
 <!-- 1.2 -->
 <article id="part1-2">
-<h3>Part 1.2. Partial Derivatives, Gradient Magnitude, and Binarized Edge Image</h3>
+<h3>Part 1.2: Finite Difference Operator</h3>
 <p>
-<strong>Goal:</strong> Show derivative images in x and y, compute the gradient magnitude, and present a binarized edge map. Justify any thresholding or denoising choices.
+Given the following image:
 </p>
-<figure>
-<img src="images/partial_dx.png" alt="Partial derivative in x" />
-<figcaption>Partial derivative in x.</figcaption>
-</figure>
-<figure>
-<img src="images/partial_dy.png" alt="Partial derivative in y" />
-<figcaption>Partial derivative in y.</figcaption>
-</figure>
-<figure>
-<img src="images/grad_mag.png" alt="Gradient magnitude image" />
-<figcaption>Gradient magnitude image.</figcaption>
-</figure>
-<figure>
-<img src="images/binary_edges.png" alt="Binarized edge image" />
-<figcaption>Binarized edge image with chosen threshold(s).</figcaption>
-</figure>
-<p><strong>Tradeoffs &amp; Justification:</strong> [Explain choice of thresholds, smoothing, and how you balanced noise vs completeness of edges.]</p>
+
+<div align="center">
+<img src="images/cameraman.png" alt="cameraman.png" width="50%">
+</div>
+
+we can convolve
+
 </article>
 
 <!-- 1.3 -->
