@@ -63,12 +63,24 @@ To demonstrate an application of convolution, we can convolve an image with the 
 <p>
 Given the following image:
 </p>
-
 <div align="center">
 <img src="images/cameraman.png" alt="cameraman.png" width="50%">
 </div>
-
-we can convolve
+<p>
+we can convolve this image with <i>D<sub>x</sub></i> and <i>D<sub>y</sub></i> to get the partial derivatives in the <i>x</i>- and <i>y</i>- direction. Using <code>np.dot</code>, we can then compute the gradient magnitude as follows:
+</p>
+<div align="center">
+<img src="images/noblurclip.png" alt="noblurclip.png" width="50%">
+</div>
+<p>
+Although the edges are visible, it's not clear, especially in the magnitude image. This is because when convolving an image with channel values in the range [0, 255], the resulting image will have a range of [-255, 255], so normalizing the image directly makes the overall image darker. To reduce the noise of the non-edge pixels, we can set a limit for each channel value before normalizing. Using a threshold of 25% from both sides, we get the following result:
+</p>
+<div align="center">
+<img src="images/noblur.png" alt="noblur.png" width="50%">
+</div>
+<p>
+From the image above, the edges in the gradient magnitude image are brighter and clearer to see.
+</p>
 
 </article>
 
