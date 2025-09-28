@@ -113,6 +113,12 @@ To illustrate the improvements, below is a side-by-side comparison of the edge m
 <div align="center">
 <img src="images/gradmag.png" alt="gradmag.png" width="50%">
 </div>
+<p>
+Instead of applying 2 convolutions to the image, we can take advantage of the fact that convolution is commutative, and first convolve the Gaussian with <i>D<sub>x</sub></i> and <i>D<sub>y</sub></i>, then convolve the image with the resulting kernel. This optimizes the computation by only convolving with the image once. Below are the respective results:
+</p>
+<div align="center">
+<img src="images/twovsone.png" alt="twovsone.png" width="50%">
+</div>
 </article>
 </section>
 
