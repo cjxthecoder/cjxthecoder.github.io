@@ -79,40 +79,32 @@ Although the edges are visible, it's not clear, especially in the magnitude imag
 <img src="images/noblur.png" alt="noblur.png" width="50%">
 </div>
 <p>
-From the image above, the edges in the gradient magnitude image are brighter and clearer to see.
+From the image above, the edges in the gradient magnitude image are brighter and more distinct.
 </p>
 
 </article>
 
 <!-- 1.3 -->
 <article id="part1-3">
-<h3>Part 1.3. Gaussian &amp; DoG Filters; Cameraman Comparisons</h3>
+<h3>Part 1.3: Derivative of Gaussian (DoG) Filter</h3>
 <p>
-<strong>Goal:</strong> Construct Gaussian filters using <em>cv2.getGaussianKernel</em>, build Difference-of-Gaussians (DoG), visualize the filters, apply Gaussian smoothing and DoG to the cameraman image, and compare with finite difference results.
+To further improve edge visibility, we can first smooth out the noise by convolving the original image with a Gaussian filter. To generate one with dimensions <i>n &times; n</i>, we can take the outer product of 2 length <i>n</i> arrays. Below is the result of blurring the original image using a 5 &times; 5 Gaussian filter.
 </p>
-<h4>Filter Visualizations</h4>
-<figure>
-<img src="images/gaussian_filter_viz.png" alt="Gaussian filter visualization" />
-<figcaption>Gaussian filter visualization.</figcaption>
-</figure>
-<figure>
-<img src="images/dog_filter_viz.png" alt="DoG filter visualization" />
-<figcaption>Difference-of-Gaussians (DoG) visualization.</figcaption>
-</figure>
-<h4>Applications to Cameraman</h4>
-<figure>
-<img src="images/cameraman_gaussian.png" alt="Cameraman after Gaussian smoothing" />
-<figcaption>Cameraman after Gaussian smoothing.</figcaption>
-</figure>
-<figure>
-<img src="images/cameraman_dog.png" alt="Cameraman after DoG filtering" />
-<figcaption>Cameraman after DoG filtering.</figcaption>
-</figure>
-<figure>
-<img src="images/cameraman_finite_diff.png" alt="Cameraman finite difference results" />
-<figcaption>Finite difference method results for comparison.</figcaption>
-</figure>
-<p><strong>Comparison &amp; Discussion:</strong> [Analyze differences in edge localization, noise sensitivity, and parameter effects.]</p>
+<div align="center">
+<img src="images/orgfilter.png" alt="orgfilter.png" width="50%">
+</div>
+<p>
+Applying the same edge detection process above, we get:
+</p>
+<div align="center">
+<img src="images/blurclip.png" alt="blurclip.png" width="50%">
+</div>
+<p>
+To illustrate the improvements, below is a side-by-side comparison of the edge magnitudes for each of the 3 methods, in row-major order from least to most clarity:
+</p>
+<div align="center">
+<img src="images/gradmag.png" alt="gradmag.png" width="50%">
+</div>
 </article>
 </section>
 
