@@ -144,13 +144,22 @@ We can obtain the blurred and high frequency versions of this image as follows:
 <img src="images/lpvshp.png" alt="lpvshp.png" width="50%">
 </div>
 <p>
-Now, we can add the second image to the original to get a sharpened version.
+Now, we can add the second image to the original to get a sharpened version:
 <div align="center">
 <img src="images/orgsharp.png" alt="orgsharp.png" width="50%">
 </div>
 <p>
-In general, we can change the sharpening amount my multiplying the high-pass filtered image by a constant. Below is a demonstration of various sharpening amounts from 0.25 to 4:
+In general, we can change the sharpening amount my multiplying the high-pass filtered image by a constant. Below is a demonstration of various sharpening amounts from 1 to 100:
 </p>
+<div align="center">
+<img src="onetotensquared.png" alt="onetotensquared.png" width="50%">
+</div>
+<p>
+From the visualizatin above, increasing the sharpening amount highlights the high-frequency signals from the original image. Below is an example of sharpening a blurred image, using the same selfie from 1.1 as the original image, and the box-filtered version as the starting image to sharpen:
+</p>
+<div align="center">
+<img src="images/blurthensharp.png" alt="blurthensharp.png" width="50%">
+</div>
 </article>
 
 <!-- 2.2 -->
