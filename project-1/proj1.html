@@ -1,294 +1,264 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<title>CS180 Project 1</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Image Processing Report</title>
+<!-- Plain HTML template (no CSS). Replace placeholder text and image sources. -->
 </head>
 <body>
-
-<h1>Project 1: Colorizing the Prokudin-Gorskii photo collection</h1>
+<header>
+<h1>Project 2: Fun with Filters and Frequencies</h1>
 <div align="center">
 <p>
-by Daniel Cheng | September 12, 2025
+by Daniel Cheng | September 29, 2025
 </p>
 </div>
+</header>
+
+<main>
+<!-- =========================== -->
+<!-- Part 1: Filters and Edges -->
+<!-- =========================== -->
+<section id="part1">
+<h2>Part 1: Filters and Edges</h2>
+
+<!-- 1.1 -->
+<article id="part1-1">
+<h3>Part 1.1: Convolutions from Scratch!</h3>
+<p>
+Using the definition of convolution:
+</p>
+
+<pre><code>
+for result_i in range(result.shape[0]):
+    for result_j in range(result.shape[1]):
+        total = 0
+        for i in range(ffker.shape[0]):
+            for j in range(ffker.shape[1]):
+                total += img[result_i + i, result_j + j] * ffker[i, j]
+        result[result_i, result_j] = total
+return result
+</code></pre>
+
+<p>
+where <code>ffker</code> is the <i>xy</i>-flipped kernel and <code>result</code> is the output 2D array, we can slightly speed up the computation by replacing the 2 inner for-loops with <code>result[result_i, result_j] = np.dot(img_flat, ffker.flatten())</code>, where <code>img_flat</code> is the flattened 1D array of the current patch of <code>img</code> based on the position of the kernel. Although this optimization produces a noticeable speed-up compared to using 4 for-loops, the fastest way is still to use <code>scipy.signal.convolve2d</code>. Below is a timing comparison of the 3 methods above using a 5x5 kernel:
+</p>
 
 <div align="center">
-<img src="images/emirCrop.jpg" alt="emirCrop.jpg" width="50%">
-</div>
-
-<!-- Section 1 -->
-<h2>Introduction</h2>
-<p>
-The Prokudin-Gorskii photo collection consists of 3 glass plate images, each taken in grayscale with a blue, green, and red filter (ordered from top to bottom). To obtain a colorized version of the original image, we can align the images and use the pixel brightness (normalized to [0, 255]) from each image as the value of its respective color channel. This project aims to perform the aligning and compositing process automatically, given any image containing the 3 glass plates in BGR order.
-</p>
-<hr>
-
-<!-- Section 2 -->
-<h2>NCC & Preprocessing</h2>
-<p>
-To begin the alignment process, we need a function that can compute a similarity score between 2 images. Motivated by the fact that given <i>a + b = c</i>, <i>ab</i> attains its highest value at <i>a = b = c/2</i>, we can use the normalized cross-correlation
-</p>
-<div align="center">
-<img src="images/equation.png" alt="equation.png" width="25%">
-</div>
-<p>
-for 2 vectors <strong>x</strong> and <strong>y</strong>. After normalizing each image with the L<sup>2</sup> norm, the dot product will ensure that the score will be the highest when the features of both images are the most similar. Since grayscale images are represented by 2d arrays, we can first flatten the 2 images we want to compare, before using them as the input vectors. A caveat of this method is that both images should be the same size. However, we can approximate the crop dimensions for just the blue and red plates and find the best displacements with respect to the green plate. The final step would require us to find the intersection of 3 rectangles, which is illustrated below:
-</p>
-<div align="center">
-<img src="images/proj1.png" alt="proj1.png" width="50%">
-</div>
-<hr>
-
-<!-- Section 3 -->
-<h2>Naive Search</h2>
-<p>
-To find the best shift, the simplest way is to compute the NCC for every possible shift within the full image. However, not only is this inefficient, but the best shift would also just be (0, 0) for any image, since the crop would just be a copy of the original crop. To solve this issue, we need to limit how much the height can shift when aligning.<br>
-<br>
-Define <i>W</i> and <i>H</i> to be the width and height of the full image, and assume, for approximations, that each plate takes up exactly a third of the full image. Considering only the top/blue plate, we can start by setting the upper limit for the top edge to be <i>(0 + H/3) / 2 = H/6</i>, and the bottom edge to be <i>(2H / 3 + H) / 2 = 5H / 6</i>. This means the top edge should be at least shifted down by <i>H/6 - 0 = H/6</i>, and the bottom edge by <i>5H / 6 - H/3 = H/2</i>. Therefore, a good place to start is a displacement of <i>(0, (H/6 + H/2) / 2) = (0, H/3)</i> with a search range of [<i>-H/6</i>, <i>H/6</i>]. For the bottom/red plate, the equivalent displacement is just <i>(0, -H/3)</i> with the same search range. Any shifts that bring the crop outside the original image will be ignored.<br>
-<br>
-Using a starting crop of {<i>(W/16, H/16), R(W - W/16, H/3 - H/16)</i>} for the blue plate and {<i>(W/16, 2H / 3 + H/16), R(W - W/16, H - H/16)</i>} for the red plate, where the tuples are the upper left and lower right corner pixels in (<i>x</i>, <i>y</i>) coordinates, we can obtain the following best shifts:
-</p>
-
-<div style="display:flex; flex-wrap:wrap; justify-content:center; text-align:center;">
-
-<figure style="flex: 1 0 20%; margin:12px;">
-<figcaption style="margin-bottom:6px;">cathedralNaive.jpg</figcaption>
-<img src="images/cathedralNaive.jpg" alt="cathedralNaive.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: B(-2, 336), R(1, -334)<br>5.070914s</figcaption>
-</figure>
-
-<figure style="flex: 1 0 20%; margin:12px;">
-<figcaption style="margin-bottom:6px;">monasteryNaive.jpg</figcaption>
-<img src="images/monasteryNaive.jpg" alt="monasteryNaive.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: B(-2, 344), R(1, -335)<br>5.107604s</figcaption>
-</figure>
-
-<figure style="flex: 1 0 20%; margin:12px;">
-<figcaption style="margin-bottom:6px;">tobolskNaive.jpg</figcaption>
-<img src="images/tobolskNaive.jpg" alt="tobolskNaive.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: B(-3, 338), R(1, -337)<br>5.857907s</figcaption>
-</figure>
-
+<img src="images/scipy.png" alt="scipy.png" width="50%">
 </div>
 
 <p>
-Unfortunately, because each crop has a height of <i>(7W / 8)</i> &times; <i>(5H / 24)</i>, the total number of NCC computations for each alignment is <i>((W - 7W / 8) + 1)</i> &times; <i>((H/3 - 5H / 24) + 1)</i> = <i>(W / 8 + 1)</i> &times; <i>(H / 8 + 1)</i> = <i>O(HW)</i>. Since each NCC computation requires <i>O(HW)</i> operations, aligning an image of dimensions <i>W</i> &times; <i>3W</i> takes <i>O(W<sup>2</sup>)</i> time using the naive search above. Because the .tif files are about 9 times bigger than the .jpg files in both dimensions, performing the same search on these files will take more than 6500x more times longer to compute. Even if we don't crop horizontally at all, it would still have a complexity of <i>O(W<sup>3</sup>)</i> and require more than 9<sup>3</sup> &approx; 720x more time on .tif files. A more efficient method is required.
+To demonstrate an application of convolution, we can convolve an image with the <strong>box filter</strong>, a kernel with entries that sum to 1 that contains only 1 unique value. We can also convolve with the difference operators <img src="images/diff_op.png" alt="diff_op.png" width="50%"> for edge detection. Each kernel computes the difference in the <i>x</i>- or <i>y</i>-direction, so edges where the brightness of the pixel changes significantly will show up as white and black pixels on the output. Using <code>box_9x9</code> = <i>J<sub>9</sub> / 9<sup>2</sup></i> as the box filter, we get the following results:
 </p>
-<hr>
-
-<!-- Section 4 -->
-<h2>Image Pyramid</h2>
-<p>
-Instead of searching over the entire image, we can scale down the image, find the best shift at a much smaller size, and scale the result back to its original size. Once the most accurate displacement (<i>x</i><sub>lowest</sub>, <i>y</i><sub>lowest</sub>) is calculated for the lowest-sized image, we can perform another search at the image 2x the size. Only this time, we start at (<i>2x</i><sub>lowest</sub>, <i>2y</i><sub>lowest</sub>), and only search over a window of [-2, 2] for pixel corrections. Once the best displacement at the layer below the lowest scale is computed, we can multiply the result again by 2 and pass it to the image in the next layer below. The limited window is used because each downscaled coordinate could have only come from a total of 4 different coordinates, so the best coordinate on the higher scale is limited to [-1, 1] of the interpolated coordinate. An additional pixel in the search range is used to further reduce the effect of noise on the best placement at the lowest scale. To further optimize this approach without storing all downscale images at once, we can modify the best displacement function to have a recursive call.
-</p>
-<div align="center">
-<img src="images/Image_pyramid_svg.png" alt="Image_pyramid_svg.png" width="25%">
-<figcaption style="margin-bottom:6px;">Source: <a href="https://en.wikipedia.org/wiki/Pyramid_%28image_processing%29">Wikipedia</a></figcaption>
-</div>
-<p>
-Now, we will only calculate the best displacement if the given width is below a certain threshold. For images above this threshold, we can first downscale the image by 2x, pass it back to the function, and the returned shifts are scaled up by 2x to return the best shifts on the input image. This means that the best shifts in the base case (<i>x</i><sub>lowest</sub>, <i>y</i><sub>lowest</sub>) will be scaled up and used in the previous recursive call, which is the scaled image 1 call above. This will continue until we return to the top-level call, and at that point, the returned shifts will be within 1 or 2 pixels of the best overall displacement. The last thing to keep in mind is to downscale the cropping box as well, which is simple to do since it is computed on the full image, and one can simply divide its coordinates by 2 for each recursive call. In practice, setting W<sub>min</sub> = 72 gives the best tradeoff between the search size and the number of rescales. With these optimizations in place, the computing time is now much faster:
-</p>
-
-<div style="display:flex; flex-wrap:wrap; justify-content:center; text-align:center;">
-
-<figure style="flex: 1 0 20%; margin:12px;">
-<figcaption style="margin-bottom:6px;">cathedral.jpg</figcaption>
-<img src="images/cathedral.jpg" alt="cathedral.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: B(-2, 336), R(1, -334)<br>0.033945s</figcaption>
-</figure>
-
-<figure style="flex: 1 0 20%; margin:12px;">
-<figcaption style="margin-bottom:6px;">church.tif</figcaption>
-<img src="images/church.jpg" alt="church.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: B(-4, 3177), R(-8, -3169)<br>3.423309s</figcaption>
-</figure>
-
-<figure style="flex: 1 0 20%; margin:12px;">
-<figcaption style="margin-bottom:6px;">emir.tif</figcaption>
-<img src="images/emir.jpg" alt="emir.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: B(-24, 3160), R(17, -3152)<br>3.36728s</figcaption>
-</figure>
-
-<figure style="flex: 1 0 20%; margin:12px;">
-<figcaption style="margin-bottom:6px;">harvesters.tif</figcaption>
-<img src="images/harvesters.jpg" alt="harvesters.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: B(-17, 3159), R(-3, -3153)<br>3.393377s</figcaption>
-</figure>
-
-<figure style="flex: 1 0 20%; margin:12px;">
-<figcaption style="margin-bottom:6px;">icon.tif</figcaption>
-<img src="images/icon.jpg" alt="icon.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: B(-17, 3204), R(5, -3196)<br>3.401831s</figcaption>
-</figure>
-
-<figure style="flex: 1 0 20%; margin:12px;">
-<figcaption style="margin-bottom:6px;">italil.tif</figcaption>
-<img src="images/italil.jpg" alt="italil.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: B(-21, 3193), R(15, -3192)<br>3.3279s</figcaption>
-</figure>
-
-<figure style="flex: 1 0 20%; margin:12px;">
-<figcaption style="margin-bottom:6px;">lastochikino.tif</figcaption>
-<img src="images/lastochikino.jpg" alt="lastochikino.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: B(2, 3244), R(-7, -3163)<br>3.270373s</figcaption>
-</figure>
-
-<figure style="flex: 1 0 20%; margin:12px;">
-<figcaption style="margin-bottom:6px;">lugano.tif</figcaption>
-<img src="images/lugano.jpg" alt="lugano.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: B(16, 3203), R(-13, -3192)<br>3.317115s</figcaption>
-</figure>
-
-<figure style="flex: 1 0 20%; margin:12px;">
-<figcaption style="margin-bottom:6px;">melons.tif</figcaption>
-<img src="images/melons.jpg" alt="melons.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: B(-11, 3159), R(3, -3145)<br>3.387267s</figcaption>
-</figure>
-
-<figure style="flex: 1 0 20%; margin:12px;">
-<figcaption style="margin-bottom:6px;">monastery.jpg</figcaption>
-<img src="images/monastery.jpg" alt="monastery.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: B(-2, 344), R(1, -335)<br>0.032784s</figcaption>
-</figure>
-
-<figure style="flex: 1 0 20%; margin:12px;">
-<figcaption style="margin-bottom:6px;">self_portrait.tif</figcaption>
-<img src="images/self_portrait.jpg" alt="self_portrait.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: B(-29, 3172), R(8, -3153)<br>3.446271s</figcaption>
-</figure>
-
-<figure style="flex: 1 0 20%; margin:12px;">
-<figcaption style="margin-bottom:6px;">siren.tif</figcaption>
-<img src="images/siren.jpg" alt="siren.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: B(6, 3201), R(-18, -3203)<br>3.37681s</figcaption>
-</figure>
-
-<figure style="flex: 1 0 20%; margin:12px;">
-<figcaption style="margin-bottom:6px;">three_generations.tif</figcaption>
-<img src="images/three_generations.jpg" alt="three_generations.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: B(-14, 3157), R(-3, -3150)<br>3.285443s</figcaption>
-</figure>
-
-<figure style="flex: 1 0 20%; margin:12px;">
-<figcaption style="margin-bottom:6px;">tobolsk.jpg</figcaption>
-<img src="images/tobolsk.jpg" alt="tobolsk.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: B(-3, 338), R(1, -337)<br>0.031668s</figcaption>
-</figure>
-
-<figure style="flex: 1 0 20%; margin:12px;">
-<figcaption style="margin-bottom:6px;"><a href="https://www.loc.gov/item/2018681257">canal.tif</a></figcaption>
-<img src="images/canal.jpg" alt="canal.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: B(-18, 3156), R(6, -3147)<br>3.386601s</figcaption>
-</figure>
-
-<figure style="flex: 1 0 20%; margin:12px;">
-<figcaption style="margin-bottom:6px;"><a href="https://www.loc.gov/item/2018679143">capri.tif</a></figcaption>
-<img src="images/capri.jpg" alt="capri.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: B(16, 3206), R(-8, -3192)<br>3.325347s</figcaption>
-</figure>
-
-</div>
-
-<p>
-Even for small images, the pyramid method achieved a speedup of over 100x due to a reduction in both size and number of NCC computations, while for large images, the computation time is still faster than what naive search takes on a single small image. More concretely, because the image is downscaled by 2x at each layer of the pyramid, the total image area is less than 1 + (1/2)<sup>2</sup> + (1/4)<sup>2</sup> + (1/8)<sup>2</sup> + ... = 1 + 1/4 + 1/16 + 1/64 + ... &lt; 4/3 of the original. Since the search at the lowest scale is limited to W &leq; 72, the total time complexity is only <i>4(3W)W / 3</i> + smaller terms = <i>O(W<sup>2</sup>)</i>, which matches with the actual factor of ~100 between the time it takes to align .jpg and .tif files.
-</p>
-<hr>
-
-<!-- Section 5 -->
-<h2>Cropping with Sobel</h2>
-<p>
-Although having a fixed cropping dimension worked for aligning the images, because the final result is simply the intersection of the translations, artifacts from the border still remain. Is there a way to automatically crop the borders? The answer is yes. We can start by convolving the sobel operator
-</p>
-
-<div style="display:flex; flex-wrap:wrap; justify-content:center; text-align:center;">
-
-<figure style="flex: 1 0 20%; margin:12px;">
-<img src="images/equationX.png" alt="equationX.png" width="50%">
-</figure>
-
-<figure style="flex: 1 0 20%; margin:12px;">
-<img src="images/equationY.png" alt="equationY.png" width="50%">
-</figure>
-
-</div>
-
-<p>
-with the base image, and add the results together. This will produce a composite of the detected edges along the <i>x</i>- and <i>y</i>-axis. The next step is to reconstruct the borders of each plate from the image. Because Sobel is distance-invariant, we can convolve the kernel on only the valid patches, resulting in the new image having dimensions <i>(W - 1)</i> &times; <i>(H - 1)</i>.
-</p>
-<div align="center">
-<img src="images/edges.png" alt="edges.png" width="50%">
-<figcaption style="margin-bottom:6px;">sobelX &starf; img + sobelY &starf; img</figcaption>
-</div>
-<p>
-Now, we can take the average of each row, and those with the lowest and highest values will be the edges. By splitting the resulting array into 4 subarrays [0 : <i>H/8</i>], [<i>H/8</i> : <i>H/2</i>], [<i>H/2</i> : <i>7H / 8</i>], and [<i>H/8</i> : <i>H</i>], we can find the argmax and argmin in each subarray, which will be used as the horizontal borders of each plate image.
-</p>
-<div align="center">
-<img src="images/y.png" alt="y.png" width="50%">
-</div>
-<p>
-The vertical borders can be computed using a similar strategy, except that we need to split the column averages into 3 subsections based on the values found in the previous part. This will ensure that we are able to find the vertical edges of each plate image. Although the center/green plate is not used in the alignment process, its borders will be needed to compute the final crop of the composited image.
-</p>
-
-<div style="display:flex; flex-wrap:wrap; justify-content:center; text-align:center;">
-
-<figure style="flex: 1 0 20%; margin:12px;">
-<img src="images/xb.png" alt="xb.png" width="100%">
-<figcaption style="margin-bottom:6px;">Blue plate</figcaption>
-</figure>
-
-<figure style="flex: 1 0 20%; margin:12px;">
-<img src="images/xg.png" alt="xg.png" width="100%">
-<figcaption style="margin-bottom:6px;">Green plate</figcaption>
-</figure>
-
-<figure style="flex: 1 0 20%; margin:12px;">
-<img src="images/xr.png" alt="xr.png" width="100%">
-<figcaption style="margin-bottom:6px;">Red plate</figcaption>
-</figure>
-
-</div>
 
 <div align="center">
-<img src="images/borders.png" alt="borders.png" width="50%">
-<figcaption style="margin-bottom:6px;">All computed borders & subarray boundries</figcaption>
+<img src="images/orgbox.png" alt="orgbox.png" width="50%">
 </div>
 
 <p>
-Once the best displacements for the blue and red plates are found, the final step is to find a way to merge the 3 crops, which can be done in the following steps: First, find the intersection of all shifted crops. Second, shift them back to their starting position using the inverse of the displacement. Finally, shift the pixels from the starting positions back to the center using the best displacement, and combine the 3 crops into their respective RGB channels. As a failsafe for bad starting crops, the normal overlap method (discussed in the NCC & Preprocessing section) will be used instead. At the cost of doubling the runtime due to convolution, the images are now much cleaner:
+For convolving with <i>D<sub>x</sub></i> and <i>D<sub>y</sub></i>, we have:
 </p>
-
-<div style="display:flex; flex-wrap:wrap; justify-content:center; text-align:center;">
-
-<figure style="flex: 1 0 20%; margin:12px;">
-<figcaption style="margin-bottom:6px;">cathedral.jpg</figcaption>
-<img src="images/cathedralCrop.jpg" alt="cathedralCrop.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: B(-2, 336), R(1, -334)
-<br>0.054221s</figcaption>
-</figure>
-
-<figure style="flex: 1 0 20%; margin:12px;">
-<figcaption style="margin-bottom:6px;">church.tif</figcaption>
-<img src="images/churchCrop.jpg" alt="churchCrop.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: B(-4, 3177), R(-8, -3169)<br>6.210625s</figcaption>
-</figure>
-
-<figure style="flex: 1 0 20%; margin:12px;">
-<figcaption style="margin-bottom:6px;">canal.tif</figcaption>
-<img src="images/canalCrop.jpg" alt="canalCrop.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: B(-16, 3155), R(6, -3147)<br>6.660678s</figcaption>
-</figure>
-
-</div>
-
-<p>
-The title image was computed with a best shift of B(-23, 3159), R(17, -3152) in 6.26317s.
-</p>
-<hr>
 
 <div align="center">
-<a href="https://cjxthecoder.github.io">cjxthecoder</a> | <a href="https://github.com/cjxthecoder">GitHub</a> | <a href="https://www.linkedin.com/in/daniel-cheng-71b475279">LinkedIn</a>
+<img src="images/dxdy.png" alt="dxdy.png" width="50%">
 </div>
 
+</article>
+
+<!-- 1.2 -->
+<article id="part1-2">
+<h3>Part 1.2: Finite Difference Operator</h3>
+<p>
+Given the following image:
+</p>
+<div align="center">
+<img src="images/cameraman.png" alt="cameraman.png" width="50%">
+</div>
+<p>
+we can convolve this image with <i>D<sub>x</sub></i> and <i>D<sub>y</sub></i> to get the partial derivatives in the <i>x</i>- and <i>y</i>- direction. Using <code>np.dot</code>, we can then compute the gradient magnitude as follows:
+</p>
+<div align="center">
+<img src="images/noblurnoclip.png" alt="noblurnoclip.png" width="50%">
+</div>
+<p>
+Although the edges are visible, it's not clear, especially in the magnitude image. This is because when convolving an image with channel values in the range [0, 255], the resulting image will have a range of [-255, 255], so normalizing the image directly makes the overall image darker. To reduce the noise of the non-edge pixels, we can set a limit for each channel value before normalizing. Using a threshold of 25% from both sides, we get the following result:
+</p>
+<div align="center">
+<img src="images/noblur.png" alt="noblur.png" width="50%">
+</div>
+<p>
+From the image above, the edges in the gradient magnitude image are brighter and more distinct.
+</p>
+
+</article>
+
+<!-- 1.3 -->
+<article id="part1-3">
+<h3>Part 1.3: Derivative of Gaussian (DoG) Filter</h3>
+<p>
+To further improve edge visibility, we can first smooth out the noise by convolving the original image with a Gaussian filter. To generate one with dimensions <i>n &times; n</i>, we can take the outer product of 2 length <i>n</i> arrays. Below is the result of blurring the original image using a 5 &times; 5 Gaussian filter:
+</p>
+<div align="center">
+<img src="images/orggauss.png" alt="orggauss.png" width="50%">
+</div>
+<p>
+Applying the same edge detection process above, we get:
+</p>
+<div align="center">
+<img src="images/blurclip.png" alt="blurclip.png" width="50%">
+</div>
+<p>
+To illustrate the improvements, below is a side-by-side comparison of the edge magnitudes for each of the 3 methods, in row-major order from least to most clarity:
+</p>
+<div align="center">
+<img src="images/gradmag.png" alt="gradmag.png" width="50%">
+</div>
+<p>
+Instead of applying 2 convolutions to the image, we can take advantage of the fact that convolution is commutative, and first convolve the Gaussian with <i>D<sub>x</sub></i> and <i>D<sub>y</sub></i>, then convolve the image with the resulting kernel. This optimizes the computation by only convolving with the image once. Below are the respective results:
+</p>
+<div align="center">
+<img src="images/twovsone.png" alt="twovsone.png" width="50%">
+</div>
+</article>
+</section>
+
+<!-- ======================== -->
+<!-- Part 2: Applications -->
+<!-- ======================== -->
+<section id="part2">
+<h2>Part 2: Applications</h2>
+
+<!-- 2.1 -->
+<article id="part2-1">
+<h3>Part 2.1: Image "Sharpening"</h3>
+<p>
+Using convolution, we can also sharpen a blurry image with a similar technique. Since a Gaussian filter removes the highest frequencies in a signal, subtracting the filtered image from the original would leave all of the highest frequencies from the base image. We can then add this difference to the original to highlight the highest frequencies of the image, then clip it to [0, 255] to preserve brightness. Using the following Taj Mahal image:
+</p>
+<div align="center">
+<img src="images/taj.jpg" alt="taj.jpg" width="50%">
+</div>
+<p>
+We can obtain the blurred and high-pass filtered versions of this image as follows:
+</p>
+<div align="center">
+<img src="images/lpvshp.png" alt="lpvshp.png" width="50%">
+</div>
+<p>
+Now, we can add the second image to the original to get a sharpened version:
+<div align="center">
+<img src="images/orgsharp.png" alt="orgsharp.png" width="50%">
+</div>
+<p>
+In general, we can change the sharpening amount by multiplying the high-pass filtered image by a constant. Below is a demonstration of various sharpening amounts from 1 to 100:
+</p>
+<div align="center">
+<img src="onetotensquared.png" alt="onetotensquared.png" width="50%">
+</div>
+<p>
+From the visualization above, increasing the sharpening amount highlights the high-frequency signals from the original image. Below is an example of sharpening a blurred image, using the same selfie from 1.1 as the original image, and the box-filtered version as the starting image to sharpen:
+</p>
+<div align="center">
+<img src="images/blurthensharp.png" alt="blurthensharp.png" width="50%">
+</div>
+</article>
+
+<!-- 2.2 -->
+<article id="part2-2">
+<h3>Part 2.2. Hybrid Images</h3>
+<p>
+<strong>Goal:</strong> Create three hybrid images (including Derek + Nutmeg and two others). For one hybrid, show the full pipeline; for the others, show originals and final hybrid only.
+</p>
+<h4>Full Pipeline Hybrid (Detailed)</h4>
+<figure>
+<img src="images/hybrid1_originalA.png" alt="Original A (aligned)" />
+<figcaption>Original A (aligned).</figcaption>
+</figure>
+<figure>
+<img src="images/hybrid1_originalB.png" alt="Original B (aligned)" />
+<figcaption>Original B (aligned).</figcaption>
+</figure>
+<figure>
+<img src="images/hybrid1_fftA.png" alt="Fourier transform of A" />
+<figcaption>Fourier transform (A).</figcaption>
+</figure>
+<figure>
+<img src="images/hybrid1_fftB.png" alt="Fourier transform of B" />
+<figcaption>Fourier transform (B).</figcaption>
+</figure>
+<figure>
+<img src="images/hybrid1_filteredA.png" alt="Filtered A" />
+<figcaption>Filtered result (A).</figcaption>
+</figure>
+<figure>
+<img src="images/hybrid1_filteredB.png" alt="Filtered B" />
+<figcaption>Filtered result (B).</figcaption>
+</figure>
+<figure>
+<img src="images/hybrid1_cutoff.png" alt="Cutoff frequency visualization/justification" />
+<figcaption>Cutoff frequency choice and justification.</figcaption>
+</figure>
+<figure>
+<img src="images/hybrid1_final.png" alt="Final hybrid image" />
+<figcaption>Final hybrid image (detailed pipeline).</figcaption>
+</figure>
+
+<h4>Additional Hybrids (Brief)</h4>
+<figure>
+<img src="images/hybrid2_originals.png" alt="Originals for Hybrid 2" />
+<figcaption>Original images for Hybrid 2.</figcaption>
+</figure>
+<figure>
+<img src="images/hybrid2_final.png" alt="Hybrid 2 final" />
+<figcaption>Hybrid 2 — final result.</figcaption>
+</figure>
+<figure>
+<img src="images/hybrid3_originals.png" alt="Originals for Hybrid 3" />
+<figcaption>Original images for Hybrid 3.</figcaption>
+</figure>
+<figure>
+<img src="images/hybrid3_final.png" alt="Hybrid 3 final" />
+<figcaption>Hybrid 3 — final result.</figcaption>
+</figure>
+</article>
+
+<!-- 2.3 + 2.4 -->
+<article id="part2-3">
+<h3>Part 2.3 &amp; 2.4. Gaussian/Laplacian Stacks; Figure 3.42(a–l); Custom Blends</h3>
+<p>
+<strong>Goal:</strong> Visualize Gaussian and Laplacian stacks for the Orange + Apple images, recreate outcomes similar to Figure 3.42(a)–(l), and include two custom blends (one with an irregular mask).
+</p>
+<h4>Gaussian &amp; Laplacian Stacks (Orange + Apple)</h4>
+<figure>
+<img src="images/orapple_gaussian_stack.png" alt="Gaussian stack visualization" />
+<figcaption>Gaussian stack visualization (Orange + Apple).</figcaption>
+</figure>
+<figure>
+<img src="images/orapple_laplacian_stack.png" alt="Laplacian stack visualization" />
+<figcaption>Laplacian stack visualization (Orange + Apple).</figcaption>
+</figure>
+<h4>Recreated Figure 3.42(a–l)</h4>
+<figure>
+<img src="images/figure342_grid.png" alt="Grid of results analogous to Fig. 3.42(a–l)" />
+<figcaption>Outcomes analogous to Figure 3.42(a–l).</figcaption>
+</figure>
+<h4>Custom Blended Images</h4>
+<figure>
+<img src="images/custom_blend1.png" alt="Custom blended image with irregular mask" />
+<figcaption>Custom blend #1 (irregular mask).</figcaption>
+</figure>
+<figure>
+<img src="images/custom_blend2.png" alt="Custom blended image (straight mask)" />
+<figcaption>Custom blend #2.</figcaption>
+</figure>
+<p><strong>Notes &amp; Discussion:</strong> [Describe masks, blending levels, feathering choices, and artifacts.]</p>
+</article>
+</section>
+</main>
+
+<footer>
+<p><strong>References:</strong> [List any papers, libraries, and datasets used.]</p>
+</footer>
 </body>
 </html>
