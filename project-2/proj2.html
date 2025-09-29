@@ -132,13 +132,13 @@ Instead of applying 2 convolutions to the image, we can take advantage of the fa
 <article id="part2-1">
 <h3>Part 2.1. Unsharp Mask</h3>
 <p>
-Using convolution, we can also sharpen a blurry image with similar technique. Recall that a Gaussian filter removes the highest frequencies in a signal. This means that subtracting the filtered image from the original would leave all of the highest frequencies from the base image. We can then add this difference to the original to highlight the highest frequencies of the image, then clip it to [0, 255] to preserve brightness. Using the following Taj Mahal image:
+Using convolution, we can also sharpen a blurry image with a similar technique. Since a Gaussian filter removes the highest frequencies in a signal, subtracting the filtered image from the original would leave all of the highest frequencies from the base image. We can then add this difference to the original to highlight the highest frequencies of the image, then clip it to [0, 255] to preserve brightness. Using the following Taj Mahal image:
 </p>
 <div align="center">
 <img src="images/taj.jpg" alt="taj.jpg" width="50%">
 </div>
 <p>
-We can obtain the blurred and high frequency versions of this image as follows:
+We can obtain the blurred and high-pass filtered versions of this image as follows:
 </p>
 <div align="center">
 <img src="images/lpvshp.png" alt="lpvshp.png" width="50%">
@@ -149,13 +149,13 @@ Now, we can add the second image to the original to get a sharpened version:
 <img src="images/orgsharp.png" alt="orgsharp.png" width="50%">
 </div>
 <p>
-In general, we can change the sharpening amount my multiplying the high-pass filtered image by a constant. Below is a demonstration of various sharpening amounts from 1 to 100:
+In general, we can change the sharpening amount by multiplying the high-pass filtered image by a constant. Below is a demonstration of various sharpening amounts from 1 to 100:
 </p>
 <div align="center">
 <img src="onetotensquared.png" alt="onetotensquared.png" width="50%">
 </div>
 <p>
-From the visualizatin above, increasing the sharpening amount highlights the high-frequency signals from the original image. Below is an example of sharpening a blurred image, using the same selfie from 1.1 as the original image, and the box-filtered version as the starting image to sharpen:
+From the visualization above, increasing the sharpening amount highlights the high-frequency signals from the original image. Below is an example of sharpening a blurred image, using the same selfie from 1.1 as the original image, and the box-filtered version as the starting image to sharpen:
 </p>
 <div align="center">
 <img src="images/blurthensharp.png" alt="blurthensharp.png" width="50%">
