@@ -9,9 +9,11 @@
 <body>
 <header>
 <h1>Project 2: Fun with Filters and Frequencies</h1>
-<p><strong>Author:</strong> Your Name</p>
-<p><strong>Date:</strong> YYYY-MM-DD</p>
-<p><strong>Course/Assignment:</strong> Course Name — Project/Report Title</p>
+<div align="center">
+<p>
+by Daniel Cheng | September 29, 2025
+</p>
+</div>
 </header>
 
 <main>
@@ -130,7 +132,7 @@ Instead of applying 2 convolutions to the image, we can take advantage of the fa
 
 <!-- 2.1 -->
 <article id="part2-1">
-<h3>Part 2.1. Unsharp Mask</h3>
+<h3>Part 2.1: Image "Sharpening"</h3>
 <p>
 Using convolution, we can also sharpen a blurry image with a similar technique. Since a Gaussian filter removes the highest frequencies in a signal, subtracting the filtered image from the original would leave all of the highest frequencies from the base image. We can then add this difference to the original to highlight the highest frequencies of the image, then clip it to [0, 255] to preserve brightness. Using the following Taj Mahal image:
 </p>
