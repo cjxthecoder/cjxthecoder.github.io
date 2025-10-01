@@ -177,7 +177,39 @@ A <strong>hybrid image</strong> is when 2 images, one under a low-pass filter an
 <div align="center">
 <img src="images/lowhigh.png" alt="lowhigh.png" width="50%">
 </div>
-To find the optimal &sigma; for each image to create the Gaussian & impulse filter with, a good starting point
+<p>
+To find the optimal &sigma; for each image to create the Gaussian & impulse filter with, a good starting point through experiementation is 2% times the shorter of the width and height of the LPF image, and 1% for the HPF image. In the example above, the optimal percentages were found to be 3% and 1% for the low and high frequency image:
+</p>
+<div align="center">
+<img src="images/lpfhpf.png" alt="lpfhpf.png" width="50%">
+</div>
+<p>
+Below is a visualization displaying the log magnitude of the Fourier Tranform of the starting and the filtered images:
+</p>
+<div align="center">
+<img src="images/fourier.png" alt="fourier.png" width="50%">
+</div>
+<p>
+After aligning an combining the LPF and HPF images, we get the final result below:
+</p>
+<div align="center">
+<img src="images/hybrid1.png" alt="hybrid1.png" width="50%">
+</div>
+<p>
+This effect can also be used on any 2 images that are aligned, like the following examples:
+</p>
+<div align="center">
+<img src="images/odettefloryn.png" alt="odettefloryn.png" width="50%">
+</div>
+<div align="center">
+<img src="images/hybrid2.png" alt="hybrid2.png" width="50%">
+</div>
+<div align="center">
+<img src="images/yinlukas.png" alt="yinlukas.png" width="50%">
+</div>
+<div align="center">
+<img src="images/hybrid3.png" alt="hybrid3.png" width="50%">
+</div>
 <!-- 2.3 + 2.4 -->
 <article id="part2-3">
 <h3>Part 2.3 &amp; 2.4. Gaussian/Laplacian Stacks; Figure 3.42(a–l); Custom Blends</h3>
