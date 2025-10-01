@@ -170,63 +170,14 @@ From the visualization above, increasing the sharpening amount highlights the hi
 
 <!-- 2.2 -->
 <article id="part2-2">
-<h3>Part 2.2. Hybrid Images</h3>
+<h3>Part 2.2: Hybrid Images</h3>
 <p>
-<strong>Goal:</strong> Create three hybrid images (including Derek + Nutmeg and two others). For one hybrid, show the full pipeline; for the others, show originals and final hybrid only.
+A <strong>hybrid image</strong> is when 2 images, one under a low-pass filter and the other a high-pass filter, are blended to create an illusion where one sees mostly the high-frequency image at a close distance, but only the low-frequency image at a longer distance. This occurs because our vision has a limited spatial frequency resolution, so higher frequencies fall outside of the frequencies visible at a sufficiently far distance. Below is an example of 2 images that we can align and create a hybrid effect:
 </p>
-<h4>Full Pipeline Hybrid (Detailed)</h4>
-<figure>
-<img src="images/hybrid1_originalA.png" alt="Original A (aligned)" />
-<figcaption>Original A (aligned).</figcaption>
-</figure>
-<figure>
-<img src="images/hybrid1_originalB.png" alt="Original B (aligned)" />
-<figcaption>Original B (aligned).</figcaption>
-</figure>
-<figure>
-<img src="images/hybrid1_fftA.png" alt="Fourier transform of A" />
-<figcaption>Fourier transform (A).</figcaption>
-</figure>
-<figure>
-<img src="images/hybrid1_fftB.png" alt="Fourier transform of B" />
-<figcaption>Fourier transform (B).</figcaption>
-</figure>
-<figure>
-<img src="images/hybrid1_filteredA.png" alt="Filtered A" />
-<figcaption>Filtered result (A).</figcaption>
-</figure>
-<figure>
-<img src="images/hybrid1_filteredB.png" alt="Filtered B" />
-<figcaption>Filtered result (B).</figcaption>
-</figure>
-<figure>
-<img src="images/hybrid1_cutoff.png" alt="Cutoff frequency visualization/justification" />
-<figcaption>Cutoff frequency choice and justification.</figcaption>
-</figure>
-<figure>
-<img src="images/hybrid1_final.png" alt="Final hybrid image" />
-<figcaption>Final hybrid image (detailed pipeline).</figcaption>
-</figure>
-
-<h4>Additional Hybrids (Brief)</h4>
-<figure>
-<img src="images/hybrid2_originals.png" alt="Originals for Hybrid 2" />
-<figcaption>Original images for Hybrid 2.</figcaption>
-</figure>
-<figure>
-<img src="images/hybrid2_final.png" alt="Hybrid 2 final" />
-<figcaption>Hybrid 2 — final result.</figcaption>
-</figure>
-<figure>
-<img src="images/hybrid3_originals.png" alt="Originals for Hybrid 3" />
-<figcaption>Original images for Hybrid 3.</figcaption>
-</figure>
-<figure>
-<img src="images/hybrid3_final.png" alt="Hybrid 3 final" />
-<figcaption>Hybrid 3 — final result.</figcaption>
-</figure>
-</article>
-
+<div align="center">
+<img src="images/lowhigh.png" alt="lowhigh.png" width="50%">
+</div>
+To find the optimal &sigma; for each image to create the Gaussian & impulse filter with, a good starting point
 <!-- 2.3 + 2.4 -->
 <article id="part2-3">
 <h3>Part 2.3 &amp; 2.4. Gaussian/Laplacian Stacks; Figure 3.42(a–l); Custom Blends</h3>
