@@ -249,8 +249,12 @@ This effect can also be used on any 2 images that are aligned, like the followin
 <article id="part2-3">
 <h3>Part 2.3 &amp; 2.4: Multiresolution Blending</h3>
 <p>
-To blend 2 images, we can first start by creating a Gaussian/Laplacian stack, where at
+To blend 2 images, we can first start by creating a Gaussian/Laplacian stack. This is similar to a Gaussian stack, except that at each level, we don't need to downsample. The easiest way to achieve this is to have a function that takes in an array of images, and for each level, append one image to a list and recurse on the last (latest added) element of the list. In the end, a 3D (4D if using RGB images) array will be returned that is a collection of all the images in the stack:
 </p>
+<div align="center">
+<img src="images/appleorangestack.png" alt="appleorangestack.png" width="50%">
+<figcaption style="margin-bottom:6px;">(T-B): Gaussian stack for apple, Laplacian stack for apple, Gaussian stack for orange, Laplacian stack for orange.</figcaption>
+</div>
 </article>
 </section>
 </main>
