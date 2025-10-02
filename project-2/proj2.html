@@ -50,7 +50,7 @@ where <code>ffker</code> is the <i>xy</i>-flipped kernel and <code>result</code>
 </div>
 
 <p>
-To demonstrate an application of convolution, we can convolve an image with the <strong>box filter</strong>, a kernel with entries that sum to 1 that contains only 1 unique value. We can also convolve with the difference operators <img src="images/diff_op.png" alt="diff_op.png" width="50%"> for edge detection. Each kernel computes the difference in the <i>x</i>- or <i>y</i>-direction, so edges where the brightness of the pixel changes significantly will show up as white and black pixels on the output. Using <code>box_9x9</code> = <i>J<sub>9</sub> / 9<sup>2</sup></i> as the box filter, we get the following results:
+To demonstrate an application of convolution, we can convolve an image with the <strong>box filter</strong>, a kernel with entries that sum to 1 that contains only 1 unique value. We can also convolve with the difference operators <img src="images/diff_op.png" alt="diff_op.png" width="25%"> for edge detection. Each kernel computes the difference in the <i>x</i>- or <i>y</i>-direction, so edges where the brightness of the pixel changes significantly will show up as white and black pixels on the output. Using <code>box_9x9</code> = <i>J<sub>9</sub> / 9<sup>2</sup></i> as the box filter, we get the following results:
 </p>
 
 <div align="center">
