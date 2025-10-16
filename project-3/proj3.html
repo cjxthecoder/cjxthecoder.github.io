@@ -47,164 +47,41 @@ To combine the images above, we can perform a projective transformation on one o
 <div style="display:flex; flex-wrap:wrap; justify-content:center; text-align:center;">
 
 <figure style="flex: 1 0 20%; margin:12px;">
-<figcaption style="margin-bottom:6px;">Original</figcaption>
-<img src="images/img_right.jpg" alt="img_right.jpg" width="50%">
+<figcaption style="margin-bottom:6px;">Center (destination) image</figcaption>
+<img src="images/img_center.jpg" alt="img_center.jpg" width="50%">
 </figure>
 
 <figure style="flex: 1 0 20%; margin:12px;">
-<figcaption style="margin-bottom:6px;">Transformed</figcaption>
-<img src="images/churchCrop.jpg" alt="churchCrop.jpg" width="50%">
+<figcaption style="margin-bottom:6px;">Right (source) image</figcaption>
+<img src="images/img_right.jpg" alt="img_right.jpg" width="50%">
 </figure>
 </div>
+
+<p>
+Using the points
+</p>
+
+<pre><code>
+xy1, xy2, xy3, xy4, uv1, uv2, uv3, uv4 = (
+    (303.4064, 446.3877),
+    (449.93048, 419.11496),
+    (447.79144, 660.29144),
+    (322.123, 702.5374),
+    (689.78, 411.4477),
+    (851.77454, 410.35315),
+    (802.5195, 661.00684),
+    (665.69977, 661.00684)
+)
+</code></pre>
+
+we can obtain the system of equations
+
 
 <h3>Part 3</h3>
 <p>
 Given the following image:
+</p>
 
-
-</article>
-<hr>
-
-<!-- 1.3 -->
-<article id="part1-3">
-<h3>Part 1.3: Derivative of Gaussian (DoG) Filter</h3>
-<p>
-To further improve edge visibility, we can first smooth out the noise by convolving the original image with a Gaussian filter. To generate one with dimensions <i>n &times; n</i>, we can take the outer product of 2 length <i>n</i> arrays. Below is the result of blurring the original image using a 5 &times; 5 Gaussian filter with &sigma; = 1:
-</p>
-<div align="center">
-<img src="images/orggaussblur.png" alt="orggauss.png" width="50%">
-</div>
-<p>
-Applying the same edge detection process above, we get:
-</p>
-<div align="center">
-<img src="images/blurclip.png" alt="blurclip.png" width="50%">
-</div>
-<p>
-To illustrate the improvements, below is a side-by-side comparison of the edge magnitudes for each of the 3 methods, in row-major order from least to most clarity:
-</p>
-<div align="center">
-<img src="images/gradmag.png" alt="gradmag.png" width="50%">
-</div>
-<p>
-Instead of applying 2 convolutions to the image, we can take advantage of the fact that convolution is commutative, and first convolve the Gaussian with <i>D<sub>x</sub></i> and <i>D<sub>y</sub></i>, then convolve the image with the resulting kernel. This optimizes the computation by only convolving with the image once. Below are the respective results:
-</p>
-<div align="center">
-<img src="images/twovsone.png" alt="twovsone.png" width="50%">
-</div>
-</article>
-</section>
-<hr>
-
-<!-- ======================== -->
-<!-- Part 2: Applications -->
-<!-- ======================== -->
-<section id="part2">
-<h2>Part 2: Applications</h2>
-
-<!-- 2.1 -->
-<article id="part2-1">
-<h3>Part 2.1: Image "Sharpening"</h3>
-<p>
-Using convolution, we can also sharpen a blurry image with a similar technique. Since a Gaussian filter removes the highest frequencies in a signal, subtracting the filtered image from the original would leave all of the highest frequencies from the base image. We can then add this difference to the original to highlight the highest frequencies of the image, then clip it to [0, 255] to preserve brightness. Using the following Taj Mahal image:
-</p>
-<div align="center">
-<img src="images/taj.jpg" alt="taj.jpg" width="50%">
-</div>
-<p>
-We can obtain the blurred and high-pass filtered versions of this image as follows:
-</p>
-<div align="center">
-<img src="images/lpvshp.png" alt="lpvshp.png" width="50%">
-</div>
-<p>
-Now, we can add the second image to the original to get a sharpened version:
-<div align="center">
-<img src="images/orgsharp.png" alt="orgsharp.png" width="50%">
-</div>
-<p>
-In general, we can change the sharpening amount by multiplying the high-pass filtered image by a constant. Below is a demonstration of various sharpening amounts from 1 to 100:
-</p>
-<div align="center">
-<img src="onetotensquared.png" alt="onetotensquared.png" width="50%">
-</div>
-<p>
-From the visualization above, increasing the sharpening amount highlights the high-frequency signals from the original image. Below is an example of sharpening a blurred image, using the same selfie from 1.1 as the original image, and the box-filtered version as the starting image to sharpen:
-</p>
-<div align="center">
-<img src="images/blurthensharp.png" alt="blurthensharp.png" width="50%">
-</div>
-</article>
-<hr>
-
-<!-- 2.2 -->
-<article id="part2-2">
-<h3>Part 2.2: Hybrid Images</h3>
-<p>
-A <strong>hybrid image</strong> is when 2 images, one under a low-pass filter and the other a high-pass filter, are blended to create an illusion where one sees mostly the high-frequency image at a close distance, but only the low-frequency image at a longer distance. This occurs because our vision has a limited spatial frequency resolution, so higher frequencies fall outside of the frequencies visible at a sufficiently far distance. Below is an example of 2 images that we can align and create a hybrid effect:
-</p>
-<div align="center">
-<img src="images/lowhigh.png" alt="lowhigh.png" width="50%">
-</div>
-<p>
-To find the optimal &sigma; for each image to create the Gaussian & impulse filter with, a good starting point through experimentation is 1.8-3% times the shorter of the width and height of the LPF image, and 0.6-1.5% for the HPF image. In the example above, a cutoff percentage of 3% and 1% was used:
-</p>
-<div align="center">
-<img src="images/lpfhpf.png" alt="lpfhpf.png" width="50%">
-</div>
-<p>
-Below is a visualization displaying the log magnitude of the Fourier Transform of the starting and the filtered images:
-</p>
-<div align="center">
-<img src="images/fourier.png" alt="fourier.png" width="50%">
-</div>
-<p>
-After aligning and combining the LPF and HPF images, we get the final result below:
-</p>
-<div align="center">
-<img src="images/hybrid1.png" alt="hybrid1.png" width="50%">
-<figcaption style="margin-bottom:6px;">Cutoffs used: &sigma;<sub>1, 2</sub> = (21.96, 10.56) [732 &times; 1024, 1408 &times; 1056]</figcaption>
-</div>
-<p>
-This effect can also be used on any 2 images that are aligned, like the following examples, which use a frequency cutoff of 2% and 0.8% times the shorter side:
-</p>
-<div align="center">
-<img src="images/lowhigh2.png" alt="lowhigh2.png" width="50%">
-<figcaption style="margin-bottom:6px;">Source: <a href="https://mobile-legends.fandom.com/wiki/Odette?file=Odette_%28Wisdom_of_the_Stars%29.jpg"><sup>[1]</sup></a> | <a href="https://mobile-legends.fandom.com/wiki/Floryn?file=Floryn_%28Melody_of_Light%29.jpg"><sup>[2]</sup></a></figcaption>
-</div>
-<div align="center">
-<img src="images/hybrid2.png" alt="hybrid2.png" width="50%">
-<figcaption style="margin-bottom:6px;">Cutoffs used: &sigma;<sub>1, 2</sub> = (7.44, 2.976) [372 &times; 372]</figcaption>
-</div>
-<div align="center">
-<img src="images/lowhigh3.png" alt="lowhigh3.png" width="50%">
-<figcaption style="margin-bottom:6px;">Source: <a href="https://mobile-legends.fandom.com/wiki/Lesley?file=Lesley_%28Angelic_Agent%29.jpg"><sup>[3]</sup></a></figcaption>
-</div>
-<div align="center">
-<img src="images/hybrid3.png" alt="hybrid3.png" width="50%">
-<figcaption style="margin-bottom:6px;">Cutoffs used: &sigma;<sub>1, 2</sub> = (9.6, 3.84) [480 &times; 720]</figcaption>
-</div>
-</article>
-<hr>
-
-<!-- 2.3 + 2.4 -->
-<article id="part2-3">
-<h3>Part 2.3 &amp; 2.4: Multiresolution Blending</h3>
-<p>
-To blend 2 images, we can first start by creating a Gaussian/Laplacian stack. This is similar to a Gaussian stack, except that at each level, we don't need to downsample. The easiest way to achieve this is to have a function that takes in an array of images, and for each level, append one image to a list and recurse on the last (latest added) element of the list. In the end, a 3D (4D if using RGB images) array will be returned that is a collection of all the images in the stack:
-</p>
-<div align="center">
-<img src="images/appleorangestack.png" alt="appleorangestack.png" width="50%">
-<figcaption style="margin-bottom:6px;">(T-B): Gaussian stack for apple, Laplacian stack for apple, Gaussian stack for orange, Laplacian stack for orange.</figcaption>
-</div>
-</article>
-</section>
 </main>
-<hr>
-
-<div align="center">
-<a href="https://cjxthecoder.github.io">cjxthecoder</a> | <a href="https://github.com/cjxthecoder">GitHub</a> | <a href="https://www.linkedin.com/in/daniel-cheng-71b475279">LinkedIn</a>
-</div>
-
 </body>
 </html>
