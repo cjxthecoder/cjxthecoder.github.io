@@ -74,8 +74,22 @@ xy1, xy2, xy3, xy4, uv1, uv2, uv3, uv4 = (
 )
 </code></pre>
 
+<p>
 we can obtain the system of equations
+</p>
+<div align="center">
+<img src="images/equation.png" alt="equation.png" width="50%">
+</div>
+<p>
+which produces the homography matrix
+</p>
+<pre><code>
+[[ 5.07543229e-01 -9.06493462e-02  4.94054627e+02]
+ [-5.71786088e-02  8.91384807e-01 -1.81376979e+01]
+ [-5.12480937e-04  8.13734006e-05  1.00000000e+00]]
+</code></pre>
 
+This will allow us to wrap the right image such that the window above will match the one in the center image.
 
 <h3>Part 3</h3>
 <p>
