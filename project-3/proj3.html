@@ -24,15 +24,15 @@ Below are 2 examples of set images that we can wrap to form a larger combined im
 
 <div style="display:flex; flex-wrap:wrap; justify-content:center; text-align:center;">
 
-<figure style="flex: 1 0 20%; margin:12px;">
+<figure style="flex: 1 0 30%; margin:12px;">
 <img src="images/img_left.png" alt="img_left.png" width="50%">
 </figure>
 
-<figure style="flex: 1 0 20%; margin:12px;">
+<figure style="flex: 1 0 30%; margin:12px;">
 <img src="images/img_center.png" alt="img_center.png" width="50%">
 </figure>
 
-<figure style="flex: 1 0 20%; margin:12px;">
+<figure style="flex: 1 0 30%; margin:12px;">
 <img src="images/img_right.png" alt="img_right.png" width="50%">
 </figure>
 </div>
@@ -46,14 +46,14 @@ To combine the images above, we can perform a projective transformation on one o
 
 <div style="display:flex; flex-wrap:wrap; justify-content:center; text-align:center;">
 
-<figure style="flex: 1 0 20%; margin:12px;">
+<figure style="flex: 1 0 40%; margin:12px;">
 <figcaption style="margin-bottom:6px;">Center (destination) image</figcaption>
-<img src="images/img_center.jpg" alt="img_center.jpg" width="50%">
+<img src="images/img_center.png" alt="img_center.png" width="50%">
 </figure>
 
-<figure style="flex: 1 0 20%; margin:12px;">
+<figure style="flex: 1 0 40%; margin:12px;">
 <figcaption style="margin-bottom:6px;">Right (source) image</figcaption>
-<img src="images/img_right.jpg" alt="img_right.jpg" width="50%">
+<img src="images/img_right.png" alt="img_right.png" width="50%">
 </figure>
 </div>
 
@@ -108,19 +108,19 @@ To compute the bounds of where to take inverse mapping from, we can transform th
 
 <div style="display:flex; flex-wrap:wrap; justify-content:center; text-align:center;">
 
-<figure style="flex: 1 0 20%; margin:12px;">
+<figure style="flex: 1 0 40%; margin:12px;">
 <figcaption style="margin-bottom:6px;">Transformed using NN Interpolation</figcaption>
 <img src="images/imwraped_nearestneighborR.jpg" alt="imwraped_nearestneighborR.jpg" width="50%">
 </figure>
 
-<figure style="flex: 1 0 20%; margin:12px;">
+<figure style="flex: 1 0 40%; margin:12px;">
 <figcaption style="margin-bottom:6px;">Transformed using Bilinear Interpolation</figcaption>
 <img src="images/imwraped_bilinearR.jpg" alt="imwraped_bilinearR.jpg" width="50%">
 </figure>
 </div>
 
 <p>
-From the above, we can see that the Nearest Neighbor method introduces jagged edges due to only sampling from exact pixel values, while the Bilinear method produces a more smooth image.
+From the above, we can see that the Nearest Neighbor method introduces jagged edges due to only sampling from exact pixel values, while the Bilinear method produces a smoother image.
 </p>
 
 <p>
@@ -129,12 +129,12 @@ We can also perform image rectification using this tool by transforming a non-re
 
 <div style="display:flex; flex-wrap:wrap; justify-content:center; text-align:center;">
 
-<figure style="flex: 1 0 20%; margin:12px;">
+<figure style="flex: 1 0 40%; margin:12px;">
 <figcaption style="margin-bottom:6px;">Original</figcaption>
 <img src="images/evacuationplan.png" alt="evacuationplan.png" width="50%">
 </figure>
 
-<figure style="flex: 1 0 20%; margin:12px;">
+<figure style="flex: 1 0 40%; margin:12px;">
 <figcaption style="margin-bottom:6px;">Rectified</figcaption>
 <img src="images/ep_rectif.jpg" alt="ep_rectif.jpg" width="50%">
 </figure>
@@ -142,12 +142,12 @@ We can also perform image rectification using this tool by transforming a non-re
 
 <div style="display:flex; flex-wrap:wrap; justify-content:center; text-align:center;">
 
-<figure style="flex: 1 0 20%; margin:12px;">
+<figure style="flex: 1 0 40%; margin:12px;">
 <figcaption style="margin-bottom:6px;">Original</figcaption>
 <img src="images/cs170.png" alt="cs170.png" width="50%">
 </figure>
 
-<figure style="flex: 1 0 20%; margin:12px;">
+<figure style="flex: 1 0 40%; margin:12px;">
 <figcaption style="margin-bottom:6px;">Rectified</figcaption>
 <img src="images/cs170_rectif.jpg" alt="cs170_rectif.jpg" width="50%">
 </figure>
