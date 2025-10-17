@@ -10,7 +10,7 @@
 <h1>Project 3A: Image Wrapping and Mosaicing</h1>
 <div align="center">
 <p>
-by Author | Current Date
+by Daniel Cheng | October 16, 2025
 </p>
 </div>
 </header>
@@ -36,6 +36,7 @@ Below are 2 examples of set images that we can wrap to form a larger combined im
 <img src="images/img_right.png" alt="img_right.png" width="50%">
 </figure>
 </div>
+<hr>
 
 <h3>Part 2</h3>
 
@@ -88,13 +89,16 @@ which produces the homography matrix
  [-5.12480937e-04  8.13734006e-05  1.00000000e+00]]
 </code></pre>
 
+<p>
 This will allow us to wrap the right image such that the window above will match the one in the center image.
+</p>
+<hr>
 
 <h3>Part 3</h3>
 <p>
 With our homography matrix <i>H</i>, we can theoretically directly map the source image to the destination. However, the mapped pixels would not be all integers, which would result in pixels that are not mapped. TO solve this issue, we can use inverse mapping, by first starting with a destination pixel as a vector in the form [<i>u</i>, <i>v</i>, 1]<sup>T</sup> and multiplying the inverse <i>H<sup>-1</sup></i> to obtain the pixel from the source image that should be mapped to the destination pixel, and use 2 methods for computing the color of the pixel from the source: Nearest Neighbor and Bilinear Interpolation.<br>
 <br>
-To compute the bounds of where to take inverse mapping from, we can transform the coordinates (-0.5, -0.5), (<i>W</i> - 0.5, -0.5), (<i>W</i>, <i>H</i>), and (-0.5, <i>H</i> - 0.5), and round the result to the closest number in &#8484; + 0.5, which is equivalent to casting the result to an integer, since we only need the integer coordinates. Below is a comparison of the 2 methods.
+To compute the bounds of where to take inverse mapping from, we can transform the coordinates (-0.5, -0.5), (<i>W</i> - 0.5, -0.5), (<i>W</i>, <i>H</i>), and (-0.5, <i>H</i> - 0.5) to provide an upper bound of the transfromed image. We can then round the result to the closest number in &#8484; + 0.5, which is equivalent to casting the result to an integer, since we only need the integer coordinates. Below is a comparison of the 2 methods.
 </p>
 
 <div align="center">
@@ -114,6 +118,10 @@ To compute the bounds of where to take inverse mapping from, we can transform th
 <img src="images/imwraped_bilinearR.jpg" alt="imwraped_bilinearR.jpg" width="50%">
 </figure>
 </div>
+
+<p>
+From the above, we can see that the Nearest Neighbor method introduces jagged edges due to only sampling from exact pixel values, while the Bilinear method produces a more smooth image.
+</p>
 
 <p>
 We can also perform image rectification using this tool by transforming a non-rectangular region into a rectangular one. Because we only care about the pixels in the selected region, we can precompute the final dimensions of the rectangle and only perform inverse mapping on the given region. Below are 2 examples of rectifying an image:
@@ -143,6 +151,11 @@ We can also perform image rectification using this tool by transforming a non-re
 <figcaption style="margin-bottom:6px;">Rectified</figcaption>
 <img src="images/cs170_rectif.jpg" alt="cs170_rectif.jpg" width="50%">
 </figure>
+</div>
+<hr>
+
+<div align="center">
+<a href="https://cjxthecoder.github.io">cjxthecoder</a> | <a href="https://github.com/cjxthecoder">GitHub</a> | <a href="https://www.linkedin.com/in/daniel-cheng-71b475279">LinkedIn</a>
 </div>
 
 </main>
