@@ -3,15 +3,14 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Image Processing Report</title>
-<!-- Plain HTML template (no CSS). Replace placeholder text and image sources. -->
+<title>CS 180 Project 3A</title>
 </head>
 <body>
 <header>
 <h1>Project 3A: Image Wrapping and Mosaicing</h1>
 <div align="center">
 <p>
-by Daniel Cheng | October 1, 2025
+by Author | Current Date
 </p>
 </div>
 </header>
@@ -93,8 +92,58 @@ This will allow us to wrap the right image such that the window above will match
 
 <h3>Part 3</h3>
 <p>
-Given the following image:
+With our homography matrix <i>H</i>, we can theoretically directly map the source image to the destination. However, the mapped pixels would not be all integers, which would result in pixels that are not mapped. TO solve this issue, we can use inverse mapping, by first starting with a destination pixel as a vector in the form [<i>u</i>, <i>v</i>, 1]<sup>T</sup> and multiplying the inverse <i>H<sup>-1</sup></i> to obtain the pixel from the source image that should be mapped to the destination pixel, and use 2 methods for computing the color of the pixel from the source: Nearest Neighbor and Bilinear Interpolation.<br>
+<br>
+To compute the bounds of where to take inverse mapping from, we can transform the coordinates (-0.5, -0.5), (<i>W</i> - 0.5, -0.5), (<i>W</i>, <i>H</i>), and (-0.5, <i>H</i> - 0.5), and round the result to the closest number in &#8484; + 0.5, which is equivalent to casting the result to an integer, since we only need the integer coordinates. Below is a comparison of the 2 methods.
 </p>
+
+<div align="center">
+<figcaption style="margin-bottom:6px;">Original</figcaption>
+<img src="images/img_right.png" alt="img_right.png" width="50%">
+</div>
+
+<div style="display:flex; flex-wrap:wrap; justify-content:center; text-align:center;">
+
+<figure style="flex: 1 0 20%; margin:12px;">
+<figcaption style="margin-bottom:6px;">Transformed using NN Interpolation</figcaption>
+<img src="images/imwraped_nearestneighborR.jpg" alt="imwraped_nearestneighborR.jpg" width="50%">
+</figure>
+
+<figure style="flex: 1 0 20%; margin:12px;">
+<figcaption style="margin-bottom:6px;">Transformed using Bilinear Interpolation</figcaption>
+<img src="images/imwraped_bilinearR.jpg" alt="imwraped_bilinearR.jpg" width="50%">
+</figure>
+</div>
+
+<p>
+We can also perform image rectification using this tool by transforming a non-rectangular region into a rectangular one. Because we only care about the pixels in the selected region, we can precompute the final dimensions of the rectangle and only perform inverse mapping on the given region. Below are 2 examples of rectifying an image:
+</p>
+
+<div style="display:flex; flex-wrap:wrap; justify-content:center; text-align:center;">
+
+<figure style="flex: 1 0 20%; margin:12px;">
+<figcaption style="margin-bottom:6px;">Original</figcaption>
+<img src="images/evacuationplan.png" alt="evacuationplan.png" width="50%">
+</figure>
+
+<figure style="flex: 1 0 20%; margin:12px;">
+<figcaption style="margin-bottom:6px;">Rectified</figcaption>
+<img src="images/ep_rectif.jpg" alt="ep_rectif.jpg" width="50%">
+</figure>
+</div>
+
+<div style="display:flex; flex-wrap:wrap; justify-content:center; text-align:center;">
+
+<figure style="flex: 1 0 20%; margin:12px;">
+<figcaption style="margin-bottom:6px;">Original</figcaption>
+<img src="images/cs170.png" alt="cs170.png" width="50%">
+</figure>
+
+<figure style="flex: 1 0 20%; margin:12px;">
+<figcaption style="margin-bottom:6px;">Rectified</figcaption>
+<img src="images/cs170_rectif.jpg" alt="cs170_rectif.jpg" width="50%">
+</figure>
+</div>
 
 </main>
 </body>
