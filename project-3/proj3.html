@@ -35,6 +35,18 @@ Below are 2 examples of set images that we can warp to form a larger combined im
 <figure style="flex: 1 0 30%; margin:12px;">
 <img src="images/img_right.png" alt="img_right.png">
 </figure>
+
+<figure style="flex: 1 0 30%; margin:12px;">
+<img src="images/img_upleft.png" alt="img_upleft.png">
+</figure>
+
+<figure style="flex: 1 0 30%; margin:12px;">
+<img src="images/img_upcenter.png" alt="img_upcenter.png">
+</figure>
+
+<figure style="flex: 1 0 30%; margin:12px;">
+<img src="images/img_upright.png" alt="img_upright.png">
+</figure>
 </div>
 <hr>
 
@@ -157,6 +169,14 @@ We can also perform image rectification using this tool by transforming a non-re
 <div align="center">
 <a href="https://cjxthecoder.github.io">cjxthecoder</a> | <a href="https://github.com/cjxthecoder">GitHub</a> | <a href="https://www.linkedin.com/in/daniel-cheng-71b475279">LinkedIn</a>
 </div>
+<hr>
+
+<h3>Part 4</h3>
+<p>
+With our homography matrix <i>H</i>, we can theoretically directly map the source image to the destination. However, the mapped pixels would not be all integers, which would result in pixels that are not mapped. TO solve this issue, we can use inverse mapping, by first starting with a destination pixel as a vector in the form [<i>u</i>, <i>v</i>, 1]<sup>T</sup> and multiplying the inverse <i>H<sup>-1</sup></i> to obtain the pixel from the source image that should be mapped to the destination pixel, and use 2 methods for computing the color of the pixel from the source: Nearest Neighbor and Bilinear Interpolation.<br>
+<br>
+To compute the bounds of where to take inverse mapping from, we can transform the coordinates (-0.5, -0.5), (<i>W</i> - 0.5, -0.5), (<i>W</i>, <i>H</i>), and (-0.5, <i>H</i> - 0.5) to provide an upper bound of the transfromed image. We can then round the result to the closest number in &#8484; + 0.5, which is equivalent to casting the result to an integer, since we only need the integer coordinates. Below is a comparison of the 2 methods.
+</p>
 
 </main>
 </body>
