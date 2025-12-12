@@ -679,20 +679,24 @@ The same procedure can also be done for images that are hand-drawn or nonrealist
 <div class="subsection">
 <h3>1.7.2 – Inpainting</h3>
 
-<h4>Code: inpaint function</h4>
-<pre><code># TODO
-# def inpaint(original_image, mask, prompt_embeds, uncond_prompt_embeds, timesteps, scale=7, ...):
-# ...
-# return inpainted_image</code></pre>
+Using the techniques above, we can also modify our <code>iterative_denoise_cfg</code> function to edit certain sections of an image. To do so, we first define a mask the same size as the image that is 1 at the pixels where we want to edit, and 0 otherwise. For each loop of the denoising process, we replace <code>x<sub>t</sub></code> with <strong>m</strong><code>x<sub>t</sub></code> + (1 - <strong>m</strong>)forward(<code>x<sub>0</sub>, t</code>), where <strong>m</strong> is the mask and <code>x<sub>0</sub></code> is the original image. This can be accomplished by the following code:
+
+<pre><code>masked_image = image * mask + forward(original_image, t).to(device).half() * (1 - mask)</code></pre>
+
+Once <code>image</code> is replaced by <code>masked_image</code>, we replace all further occurences of <code>image</code> except for the last instance, as the image at each step still needs to be updated. Finally, we let our starting noise be purely random and start with an timestamp index of 0, so that the patch we want to change can be sufficiently denoised. Below are the reuslts on the Campanile image:
 
 <h4>Campanile Inpainting</h4>
 <div class="image-row">
 <figure>
-<img src="images/part1_7_campanile_inpaint_mask.png" alt="Campanile inpaint mask" />
-<figcaption>Campanile with inpaint mask overlay</figcaption>
+<img src="images/campanile.png" alt="campanile.png" />
+<figcaption>Original Campanile</figcaption>
 </figure>
 <figure>
-<img src="images/part1_7_campanile_inpaint_result.png" alt="Campanile inpaint result" />
+<img src="images/campanile_mask.png" alt="campanile_mask.png" />
+<figcaption>Mask</figcaption>
+</figure>
+<figure>
+<img src="images/campanile_inpaint.png" alt="campanile_inpaint.png" />
 <figcaption>Inpainted Campanile</figcaption>
 </figure>
 </div>
