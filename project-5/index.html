@@ -385,39 +385,29 @@ Below are some visualizations for the iterative denoising process:
 <section id="part-1-5">
 <h2>Part 1.5 – Unconditional Sampling</h2>
 
-<div class="subsection">
-<h3>Code: Sampling from Stage 1</h3>
-<pre><code># TODO
-# Example:
-# stage_1_output = stage_1(
-# prompt_embeds=prompt_embeds_null,
-# negative_prompt_embeds=...,
-# num_inference_steps=...,
-# output_type="pt",
-# ).images</code></pre>
-</div>
+Starting with pure noise, we can obtain random denoise images by setting the starting index of <code>strided_timestamps</code> to 0, and using the prompt <code>'a high quality photo'</code>. Below are a few examples:
 
 <div class="subsection">
 <h3>5 Sampled Images</h3>
 <div class="image-row">
 <figure>
-<img src="images/part1_5_sample_1.png" alt="Sample 1" />
+<img src="images/ahqi/ahqi_1.png" alt="ahqi_1.png" />
 <figcaption>Sample 1</figcaption>
 </figure>
 <figure>
-<img src="images/part1_5_sample_2.png" alt="Sample 2" />
+<img src="images/ahqi/ahqi_2.png" alt="ahqi_2.png" />
 <figcaption>Sample 2</figcaption>
 </figure>
 <figure>
-<img src="images/part1_5_sample_3.png" alt="Sample 3" />
+<img src="images/ahqi/ahqi_3.png" alt="ahqi_3.png" />
 <figcaption>Sample 3</figcaption>
 </figure>
 <figure>
-<img src="images/part1_5_sample_4.png" alt="Sample 4" />
+<img src="images/ahqi/ahqi_4.png" alt="ahqi_4.png" />
 <figcaption>Sample 4</figcaption>
 </figure>
 <figure>
-<img src="images/part1_5_sample_5.png" alt="Sample 5" />
+<img src="images/ahqi/ahqi_5.png" alt="ahqi_5.png" />
 <figcaption>Sample 5</figcaption>
 </figure>
 </div>
@@ -432,34 +422,31 @@ Below are some visualizations for the iterative denoising process:
 
 <div class="subsection">
 <h3>Code: iterative_denoise_cfg</h3>
-<pre><code># TODO
-# def iterative_denoise_cfg(im_noisy, i_start, timesteps, prompt_embeds, uncond_prompt_embeds, scale=7, ...):
-# # Use CFG noise estimate:
-# # noise_est_cfg = uncond_noise_est + scale * (noise_est - uncond_noise_est)
-# return clean_image</code></pre>
+<pre><code>noise_est_cfg = uncond_noise_est + scale * (noise_est - uncond_noise_est)
+</code></pre>
 </div>
 
 <div class="subsection">
 <h3>5 Images with Prompt "a high quality photo" (γ = 7)</h3>
 <div class="image-row">
 <figure>
-<img src="images/part1_6_cfg_1.png" alt="CFG sample 1" />
+<img src="images/ahqi/cfg_ahqi_1.png" alt="cfg_ahqi_1.png" />
 <figcaption>CFG sample 1</figcaption>
 </figure>
 <figure>
-<img src="images/part1_6_cfg_2.png" alt="CFG sample 2" />
+<img src="images/ahqi/cfg_ahqi_2.png" alt="cfg_ahqi_2.png" />
 <figcaption>CFG sample 2</figcaption>
 </figure>
 <figure>
-<img src="images/part1_6_cfg_3.png" alt="CFG sample 3" />
+<img src="images/ahqi/cfg_ahqi_3.png" alt="cfg_ahqi_3.png" />
 <figcaption>CFG sample 3</figcaption>
 </figure>
 <figure>
-<img src="images/part1_6_cfg_4.png" alt="CFG sample 4" />
+<img src="images/ahqi/cfg_ahqi_4.png" alt="cfg_ahqi_4.png" />
 <figcaption>CFG sample 4</figcaption>
 </figure>
 <figure>
-<img src="images/part1_6_cfg_5.png" alt="CFG sample 5" />
+<img src="images/ahqi/cfg_ahqi_5.png" alt="cfg_ahqi_5.png" />
 <figcaption>CFG sample 5</figcaption>
 </figure>
 </div>
