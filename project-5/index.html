@@ -1,1 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Project 5: Fun with Diffusion Models</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 2rem;
+      background: #fafafa;
+      color: #222;
+    }
+    h1, h2, h3 {
+      margin-top: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    h1 {
+      text-align: center;
+    }
+    section {
+      margin-bottom: 2rem;
+      padding: 1.5rem;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .subsection {
+      margin-top: 1rem;
+      margin-bottom: 1rem;
+      padding-top: 0.5rem;
+      border-top: 1px solid #eee;
+    }
+    figure {
+      margin: 1rem 0;
+      display: inline-block;
+      text-align: center;
+    }
+    figure img {
+      max-width: 280px;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+    }
+    figure figcaption {
+      font-size: 0.9rem;
+      color: #555;
+      margin-top: 0.35rem;
+    }
+    .image-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    pre {
+      background: #111;
+      color: #f1f1f1;
+      padding: 0.75rem 1rem;
+      border-radius: 6px;
+      overflow-x: auto;
+      font-size: 0.9rem;
+    }
+    code {
+      font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+    .note {
+      font-size: 0.9rem;
+      color: #666;
+      margin-top: 0.25rem;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Project 5: Fun with Diffusion Models</h1>
+
+<!-- ========================================================= -->
+<!-- Part 0: Prompting & Sampling                             -->
+<!-- ========================================================= -->
+<section id="part-0">
+  <h2>Part 0 – Prompting and Sampling</h2>
+
+  <div class="subsection" id="part-0-prompts">
+    <h3>0.1 Text Prompts and Embeddings</h3>
+    <p><strong>Interesting prompts used:</strong></p>
+    <ul>
+      <li>Prompt 1: <em><!-- TODO: fill prompt --></em></li>
+      <li>Prompt 2: <em><!-- TODO: fill prompt --></em></li>
+      <li>Prompt 3: <em><!-- TODO: fill prompt --></em></li>
+      <!-- Add more as needed -->
+    </ul>
+
+    <h4>Code: generating prompt embeddings</h4>
+    <pre><code># TODO
+# Code to generate prompt embeddings
+# e.g., prompt_embeds_dict = encode(prompts)</code></pre>
+  </div>
+
+  <div class="subsection" id="part-0-images">
+    <h3>0.2 Generated Images for 3 Prompts</h3>
+
+    <div class="image-row">
+      <figure>
+        <img src="images/part0_prompt1_stepsA.png" alt="Prompt 1 - num_inference_steps = A" />
+        <figcaption>Prompt 1 – steps = A<br />Caption and reflection: <!-- TODO --></figcaption>
+      </figure>
+      <figure>
+        <img src="images/part0_prompt1_stepsB.png" alt="Prompt 1 - num_inference_steps = B" />
+        <figcaption>Prompt 1 – steps = B<br />Before/after comparison. <!-- TODO --></figcaption>
+      </figure>
+    </div>
+
+    <div class="image-row">
+      <figure>
+        <img src="images/part0_prompt2.png" alt="Prompt 2 image" />
+        <figcaption>Prompt 2 – single setting<br />Reflection: <!-- TODO --></figcaption>
+      </figure>
+      <figure>
+        <img src="images/part0_prompt3.png" alt="Prompt 3 image" />
+        <figcaption>Prompt 3 – single setting<br />Reflection: <!-- TODO --></figcaption>
+      </figure>
+    </div>
+
+    <p class="note"><strong>Random seed used:</strong> 180</p>
+  </div>
+</section>
+
+<!-- ========================================================= -->
+<!-- Part 1.1: Forward Process                                -->
+<!-- ========================================================= -->
+<section id="part-1-1">
+  <h2>Part 1.1 – Implementing the forward process</h2>
+
+  <div class="subsection">
+    <h3>Code: forward(im, t)</h3>
+    <pre><code># TODO
+# def forward(im, t):
+#     ...
+#     return im_noisy</code></pre>
+  </div>
+
+  <div class="subsection">
+    <h3>Campanile at Different Noise Levels</h3>
+    <div class="image-row">
+      <figure>
+        <img src="images/part1_1_campanile_t250.png" alt="Campanile t=250" />
+        <figcaption>Campanile at noise level t = 250</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_1_campanile_t500.png" alt="Campanile t=500" />
+        <figcaption>Campanile at noise level t = 500</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_1_campanile_t750.png" alt="Campanile t=750" />
+        <figcaption>Campanile at noise level t = 750</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ========================================================= -->
+<!-- Part 1.2: Gaussian Denoising                             -->
+<!-- ========================================================= -->
+<section id="part-1-2">
+  <h2>Part 1.2 – Gaussian Denoising</h2>
+
+  <div class="subsection">
+    <h3>Code: Gaussian Denoising</h3>
+    <pre><code># TODO
+# def gaussian_denoise(im_noisy, ...):
+#     ...
+#     return im_denoised</code></pre>
+  </div>
+
+  <div class="subsection">
+    <h3>Noisy vs Gaussian-Denoised Campanile</h3>
+
+    <h4>t = 250</h4>
+    <div class="image-row">
+      <figure>
+        <img src="images/part1_2_campanile_t250_noisy.png" alt="Campanile noisy t=250" />
+        <figcaption>Noisy Campanile (t = 250)</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_2_campanile_t250_gauss.png" alt="Campanile denoised t=250" />
+        <figcaption>Gaussian denoised (t = 250)</figcaption>
+      </figure>
+    </div>
+
+    <h4>t = 500</h4>
+    <div class="image-row">
+      <figure>
+        <img src="images/part1_2_campanile_t500_noisy.png" alt="Campanile noisy t=500" />
+        <figcaption>Noisy Campanile (t = 500)</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_2_campanile_t500_gauss.png" alt="Campanile denoised t=500" />
+        <figcaption>Gaussian denoised (t = 500)</figcaption>
+      </figure>
+    </div>
+
+    <h4>t = 750</h4>
+    <div class="image-row">
+      <figure>
+        <img src="images/part1_2_campanile_t750_noisy.png" alt="Campanile noisy t=750" />
+        <figcaption>Noisy Campanile (t = 750)</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_2_campanile_t750_gauss.png" alt="Campanile denoised t=750" />
+        <figcaption>Gaussian denoised (t = 750)</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ========================================================= -->
+<!-- Part 1.3: One-Step Denoising                             -->
+<!-- ========================================================= -->
+<section id="part-1-3">
+  <h2>Part 1.3 – One-Step Denoising with UNet</h2>
+
+  <div class="subsection">
+    <h3>Code: One-Step Denoise</h3>
+    <pre><code># TODO
+# def one_step_denoise(im_noisy, t, ...):
+#     # 1) forward(...) to get noisy version
+#     # 2) stage_1.unet to estimate noise
+#     # 3) subtract noise to estimate x_0
+#     return im_estimated</code></pre>
+  </div>
+
+  <div class="subsection">
+    <h3>Original, Noisy, One-Step Estimate (t = 250, 500, 750)</h3>
+
+    <h4>t = 250</h4>
+    <div class="image-row">
+      <figure>
+        <img src="images/part1_3_t250_original.png" alt="Original Campanile" />
+        <figcaption>Original Campanile</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_3_t250_noisy.png" alt="Noisy Campanile t=250" />
+        <figcaption>Noisy (t = 250)</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_3_t250_est.png" alt="Estimate Campanile t=250" />
+        <figcaption>One-step estimate of original (t = 250)</figcaption>
+      </figure>
+    </div>
+
+    <h4>t = 500</h4>
+    <div class="image-row">
+      <figure>
+        <img src="images/part1_3_t500_original.png" alt="Original Campanile" />
+        <figcaption>Original Campanile</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_3_t500_noisy.png" alt="Noisy Campanile t=500" />
+        <figcaption>Noisy (t = 500)</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_3_t500_est.png" alt="Estimate Campanile t=500" />
+        <figcaption>One-step estimate of original (t = 500)</figcaption>
+      </figure>
+    </div>
+
+    <h4>t = 750</h4>
+    <div class="image-row">
+      <figure>
+        <img src="images/part1_3_t750_original.png" alt="Original Campanile" />
+        <figcaption>Original Campanile</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_3_t750_noisy.png" alt="Noisy Campanile t=750" />
+        <figcaption>Noisy (t = 750)</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_3_t750_est.png" alt="Estimate Campanile t=750" />
+        <figcaption>One-step estimate of original (t = 750)</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ========================================================= -->
+<!-- Part 1.4: Iterative Denoising                            -->
+<!-- ========================================================= -->
+<section id="part-1-4">
+  <h2>Part 1.4 – Iterative Denoising</h2>
+
+  <div class="subsection">
+    <h3>Code: strided_timesteps</h3>
+    <pre><code># TODO
+# Example:
+# strided_timesteps = list(range(990, -10, -30))
+# stage_1.scheduler.set_timesteps(timesteps=strided_timesteps)</code></pre>
+  </div>
+
+  <div class="subsection">
+    <h3>Code: iterative_denoise</h3>
+    <pre><code># TODO
+# def iterative_denoise(im_noisy, i_start, timesteps, ...):
+#     # Loop from timesteps[i_start] down to 0 using Equation 3
+#     return clean_image</code></pre>
+  </div>
+
+  <div class="subsection">
+    <h3>Denoising Loop Visualizations (i_start = 10)</h3>
+
+    <p>Noisy Campanile at t = timestep[10]:</p>
+    <figure>
+      <img src="images/part1_4_initial_noisy.png" alt="Initial noisy Campanile (i_start=10)" />
+      <figcaption>Initial noisy Campanile (i_start = 10)</figcaption>
+    </figure>
+
+    <h4>Every 5th loop of iterative denoising</h4>
+    <div class="image-row">
+      <figure>
+        <img src="images/part1_4_step_0.png" alt="Iterative step 0" />
+        <figcaption>Step 0</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_4_step_5.png" alt="Iterative step 5" />
+        <figcaption>Step 5</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_4_step_10.png" alt="Iterative step 10" />
+        <figcaption>Step 10</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_4_step_15.png" alt="Iterative step 15" />
+        <figcaption>Step 15</figcaption>
+      </figure>
+      <!-- Add more if needed -->
+    </div>
+
+    <h4>Final predicted clean images</h4>
+    <div class="image-row">
+      <figure>
+        <img src="images/part1_4_iterative_clean.png" alt="Iterative clean estimate" />
+        <figcaption>Iterative denoising clean image</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_4_onestep_clean.png" alt="One-step clean estimate" />
+        <figcaption>One-step denoising (from part 1.3)</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_4_gaussian_clean.png" alt="Gaussian-blurred estimate" />
+        <figcaption>Gaussian blur baseline (from part 1.2)</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ========================================================= -->
+<!-- Part 1.5: Unconditional Sampling                         -->
+<!-- ========================================================= -->
+<section id="part-1-5">
+  <h2>Part 1.5 – Unconditional Sampling</h2>
+
+  <div class="subsection">
+    <h3>Code: Sampling from Stage 1</h3>
+    <pre><code># TODO
+# Example:
+# stage_1_output = stage_1(
+#     prompt_embeds=prompt_embeds_null,
+#     negative_prompt_embeds=...,
+#     num_inference_steps=...,
+#     output_type="pt",
+# ).images</code></pre>
+  </div>
+
+  <div class="subsection">
+    <h3>5 Sampled Images</h3>
+    <div class="image-row">
+      <figure>
+        <img src="images/part1_5_sample_1.png" alt="Sample 1" />
+        <figcaption>Sample 1</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_5_sample_2.png" alt="Sample 2" />
+        <figcaption>Sample 2</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_5_sample_3.png" alt="Sample 3" />
+        <figcaption>Sample 3</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_5_sample_4.png" alt="Sample 4" />
+        <figcaption>Sample 4</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_5_sample_5.png" alt="Sample 5" />
+        <figcaption>Sample 5</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ========================================================= -->
+<!-- Part 1.6: CFG Sampling                                   -->
+<!-- ========================================================= -->
+<section id="part-1-6">
+  <h2>Part 1.6 – Classifier-Free Guidance (CFG)</h2>
+
+  <div class="subsection">
+    <h3>Code: iterative_denoise_cfg</h3>
+    <pre><code># TODO
+# def iterative_denoise_cfg(im_noisy, i_start, timesteps, prompt_embeds, uncond_prompt_embeds, scale=7, ...):
+#     # Use CFG noise estimate:
+#     # noise_est_cfg = uncond_noise_est + scale * (noise_est - uncond_noise_est)
+#     return clean_image</code></pre>
+  </div>
+
+  <div class="subsection">
+    <h3>5 Images with Prompt "a high quality photo" (γ = 7)</h3>
+    <div class="image-row">
+      <figure>
+        <img src="images/part1_6_cfg_1.png" alt="CFG sample 1" />
+        <figcaption>CFG sample 1</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_6_cfg_2.png" alt="CFG sample 2" />
+        <figcaption>CFG sample 2</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_6_cfg_3.png" alt="CFG sample 3" />
+        <figcaption>CFG sample 3</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_6_cfg_4.png" alt="CFG sample 4" />
+        <figcaption>CFG sample 4</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_6_cfg_5.png" alt="CFG sample 5" />
+        <figcaption>CFG sample 5</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ========================================================= -->
+<!-- Part 1.7: SDEdit-style Edits & Inpainting                -->
+<!-- ========================================================= -->
+<section id="part-1-7">
+  <h2>Part 1.7 – SDEdit-Style Edits and Inpainting</h2>
+
+  <!-- 1.7: Edits of Campanile -->
+  <div class="subsection">
+    <h3>1.7.1 – Edits of the Campanile (Noise Levels [1, 3, 5, 7, 10, 20])</h3>
+    <p>Conditional text prompt: <strong>"a high quality photo"</strong></p>
+
+    <div class="image-row">
+      <figure>
+        <img src="images/part1_7_campanile_edit_level1.png" alt="Campanile edit level 1" />
+        <figcaption>Noise level index 1</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_7_campanile_edit_level3.png" alt="Campanile edit level 3" />
+        <figcaption>Noise level index 3</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_7_campanile_edit_level5.png" alt="Campanile edit level 5" />
+        <figcaption>Noise level index 5</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_7_campanile_edit_level7.png" alt="Campanile edit level 7" />
+        <figcaption>Noise level index 7</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_7_campanile_edit_level10.png" alt="Campanile edit level 10" />
+        <figcaption>Noise level index 10</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_7_campanile_edit_level20.png" alt="Campanile edit level 20" />
+        <figcaption>Noise level index 20</figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <!-- 1.7: Edits of own test images -->
+  <div class="subsection">
+    <h3>1.7.2 – Edits of 2 Own Test Images</h3>
+
+    <h4>Test Image 1</h4>
+    <div class="image-row">
+      <figure>
+        <img src="images/part1_7_own1_original.png" alt="Own test image 1 original" />
+        <figcaption>Original image 1</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_7_own1_edit_level1.png" alt="Own image 1 edit level 1" />
+        <figcaption>Noise index 1</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_7_own1_edit_level3.png" alt="Own image 1 edit level 3" />
+        <figcaption>Noise index 3</figcaption>
+      </figure>
+      <!-- add 5, 7, 10, 20 -->
+    </div>
+
+    <h4>Test Image 2</h4>
+    <div class="image-row">
+      <figure>
+        <img src="images/part1_7_own2_original.png" alt="Own test image 2 original" />
+        <figcaption>Original image 2</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_7_own2_edit_level1.png" alt="Own image 2 edit level 1" />
+        <figcaption>Noise index 1</figcaption>
+      </figure>
+      <!-- add 3, 5, 7, 10, 20 -->
+    </div>
+  </div>
+
+  <!-- 1.7: Web image edits -->
+  <div class="subsection">
+    <h3>1.7.3 – Edits of a Web Image</h3>
+    <p>Describe the source image: <!-- TODO --></p>
+
+    <div class="image-row">
+      <figure>
+        <img src="images/part1_7_web_original.png" alt="Web image original" />
+        <figcaption>Original web image</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_7_web_edit_level1.png" alt="Web image edit level 1" />
+        <figcaption>Noise index 1</figcaption>
+      </figure>
+      <!-- add 3, 5, 7, 10, 20 (+ extras if any) -->
+    </div>
+  </div>
+
+  <!-- 1.7: Hand-drawn image edits -->
+  <div class="subsection">
+    <h3>1.7.4 – Edits of 2 Hand-Drawn Images</h3>
+
+    <h4>Hand Drawn Image 1</h4>
+    <div class="image-row">
+      <figure>
+        <img src="images/part1_7_hand1_original.png" alt="Hand-drawn 1 original" />
+        <figcaption>Original hand-drawn image 1</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_7_hand1_edit_level1.png" alt="Hand-drawn 1 edit level 1" />
+        <figcaption>Noise index 1</figcaption>
+      </figure>
+      <!-- add 3, 5, 7, 10, 20 -->
+    </div>
+
+    <h4>Hand Drawn Image 2</h4>
+    <div class="image-row">
+      <figure>
+        <img src="images/part1_7_hand2_original.png" alt="Hand-drawn 2 original" />
+        <figcaption>Original hand-drawn image 2</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_7_hand2_edit_level1.png" alt="Hand-drawn 2 edit level 1" />
+        <figcaption>Noise index 1</figcaption>
+      </figure>
+      <!-- add 3, 5, 7, 10, 20 -->
+    </div>
+  </div>
+
+  <!-- 1.7: Inpainting -->
+  <div class="subsection">
+    <h3>1.7.5 – Inpainting</h3>
+
+    <h4>Code: inpaint function</h4>
+    <pre><code># TODO
+# def inpaint(original_image, mask, prompt_embeds, uncond_prompt_embeds, timesteps, scale=7, ...):
+#     ...
+#     return inpainted_image</code></pre>
+
+    <h4>Campanile Inpainting</h4>
+    <div class="image-row">
+      <figure>
+        <img src="images/part1_7_campanile_inpaint_mask.png" alt="Campanile inpaint mask" />
+        <figcaption>Campanile with inpaint mask overlay</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_7_campanile_inpaint_result.png" alt="Campanile inpaint result" />
+        <figcaption>Inpainted Campanile</figcaption>
+      </figure>
+    </div>
+
+    <h4>Inpainting on 2 of Your Own Images</h4>
+    <h5>Own Image 1</h5>
+    <div class="image-row">
+      <figure>
+        <img src="images/part1_7_own1_inpaint_mask.png" alt="Own image 1 inpaint mask" />
+        <figcaption>Own image 1 – mask</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_7_own1_inpaint_result.png" alt="Own image 1 inpaint result" />
+        <figcaption>Own image 1 – inpainted</figcaption>
+      </figure>
+    </div>
+
+    <h5>Own Image 2</h5>
+    <div class="image-row">
+      <figure>
+        <img src="images/part1_7_own2_inpaint_mask.png" alt="Own image 2 inpaint mask" />
+        <figcaption>Own image 2 – mask</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_7_own2_inpaint_result.png" alt="Own image 2 inpaint result" />
+        <figcaption>Own image 2 – inpainted</figcaption>
+      </figure>
+    </div>
+  </div>
+
+</section>
+
+</body>
+</html>
 
