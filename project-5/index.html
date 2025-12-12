@@ -230,7 +230,7 @@ In order to try to revert the image with noise, we can try the classical method 
 <section id="part-1-3">
 <h2>Part 1.3 – Implementing One Step Denoising</h2>
 
-A much more effective method is to use a pretrained diffusion model. Using <code>stage_1.unet</code>, we can estimate the amount of noise in the noisy image. With the forward equation, we can solve for <code>x<sub>0</sub></code> (the original image) given the timestamp <code>t</code>:
+A more effective method is to use a pretrained diffusion model. Using <code>stage_1.unet</code>, we can estimate the amount of noise in the noisy image. With the forward equation, we can solve for <code>x<sub>0</sub></code> (the original image) given the timestamp <code>t</code>:
 
 <div class="subsection">
 <pre><code>at_x0 = im_noisy_cpu - (1 - alpha_cumprod).sqrt() * noise_est
@@ -298,9 +298,7 @@ Below are a comparison the original, noisy, and the estimate of the original ima
 <section id="part-1-4">
 <h2>Part 1.4 – Iterative Denoising</h2>
 
-Instead of using one step, we can obtain better results by iterativly denoising from step <code>t</code> until step 0. However, this means running the diffusion model 1000 times in the worst case, which is slow and costly.<br>
-<br>
-Fortunately, we can speed up the computation by first defining series of strided timestamps, starting at close to 1000 and ending at 0. For the examples below, we will use <code>strided_timestamps = [990, 960, ..., 30, 0]</code>. Then, we can use the formula
+Instead of using one step, we can obtain better results by iterativly denoising from step <code>t</code> until step 0. However, this means running the diffusion model 1000 times in the worst case, which is slow and costly. Fortunately, we can speed up the computation by first defining series of strided timestamps, starting at close to 1000 and ending at 0. For the examples below, we will use <code>strided_timestamps = [990, 960, ..., 30, 0]</code>. Then, we can use the formula
 
 <div class="image-row">
 <figure>
@@ -358,6 +356,10 @@ Below are some visualizations for the iterative denoising process:
 <figure>
 <img src="images/ddpm/DDPM_4x5.png" alt="DDPM_4x5.png" />
 <figcaption>Step 20</figcaption>
+</figure>
+<figure>
+<img src="images/ddpm/final_ddpm.png" alt="DDPM_4x5.png" />
+<figcaption>Step 23 (final)</figcaption>
 </figure>
 </div>
 
@@ -420,11 +422,14 @@ Starting with pure noise, we can obtain random denoise images by setting the sta
 <section id="part-1-6">
 <h2>Part 1.6 – Classifier-Free Guidance (CFG)</h2>
 
+To improve the quality of the images, we can compute both a noise estiamte conditioned on the text prompt, and the unconditional noise estimate, based on the null prompt <code>''</code>. Denoting the conditional noise estimate as &epsilon;<sub>c</sub> and the unconditional noise estimate as &epsilon;<sub>u</sub>, we let our noise estimate be &epsilon; = &epsilon;<sub>u</sub> + &gamma;(&epsilon;<sub>c</sub> - &epsilon;<sub>u</sub>). Note that we have &epsilon; = &epsilon;<sub>u</sub> and &epsilon; = &epsilon;<sub>c</sub> for &gamma; = 0 and &gamma; = 1 respectively. However, when &gamma; > 1, we can get much higher equality images for reasons still dicussed today. This technique is known as <strong>classifier-free guidance</strong>, and we can implement the noise estimate as follows:
+
 <div class="subsection">
-<h3>Code: iterative_denoise_cfg</h3>
 <pre><code>noise_est_cfg = uncond_noise_est + scale * (noise_est - uncond_noise_est)
 </code></pre>
 </div>
+
+Using &gamma; = 7 and the conditional & unconditional prompts be <code>'a high quality photo'</code> and the null prompt, we the following sample images:
 
 <div class="subsection">
 <h3>5 Images with Prompt "a high quality photo" (γ = 7)</h3>
