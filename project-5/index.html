@@ -506,7 +506,7 @@ Below are 2 other examples of editing similar images:
 <h4>Test Image 1 (Eiffel Tower)</h4>
 <div class="image-row">
 <figure>
-<img src="images/noise/eiffel.png" alt="eiffel.png" />
+<img src="images/eiffel.png" alt="eiffel.png" />
 <figcaption>Original</figcaption>
 </figure>
 <figure>
@@ -538,7 +538,7 @@ Below are 2 other examples of editing similar images:
 <h4>Test Image 2 (St. Basil's Cathedral)</h4>
 <div class="image-row">
 <figure>
-<img src="images/noise/stbasil.png" alt="stbasil.png" />
+<img src="images/stbasil.png" alt="stbasil.png" />
 <figcaption>Original</figcaption>
 </figure>
 <figure>
@@ -701,8 +701,8 @@ Once <code>image</code> is replaced by <code>masked_image</code>, we replace all
 </figure>
 </div>
 
-<h4>Inpainting on 2 of Your Own Images</h4>
-<h5>Own Image 1</h5>
+<h4>Inpainting on test images</h4>
+<h5>Test Image 1</h5>
 <div class="image-row">
 <figure>
 <img src="images/part1_7_own1_inpaint_mask.png" alt="Own image 1 inpaint mask" />
@@ -714,7 +714,7 @@ Once <code>image</code> is replaced by <code>masked_image</code>, we replace all
 </figure>
 </div>
 
-<h5>Own Image 2</h5>
+<h5>Test Image 2</h5>
 <div class="image-row">
 <figure>
 <img src="images/part1_7_own2_inpaint_mask.png" alt="Own image 2 inpaint mask" />
@@ -723,6 +723,108 @@ Once <code>image</code> is replaced by <code>masked_image</code>, we replace all
 <figure>
 <img src="images/part1_7_own2_inpaint_result.png" alt="Own image 2 inpaint result" />
 <figcaption>Own image 2 – inpainted</figcaption>
+</figure>
+</div>
+</div>
+
+<h3>1.7.3 – Text-Conditioned Image-to-image Translation</h3>
+
+Finally, we can also change our conditional prompt, namely <code>'a high quality photo'</code>, to any other. This will give control to what the noise is projected to, resulting in a series of images that look more like the original image, but also similar to the conditional prompt.
+
+<div class="subsection">
+<h4>Campanile with prompt <code>'a pencil'</code></h4>
+<div class="image-row">
+<figure>
+<img src="images/campanile.png" alt="campanile.png" />
+<figcaption>Original</figcaption>
+</figure>
+<figure>
+<img src="images/conditioned/campanile_pencil1.png" alt="campanile_pencil1.png" />
+<figcaption>i_start = 1</figcaption>
+</figure>
+<figure>
+<img src="images/conditioned/campanile_pencil3.png" alt="campanile_pencil3.png" />
+<figcaption>i_start = 3</figcaption>
+</figure>
+<figure>
+<img src="images/conditioned/campanile_pencil5.png" alt="campanile_pencil5.png" />
+<figcaption>i_start = 5</figcaption>
+</figure>
+<figure>
+<img src="images/conditioned/campanile_pencil7.png" alt="campanile_pencil7.png" />
+<figcaption>i_start = 7</figcaption>
+</figure>
+<figure>
+<img src="images/conditioned/campanile_pencil10.png" alt="campanile_pencil10.png" />
+<figcaption>i_start = 10</figcaption>
+</figure>
+<figure>
+<img src="images/conditioned/campanile_pencil20.png" alt="campanile_pencil20.png" />
+<figcaption>i_start = 20</figcaption>
+</figure>
+</div>
+
+<h4>Eiffel Tower with prompt <code>'a rocket ship'</code></h4>
+<div class="image-row">
+<figure>
+<img src="images/eiffel.png" alt="eiffel.png" />
+<figcaption>Original</figcaption>
+</figure>
+<figure>
+<img src="images/conditioned/eiffel_rocket1.png" alt="eiffel_rocket1.png" />
+<figcaption>i_start = 1</figcaption>
+</figure>
+<figure>
+<img src="images/conditioned/eiffel_rocket3.png" alt="eiffel_rocket3.png" />
+<figcaption>i_start = 3</figcaption>
+</figure>
+<figure>
+<img src="images/conditioned/eiffel_rocket5.png" alt="eiffel_rocket5.png" />
+<figcaption>i_start = 5</figcaption>
+</figure>
+<figure>
+<img src="images/conditioned/eiffel_rocket7.png" alt="eiffel_rocket7.png" />
+<figcaption>i_start = 7</figcaption>
+</figure>
+<figure>
+<img src="images/conditioned/eiffel_rocket10.png" alt="eiffel_rocket10.png" />
+<figcaption>i_start = 10</figcaption>
+</figure>
+<figure>
+<img src="images/conditioned/eiffel_rocket20.png" alt="eiffel_rocket20.png" />
+<figcaption>i_start = 20</figcaption>
+</figure>
+</div>
+
+<h4>St. Basil's Cathedral with prompt <code>'an oil painting of a snowy mountain village'</code></h4>
+<div class="image-row">
+<figure>
+<img src="images/stbasil.png" alt="stbasil.png" />
+<figcaption>Original</figcaption>
+</figure>
+<figure>
+<img src="images/conditioned/stbasil_oil1.png" alt="stbasil_oil1.png" />
+<figcaption>i_start = 1</figcaption>
+</figure>
+<figure>
+<img src="images/conditioned/stbasil_oil3.png" alt="stbasil_oil3.png" />
+<figcaption>i_start = 3</figcaption>
+</figure>
+<figure>
+<img src="images/conditioned/stbasil_oil5.png" alt="stbasil_oil5.png" />
+<figcaption>i_start = 5</figcaption>
+</figure>
+<figure>
+<img src="images/conditioned/stbasil_oil7.png" alt="stbasil_oil7.png" />
+<figcaption>i_start = 7</figcaption>
+</figure>
+<figure>
+<img src="images/conditioned/stbasil_oil10.png" alt="stbasil_oil10.png" />
+<figcaption>i_start = 10</figcaption>
+</figure>
+<figure>
+<img src="images/conditioned/stbasil_oil20.png" alt="stbasil_oil20.png" />
+<figcaption>i_start = 20</figcaption>
 </figure>
 </div>
 </div>
