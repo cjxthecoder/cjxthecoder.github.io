@@ -79,48 +79,65 @@
 <section id="part-0">
   <h2>Part 0 – Prompting and Sampling</h2>
 
-  <div class="subsection" id="part-0-prompts">
-    <h3>0.1 Text Prompts and Embeddings</h3>
-    <p><strong>Interesting prompts used:</strong></p>
-    <ul>
-      <li>Prompt 1: <em><!-- TODO: fill prompt --></em></li>
-      <li>Prompt 2: <em><!-- TODO: fill prompt --></em></li>
-      <li>Prompt 3: <em><!-- TODO: fill prompt --></em></li>
-      <!-- Add more as needed -->
-    </ul>
-
-    <h4>Code: generating prompt embeddings</h4>
-    <pre><code># TODO
-# Code to generate prompt embeddings
-# e.g., prompt_embeds_dict = encode(prompts)</code></pre>
-  </div>
+  To demonstrate the usage of the DeepFloyd IF diffusion model, below are a few examples of different prompts using 20 inference steps with stage 1 of the model, which generates images at 64x64 resolution:
 
   <div class="subsection" id="part-0-images">
-    <h3>0.2 Generated Images for 3 Prompts</h3>
+    <h3>Images generated with num_inference_steps=20</h3>
 
     <div class="image-row">
       <figure>
-        <img src="images/part0_prompt1_stepsA.png" alt="Prompt 1 - num_inference_steps = A" />
-        <figcaption>Prompt 1 – steps = A<br />Caption and reflection: <!-- TODO --></figcaption>
+        <img src="images/64vs256/01_64px_20.png" alt="01_64px_20.png" />
+        <figcaption>Prompt 1 – 'a photo of a hipster barista'<br /></figcaption>
       </figure>
       <figure>
-        <img src="images/part0_prompt1_stepsB.png" alt="Prompt 1 - num_inference_steps = B" />
-        <figcaption>Prompt 1 – steps = B<br />Before/after comparison. <!-- TODO --></figcaption>
+        <img src="images/64vs256/02_64px_20.png" alt="02_64px_20.png" />
+        <figcaption>Prompt 2 – 'a man wearing a hat'<br /></figcaption>
+      </figure>
+      <figure>
+        <img src="images/64vs256/03_64px_20.png" alt="03_64px_20.png" />
+        <figcaption>Prompt 3 – 'a rocket ship'<br /></figcaption>
       </figure>
     </div>
+  </div>
+ 
+  Using stage 2, we can take the output of stage 1 and upscale them to 256x256 resolution:
+  
+  <div class="subsection" id="part-0-images">
+    <div class="image-row">
+      <figure>
+        <img src="images/64vs256/01_256px_20.png" alt="01_256px_20.png" />
+        <figcaption>Prompt 1 – 'a photo of a hipster barista'<br /></figcaption>
+      </figure>
+      <figure>
+        <img src="images/64vs256/02_256px_20.png" alt="02_256px_20.png" />
+        <figcaption>Prompt 2 – 'a man wearing a hat'<br /></figcaption>
+      </figure>
+      <figure>
+        <img src="images/64vs256/03_256px_20.png" alt="03_256px_20.png" />
+        <figcaption>Prompt 3 – 'a rocket ship'<br /></figcaption>
+      </figure>
+    </div>
+  </div>
+  
+  By increasing the inference steps, we can generate higher quality images at cost of more compute time. Below are the stage 2 outputs with the number of inference steps at 100:
+  
+  <div class="subsection" id="part-0-images">
+    <h3>Images generated with num_inference_steps=100</h3>
 
     <div class="image-row">
       <figure>
-        <img src="images/part0_prompt2.png" alt="Prompt 2 image" />
-        <figcaption>Prompt 2 – single setting<br />Reflection: <!-- TODO --></figcaption>
+        <img src="images/64vs256/01_256px_100.png" alt="01_256px_100.png" />
+        <figcaption>Prompt 1 – 'a photo of a hipster barista'<br /></figcaption>
       </figure>
       <figure>
-        <img src="images/part0_prompt3.png" alt="Prompt 3 image" />
-        <figcaption>Prompt 3 – single setting<br />Reflection: <!-- TODO --></figcaption>
+        <img src="images/64vs256/02_256px_100.png" alt="02_256px_100.png" />
+        <figcaption>Prompt 2 – 'a man wearing a hat'<br /></figcaption>
+      </figure>
+      <figure>
+        <img src="images/64vs256/03_256px_100.png" alt="03_256px_100.png" />
+        <figcaption>Prompt 3 – 'a rocket ship'<br /></figcaption>
       </figure>
     </div>
-
-    <p class="note"><strong>Random seed used:</strong> 180</p>
   </div>
 </section>
 
@@ -161,16 +178,11 @@
 <!-- Part 1.2: Gaussian Denoising                             -->
 <!-- ========================================================= -->
 <section id="part-1-2">
-  <h2>Part 1.2 – Gaussian Denoising</h2>
+  <h2>Part 1.2 – Classical Denoising</h2>
 
   <div class="subsection">
     <h3>Code: Gaussian Denoising</h3>
-    <pre><code># TODO
-# def gaussian_denoise(im_noisy, ...):
-#     ...
-#     return im_denoised</code></pre>
-  </div>
-
+    
   <div class="subsection">
     <h3>Noisy vs Gaussian-Denoised Campanile</h3>
 
@@ -613,4 +625,3 @@
 
 </body>
 </html>
-
