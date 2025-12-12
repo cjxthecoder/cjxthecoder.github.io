@@ -145,7 +145,7 @@ By increasing the inference steps, we can generate higher quality images at cost
 <!-- Part 1.1: Forward Process-->
 <!-- ========================================================= -->
 <section id="part-1-1">
-<h2>Part 1.1 – Implementing the forward process</h2>
+<h2>Part 1.1 – The forward process</h2>
 
 To start, we have the original Campanile image at 64px:
 <div class="image-row">
@@ -383,7 +383,7 @@ Below are some visualizations for the iterative denoising process:
 <!-- Part 1.5: Unconditional Sampling -->
 <!-- ========================================================= -->
 <section id="part-1-5">
-<h2>Part 1.5 – Unconditional Sampling</h2>
+<h2>Part 1.5 – Diffusion Model Sampling</h2>
 
 Starting with pure noise, we can obtain random denoise images by setting the starting index of <code>strided_timestamps</code> to 0, and using the prompt <code>'a high quality photo'</code>. Below are a few examples:
 
