@@ -146,29 +146,28 @@
 <!-- ========================================================= -->
 <section id="part-1-1">
   <h2>Part 1.1 – Implementing the forward process</h2>
-
-  <div class="subsection">
-    <h3>Code: forward(im, t)</h3>
-    <pre><code># TODO
-# def forward(im, t):
-#     ...
-#     return im_noisy</code></pre>
-  </div>
+  
+  To start, we have the original Campanile image at 64px:
+  <figure>
+    <img src="images/campanile.png" alt="campanile.png" />
+  </figure>
+  
+  For the forward function, we can use <code>alphas_cumprod[t]</code> to obtain the noise coefficient at timestamp <code>t</code>, and <code>torch.randn_like</code> to get &epsilon; &isin; [0, 1), allowing us to compute <code>im_noisy</code>. Below are examples of the Campanile at noise timestamps 250, 500, and 750:
 
   <div class="subsection">
     <h3>Campanile at Different Noise Levels</h3>
     <div class="image-row">
       <figure>
-        <img src="images/part1_1_campanile_t250.png" alt="Campanile t=250" />
-        <figcaption>Campanile at noise level t = 250</figcaption>
+        <img src="images/250500750/campanile_250noise.png" alt="campanile_250noise.png" />
+        <figcaption>Campanile at t = 250</figcaption>
       </figure>
       <figure>
-        <img src="images/part1_1_campanile_t500.png" alt="Campanile t=500" />
-        <figcaption>Campanile at noise level t = 500</figcaption>
+        <img src="images/250500750/campanile_500noise.png" alt="campanile_500noise.png" />
+        <figcaption>Campanile at t = 500</figcaption>
       </figure>
       <figure>
-        <img src="images/part1_1_campanile_t750.png" alt="Campanile t=750" />
-        <figcaption>Campanile at noise level t = 750</figcaption>
+        <img src="images/250500750/campanile_750noise.png" alt="campanile_750noise.png" />
+        <figcaption>Campanile at t = 750</figcaption>
       </figure>
     </div>
   </div>
@@ -180,20 +179,19 @@
 <section id="part-1-2">
   <h2>Part 1.2 – Classical Denoising</h2>
 
-  <div class="subsection">
-    <h3>Code: Gaussian Denoising</h3>
-    
+  In order to try to revert the image with noise, we can try the classical method for denoising, namely Gaussian filtering. However, with high noise the effect is limited:
+
   <div class="subsection">
     <h3>Noisy vs Gaussian-Denoised Campanile</h3>
 
     <h4>t = 250</h4>
     <div class="image-row">
       <figure>
-        <img src="images/part1_2_campanile_t250_noisy.png" alt="Campanile noisy t=250" />
+        <img src="images/250500750/campanile_250noise.png" alt="campanile_250noise.png" />
         <figcaption>Noisy Campanile (t = 250)</figcaption>
       </figure>
       <figure>
-        <img src="images/part1_2_campanile_t250_gauss.png" alt="Campanile denoised t=250" />
+        <img src="images/250500750/campanile_250denoise_gaussian.png" alt="campanile_250denoise_gaussian.png" />
         <figcaption>Gaussian denoised (t = 250)</figcaption>
       </figure>
     </div>
@@ -201,11 +199,11 @@
     <h4>t = 500</h4>
     <div class="image-row">
       <figure>
-        <img src="images/part1_2_campanile_t500_noisy.png" alt="Campanile noisy t=500" />
+        <img src="images/250500750/campanile_500noise.png" alt="campanile_500noise.png" />
         <figcaption>Noisy Campanile (t = 500)</figcaption>
       </figure>
       <figure>
-        <img src="images/part1_2_campanile_t500_gauss.png" alt="Campanile denoised t=500" />
+        <img src="images/250500750/campanile_500denoise_gaussian.png" alt="campanile_500denoise_gaussian.png" />
         <figcaption>Gaussian denoised (t = 500)</figcaption>
       </figure>
     </div>
@@ -213,11 +211,11 @@
     <h4>t = 750</h4>
     <div class="image-row">
       <figure>
-        <img src="images/part1_2_campanile_t750_noisy.png" alt="Campanile noisy t=750" />
+        <img src="images/250500750/campanile_750noise.png" alt="campanile_750noise.png" />
         <figcaption>Noisy Campanile (t = 750)</figcaption>
       </figure>
       <figure>
-        <img src="images/part1_2_campanile_t750_gauss.png" alt="Campanile denoised t=750" />
+        <img src="images/250500750/campanile_750denoise_gaussian.png" alt="campanile_750denoise_gaussian.png" />
         <figcaption>Gaussian denoised (t = 750)</figcaption>
       </figure>
     </div>
@@ -228,17 +226,16 @@
 <!-- Part 1.3: One-Step Denoising                             -->
 <!-- ========================================================= -->
 <section id="part-1-3">
-  <h2>Part 1.3 – One-Step Denoising with UNet</h2>
+  <h2>Part 1.3 – Implementing One Step Denoising</h2>
+  
+  A much more effective method is to use a pretrained diffusion model. Using <code>stage_1.unet</code>, we can estimate the amount of noise in the noisy image. With the forward equation, we can solve for x<sub>0</sub> (the original image) given the timestamp <code>t</code>:
 
   <div class="subsection">
-    <h3>Code: One-Step Denoise</h3>
-    <pre><code># TODO
-# def one_step_denoise(im_noisy, t, ...):
-#     # 1) forward(...) to get noisy version
-#     # 2) stage_1.unet to estimate noise
-#     # 3) subtract noise to estimate x_0
-#     return im_estimated</code></pre>
+    <pre><code>at_x0 = im_noisy_cpu - (1 - alpha_cumprod).sqrt() * noise_est
+original_im = at_x0 / alpha_cumprod.sqrt()</code></pre>
   </div>
+  
+  Below are a comparison the original, noisy, and the estimate of the original image for <code>t</code> &isin; [250, 500, 750]:
 
   <div class="subsection">
     <h3>Original, Noisy, One-Step Estimate (t = 250, 500, 750)</h3>
@@ -246,15 +243,15 @@
     <h4>t = 250</h4>
     <div class="image-row">
       <figure>
-        <img src="images/part1_3_t250_original.png" alt="Original Campanile" />
+        <img src="images/campanile.png" alt="campanile.png" />
         <figcaption>Original Campanile</figcaption>
       </figure>
       <figure>
-        <img src="images/part1_3_t250_noisy.png" alt="Noisy Campanile t=250" />
+        <img src="images/250500750/campanile_250noise.png" alt="campanile_250noise.png" />
         <figcaption>Noisy (t = 250)</figcaption>
       </figure>
       <figure>
-        <img src="images/part1_3_t250_est.png" alt="Estimate Campanile t=250" />
+        <img src="images/250500750/campanile_250denoise_onestep.png" alt="campanile_250denoise_onestep.png" />
         <figcaption>One-step estimate of original (t = 250)</figcaption>
       </figure>
     </div>
@@ -262,15 +259,15 @@
     <h4>t = 500</h4>
     <div class="image-row">
       <figure>
-        <img src="images/part1_3_t500_original.png" alt="Original Campanile" />
+        <img src="images/campanile.png" alt="campanile.png" />
         <figcaption>Original Campanile</figcaption>
       </figure>
       <figure>
-        <img src="images/part1_3_t500_noisy.png" alt="Noisy Campanile t=500" />
+        <img src="images/250500750/campanile_500noise.png" alt="campanile_500noise.png" />
         <figcaption>Noisy (t = 500)</figcaption>
       </figure>
       <figure>
-        <img src="images/part1_3_t500_est.png" alt="Estimate Campanile t=500" />
+        <img src="images/250500750/campanile_500denoise_onestep.png" alt="campanile_500denoise_onestep.png" />
         <figcaption>One-step estimate of original (t = 500)</figcaption>
       </figure>
     </div>
@@ -278,15 +275,15 @@
     <h4>t = 750</h4>
     <div class="image-row">
       <figure>
-        <img src="images/part1_3_t750_original.png" alt="Original Campanile" />
+        <img src="images/campanile.png" alt="campanile.png" />
         <figcaption>Original Campanile</figcaption>
       </figure>
       <figure>
-        <img src="images/part1_3_t750_noisy.png" alt="Noisy Campanile t=750" />
+        <img src="images/250500750/campanile_750noise.png" alt="campanile_750noise.png" />
         <figcaption>Noisy (t = 750)</figcaption>
       </figure>
       <figure>
-        <img src="images/part1_3_t750_est.png" alt="Estimate Campanile t=750" />
+        <img src="images/250500750/campanile_750denoise_onestep.png" alt="campanile_750denoise_onestep.png" />
         <figcaption>One-step estimate of original (t = 750)</figcaption>
       </figure>
     </div>
@@ -299,13 +296,9 @@
 <section id="part-1-4">
   <h2>Part 1.4 – Iterative Denoising</h2>
 
-  <div class="subsection">
-    <h3>Code: strided_timesteps</h3>
-    <pre><code># TODO
-# Example:
-# strided_timesteps = list(range(990, -10, -30))
-# stage_1.scheduler.set_timesteps(timesteps=strided_timesteps)</code></pre>
-  </div>
+  Instead of using one step, we can obtain better results by iterativly denoising from step <code>t</code> until step 0. However, this means running the diffusion model 1000 times in the worst case, which is slow and costly.
+  
+  Fortunately, we can speed up the computation by iterating in steps. Due to
 
   <div class="subsection">
     <h3>Code: iterative_denoise</h3>
