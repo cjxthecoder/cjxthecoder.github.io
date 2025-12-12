@@ -1,294 +1,627 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<title>CS180 Project 1</title>
+  <meta charset="UTF-8" />
+  <title>Project 5: Fun with Diffusion Models</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 2rem;
+      background: #fafafa;
+      color: #222;
+    }
+    h1, h2, h3 {
+      margin-top: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    h1 {
+      text-align: center;
+    }
+    section {
+      margin-bottom: 2rem;
+      padding: 1.5rem;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .subsection {
+      margin-top: 1rem;
+      margin-bottom: 1rem;
+      padding-top: 0.5rem;
+      border-top: 1px solid #eee;
+    }
+    figure {
+      margin: 1rem 0;
+      display: inline-block;
+      text-align: center;
+    }
+    figure img {
+      max-width: 280px;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+    }
+    figure figcaption {
+      font-size: 0.9rem;
+      color: #555;
+      margin-top: 0.35rem;
+    }
+    .image-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    pre {
+      background: #111;
+      color: #f1f1f1;
+      padding: 0.75rem 1rem;
+      border-radius: 6px;
+      overflow-x: auto;
+      font-size: 0.9rem;
+    }
+    code {
+      font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+    .note {
+      font-size: 0.9rem;
+      color: #666;
+      margin-top: 0.25rem;
+    }
+  </style>
 </head>
 <body>
 
-<h1>Project 1: Colorizing the Prokudin-Gorskii photo collection</h1>
-<div align="center">
-<p>
-by Daniel Cheng | September 12, 2025
-</p>
-</div>
+<h1>Project 5: Fun with Diffusion Models</h1>
 
-<div align="center">
-<img src="images/emirCrop.jpg" alt="emirCrop.jpg" width="50%">
-</div>
+<!-- ========================================================= -->
+<!-- Part 0: Prompting & Sampling                             -->
+<!-- ========================================================= -->
+<section id="part-0">
+  <h2>Part 0 – Prompting and Sampling</h2>
 
-<!-- Section 1 -->
-<h2>Introduction</h2>
-<p>
-The Prokudin-Gorskii photo collection consists of 3 glass plate images, each taken in grayscale with a blue, green, and red filter (ordered from top to bottom). To obtain a colorized version of the original image, we can align the images and use the pixel brightness (normalized to [0, 255]) from each image as the value of its respective color channel. This project aims to perform the aligning and compositing process automatically, given any image containing the 3 glass plates in BGR order.
-</p>
-<hr>
+  To demonstrate the usage of the DeepFloyd IF diffusion model, below are a few examples of different prompts using 20 inference steps with stage 1 of the model, which generates images at 64x64 resolution:
 
-<!-- Section 2 -->
-<h2>NCC & Preprocessing</h2>
-<p>
-To begin the alignment process, we need a function that can compute a similarity score between 2 images. Motivated by the fact that given <i>a + b = c</i>, <i>ab</i> attains its highest value at <i>a = b = c/2</i>, we can use the normalized cross-correlation
-</p>
-<div align="center">
-<img src="images/equation.png" alt="equation.png" width="25%">
-</div>
-<p>
-for 2 vectors <strong>x</strong> and <strong>y</strong>. After normalizing each image with the L<sup>2</sup> norm, the dot product will ensure that the score will be the highest when the features of both images are the most similar. Since grayscale images are represented by 2d arrays, we can first flatten the 2 images we want to compare, before using them as the input vectors. A caveat of this method is that both images should be the same size. However, we can approximate the crop dimensions for just the blue and red plates and find the best displacements with respect to the green plate. The final step would require us to find the intersection of 3 rectangles, which is illustrated below:
-</p>
-<div align="center">
-<img src="images/proj1.png" alt="proj1.png" width="50%">
-</div>
-<hr>
+  <div class="subsection" id="part-0-images">
+    <h3>Images generated with num_inference_steps=20</h3>
 
-<!-- Section 3 -->
-<h2>Naive Search</h2>
-<p>
-To find the best shift, the simplest way is to compute the NCC for every possible shift within the full image. However, not only is this inefficient, but the best shift would also just be (0, 0) for any image, since the crop would just be a copy of the original crop. To solve this issue, we need to limit how much the height can shift when aligning.<br>
-<br>
-Define <i>W</i> and <i>H</i> to be the width and height of the full image, and assume, for approximations, that each plate takes up exactly a third of the full image. Considering only the top/blue plate, we can start by setting the upper limit for the top edge to be <i>(0 + H/3) / 2 = H/6</i>, and the bottom edge to be <i>(2H / 3 + H) / 2 = 5H / 6</i>. This means the top edge should be at least shifted down by <i>H/6 - 0 = H/6</i>, and the bottom edge by <i>5H / 6 - H/3 = H/2</i>. Therefore, a good place to start is a displacement of <i>(0, (H/6 + H/2) / 2) = (0, H/3)</i> with a search range of [<i>-H/6</i>, <i>H/6</i>]. For the bottom/red plate, the equivalent displacement is just <i>(0, -H/3)</i> with the same search range. Any shifts that bring the crop outside the original image will be ignored.<br>
-<br>
-Using a starting crop of {<i>(W/16, H/16), R(W - W/16, H/3 - H/16)</i>} for the blue plate and {<i>(W/16, 2H / 3 + H/16), R(W - W/16, H - H/16)</i>} for the red plate, where the tuples are the upper left and lower right corner pixels in (<i>x</i>, <i>y</i>) coordinates, we can obtain the following best shifts:
-</p>
+    <div class="image-row">
+      <figure>
+        <img src="images/64vs256/01_64px_20.png" alt="01_64px_20.png" />
+        <figcaption>Prompt 1 – 'a photo of a hipster barista'<br /></figcaption>
+      </figure>
+      <figure>
+        <img src="images/64vs256/02_64px_20.png" alt="02_64px_20.png" />
+        <figcaption>Prompt 2 – 'a man wearing a hat'<br /></figcaption>
+      </figure>
+      <figure>
+        <img src="images/64vs256/03_64px_20.png" alt="03_64px_20.png" />
+        <figcaption>Prompt 3 – 'a rocket ship'<br /></figcaption>
+      </figure>
+    </div>
+  </div>
+ 
+  Using stage 2, we can take the output of stage 1 and upscale them to 256x256 resolution:
+  
+  <div class="subsection" id="part-0-images">
+    <div class="image-row">
+      <figure>
+        <img src="images/64vs256/01_256px_20.png" alt="01_256px_20.png" />
+        <figcaption>Prompt 1 – 'a photo of a hipster barista'<br /></figcaption>
+      </figure>
+      <figure>
+        <img src="images/64vs256/02_256px_20.png" alt="02_256px_20.png" />
+        <figcaption>Prompt 2 – 'a man wearing a hat'<br /></figcaption>
+      </figure>
+      <figure>
+        <img src="images/64vs256/03_256px_20.png" alt="03_256px_20.png" />
+        <figcaption>Prompt 3 – 'a rocket ship'<br /></figcaption>
+      </figure>
+    </div>
+  </div>
+  
+  By increasing the inference steps, we can generate higher quality images at cost of more compute time. Below are the stage 2 outputs with the number of inference steps at 100:
+  
+  <div class="subsection" id="part-0-images">
+    <h3>Images generated with num_inference_steps=100</h3>
 
-<div style="display:flex; flex-wrap:wrap; justify-content:center; text-align:center;">
+    <div class="image-row">
+      <figure>
+        <img src="images/64vs256/01_256px_100.png" alt="01_256px_100.png" />
+        <figcaption>Prompt 1 – 'a photo of a hipster barista'<br /></figcaption>
+      </figure>
+      <figure>
+        <img src="images/64vs256/02_256px_100.png" alt="02_256px_100.png" />
+        <figcaption>Prompt 2 – 'a man wearing a hat'<br /></figcaption>
+      </figure>
+      <figure>
+        <img src="images/64vs256/03_256px_100.png" alt="03_256px_100.png" />
+        <figcaption>Prompt 3 – 'a rocket ship'<br /></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
 
-<figure style="flex: 1 0 20%; margin:12px;">
-<figcaption style="margin-bottom:6px;">cathedralNaive.jpg</figcaption>
-<img src="images/cathedralNaive.jpg" alt="cathedralNaive.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: B(-2, 336), R(1, -334)<br>5.070914s</figcaption>
-</figure>
+<!-- ========================================================= -->
+<!-- Part 1.1: Forward Process                                -->
+<!-- ========================================================= -->
+<section id="part-1-1">
+  <h2>Part 1.1 – Implementing the forward process</h2>
 
-<figure style="flex: 1 0 20%; margin:12px;">
-<figcaption style="margin-bottom:6px;">monasteryNaive.jpg</figcaption>
-<img src="images/monasteryNaive.jpg" alt="monasteryNaive.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: B(-2, 344), R(1, -335)<br>5.107604s</figcaption>
-</figure>
+  <div class="subsection">
+    <h3>Code: forward(im, t)</h3>
+    <pre><code># TODO
+# def forward(im, t):
+#     ...
+#     return im_noisy</code></pre>
+  </div>
 
-<figure style="flex: 1 0 20%; margin:12px;">
-<figcaption style="margin-bottom:6px;">tobolskNaive.jpg</figcaption>
-<img src="images/tobolskNaive.jpg" alt="tobolskNaive.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: B(-3, 338), R(1, -337)<br>5.857907s</figcaption>
-</figure>
+  <div class="subsection">
+    <h3>Campanile at Different Noise Levels</h3>
+    <div class="image-row">
+      <figure>
+        <img src="images/part1_1_campanile_t250.png" alt="Campanile t=250" />
+        <figcaption>Campanile at noise level t = 250</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_1_campanile_t500.png" alt="Campanile t=500" />
+        <figcaption>Campanile at noise level t = 500</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_1_campanile_t750.png" alt="Campanile t=750" />
+        <figcaption>Campanile at noise level t = 750</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
 
-</div>
+<!-- ========================================================= -->
+<!-- Part 1.2: Gaussian Denoising                             -->
+<!-- ========================================================= -->
+<section id="part-1-2">
+  <h2>Part 1.2 – Classical Denoising</h2>
 
-<p>
-Unfortunately, because each crop has a height of <i>(7W / 8)</i> &times; <i>(5H / 24)</i>, the total number of NCC computations for each alignment is <i>((W - 7W / 8) + 1)</i> &times; <i>((H/3 - 5H / 24) + 1)</i> = <i>(W / 8 + 1)</i> &times; <i>(H / 8 + 1)</i> = <i>O(HW)</i>. Since each NCC computation requires <i>O(HW)</i> operations, aligning an image of dimensions <i>W</i> &times; <i>3W</i> takes <i>O(W<sup>2</sup>)</i> time using the naive search above. Because the .tif files are about 9 times bigger than the .jpg files in both dimensions, performing the same search on these files will take more than 6500x more times longer to compute. Even if we don't crop horizontally at all, it would still have a complexity of <i>O(W<sup>3</sup>)</i> and require more than 9<sup>3</sup> &approx; 720x more time on .tif files. A more efficient method is required.
-</p>
-<hr>
+  <div class="subsection">
+    <h3>Code: Gaussian Denoising</h3>
+    
+  <div class="subsection">
+    <h3>Noisy vs Gaussian-Denoised Campanile</h3>
 
-<!-- Section 4 -->
-<h2>Image Pyramid</h2>
-<p>
-Instead of searching over the entire image, we can scale down the image, find the best shift at a much smaller size, and scale the result back to its original size. Once the most accurate displacement (<i>x</i><sub>lowest</sub>, <i>y</i><sub>lowest</sub>) is calculated for the lowest-sized image, we can perform another search at the image 2x the size. Only this time, we start at (<i>2x</i><sub>lowest</sub>, <i>2y</i><sub>lowest</sub>), and only search over a window of [-2, 2] for pixel corrections. Once the best displacement at the layer below the lowest scale is computed, we can multiply the result again by 2 and pass it to the image in the next layer below. The limited window is used because each downscaled coordinate could have only come from a total of 4 different coordinates, so the best coordinate on the higher scale is limited to [-1, 1] of the interpolated coordinate. An additional pixel in the search range is used to further reduce the effect of noise on the best placement at the lowest scale. To further optimize this approach without storing all downscale images at once, we can modify the best displacement function to have a recursive call.
-</p>
-<div align="center">
-<img src="images/Image_pyramid_svg.png" alt="Image_pyramid_svg.png" width="25%">
-<figcaption style="margin-bottom:6px;">Source: <a href="https://en.wikipedia.org/wiki/Pyramid_%28image_processing%29">Wikipedia</a></figcaption>
-</div>
-<p>
-Now, we will only calculate the best displacement if the given width is below a certain threshold. For images above this threshold, we can first downscale the image by 2x, pass it back to the function, and the returned shifts are scaled up by 2x to return the best shifts on the input image. This means that the best shifts in the base case (<i>x</i><sub>lowest</sub>, <i>y</i><sub>lowest</sub>) will be scaled up and used in the previous recursive call, which is the scaled image 1 call above. This will continue until we return to the top-level call, and at that point, the returned shifts will be within 1 or 2 pixels of the best overall displacement. The last thing to keep in mind is to downscale the cropping box as well, which is simple to do since it is computed on the full image, and one can simply divide its coordinates by 2 for each recursive call. In practice, setting W<sub>min</sub> = 72 gives the best tradeoff between the search size and the number of rescales. With these optimizations in place, the computing time is now much faster:
-</p>
+    <h4>t = 250</h4>
+    <div class="image-row">
+      <figure>
+        <img src="images/part1_2_campanile_t250_noisy.png" alt="Campanile noisy t=250" />
+        <figcaption>Noisy Campanile (t = 250)</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_2_campanile_t250_gauss.png" alt="Campanile denoised t=250" />
+        <figcaption>Gaussian denoised (t = 250)</figcaption>
+      </figure>
+    </div>
 
-<div style="display:flex; flex-wrap:wrap; justify-content:center; text-align:center;">
+    <h4>t = 500</h4>
+    <div class="image-row">
+      <figure>
+        <img src="images/part1_2_campanile_t500_noisy.png" alt="Campanile noisy t=500" />
+        <figcaption>Noisy Campanile (t = 500)</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_2_campanile_t500_gauss.png" alt="Campanile denoised t=500" />
+        <figcaption>Gaussian denoised (t = 500)</figcaption>
+      </figure>
+    </div>
 
-<figure style="flex: 1 0 20%; margin:12px;">
-<figcaption style="margin-bottom:6px;">cathedral.jpg</figcaption>
-<img src="images/cathedral.jpg" alt="cathedral.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: B(-2, 336), R(1, -334)<br>0.033945s</figcaption>
-</figure>
+    <h4>t = 750</h4>
+    <div class="image-row">
+      <figure>
+        <img src="images/part1_2_campanile_t750_noisy.png" alt="Campanile noisy t=750" />
+        <figcaption>Noisy Campanile (t = 750)</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_2_campanile_t750_gauss.png" alt="Campanile denoised t=750" />
+        <figcaption>Gaussian denoised (t = 750)</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
 
-<figure style="flex: 1 0 20%; margin:12px;">
-<figcaption style="margin-bottom:6px;">church.tif</figcaption>
-<img src="images/church.jpg" alt="church.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: B(-4, 3177), R(-8, -3169)<br>3.423309s</figcaption>
-</figure>
+<!-- ========================================================= -->
+<!-- Part 1.3: One-Step Denoising                             -->
+<!-- ========================================================= -->
+<section id="part-1-3">
+  <h2>Part 1.3 – One-Step Denoising with UNet</h2>
 
-<figure style="flex: 1 0 20%; margin:12px;">
-<figcaption style="margin-bottom:6px;">emir.tif</figcaption>
-<img src="images/emir.jpg" alt="emir.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: B(-24, 3160), R(17, -3152)<br>3.36728s</figcaption>
-</figure>
+  <div class="subsection">
+    <h3>Code: One-Step Denoise</h3>
+    <pre><code># TODO
+# def one_step_denoise(im_noisy, t, ...):
+#     # 1) forward(...) to get noisy version
+#     # 2) stage_1.unet to estimate noise
+#     # 3) subtract noise to estimate x_0
+#     return im_estimated</code></pre>
+  </div>
 
-<figure style="flex: 1 0 20%; margin:12px;">
-<figcaption style="margin-bottom:6px;">harvesters.tif</figcaption>
-<img src="images/harvesters.jpg" alt="harvesters.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: B(-17, 3159), R(-3, -3153)<br>3.393377s</figcaption>
-</figure>
+  <div class="subsection">
+    <h3>Original, Noisy, One-Step Estimate (t = 250, 500, 750)</h3>
 
-<figure style="flex: 1 0 20%; margin:12px;">
-<figcaption style="margin-bottom:6px;">icon.tif</figcaption>
-<img src="images/icon.jpg" alt="icon.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: B(-17, 3204), R(5, -3196)<br>3.401831s</figcaption>
-</figure>
+    <h4>t = 250</h4>
+    <div class="image-row">
+      <figure>
+        <img src="images/part1_3_t250_original.png" alt="Original Campanile" />
+        <figcaption>Original Campanile</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_3_t250_noisy.png" alt="Noisy Campanile t=250" />
+        <figcaption>Noisy (t = 250)</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_3_t250_est.png" alt="Estimate Campanile t=250" />
+        <figcaption>One-step estimate of original (t = 250)</figcaption>
+      </figure>
+    </div>
 
-<figure style="flex: 1 0 20%; margin:12px;">
-<figcaption style="margin-bottom:6px;">italil.tif</figcaption>
-<img src="images/italil.jpg" alt="italil.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: B(-21, 3193), R(15, -3192)<br>3.3279s</figcaption>
-</figure>
+    <h4>t = 500</h4>
+    <div class="image-row">
+      <figure>
+        <img src="images/part1_3_t500_original.png" alt="Original Campanile" />
+        <figcaption>Original Campanile</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_3_t500_noisy.png" alt="Noisy Campanile t=500" />
+        <figcaption>Noisy (t = 500)</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_3_t500_est.png" alt="Estimate Campanile t=500" />
+        <figcaption>One-step estimate of original (t = 500)</figcaption>
+      </figure>
+    </div>
 
-<figure style="flex: 1 0 20%; margin:12px;">
-<figcaption style="margin-bottom:6px;">lastochikino.tif</figcaption>
-<img src="images/lastochikino.jpg" alt="lastochikino.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: B(2, 3244), R(-7, -3163)<br>3.270373s</figcaption>
-</figure>
+    <h4>t = 750</h4>
+    <div class="image-row">
+      <figure>
+        <img src="images/part1_3_t750_original.png" alt="Original Campanile" />
+        <figcaption>Original Campanile</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_3_t750_noisy.png" alt="Noisy Campanile t=750" />
+        <figcaption>Noisy (t = 750)</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_3_t750_est.png" alt="Estimate Campanile t=750" />
+        <figcaption>One-step estimate of original (t = 750)</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
 
-<figure style="flex: 1 0 20%; margin:12px;">
-<figcaption style="margin-bottom:6px;">lugano.tif</figcaption>
-<img src="images/lugano.jpg" alt="lugano.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: B(16, 3203), R(-13, -3192)<br>3.317115s</figcaption>
-</figure>
+<!-- ========================================================= -->
+<!-- Part 1.4: Iterative Denoising                            -->
+<!-- ========================================================= -->
+<section id="part-1-4">
+  <h2>Part 1.4 – Iterative Denoising</h2>
 
-<figure style="flex: 1 0 20%; margin:12px;">
-<figcaption style="margin-bottom:6px;">melons.tif</figcaption>
-<img src="images/melons.jpg" alt="melons.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: B(-11, 3159), R(3, -3145)<br>3.387267s</figcaption>
-</figure>
+  <div class="subsection">
+    <h3>Code: strided_timesteps</h3>
+    <pre><code># TODO
+# Example:
+# strided_timesteps = list(range(990, -10, -30))
+# stage_1.scheduler.set_timesteps(timesteps=strided_timesteps)</code></pre>
+  </div>
 
-<figure style="flex: 1 0 20%; margin:12px;">
-<figcaption style="margin-bottom:6px;">monastery.jpg</figcaption>
-<img src="images/monastery.jpg" alt="monastery.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: B(-2, 344), R(1, -335)<br>0.032784s</figcaption>
-</figure>
+  <div class="subsection">
+    <h3>Code: iterative_denoise</h3>
+    <pre><code># TODO
+# def iterative_denoise(im_noisy, i_start, timesteps, ...):
+#     # Loop from timesteps[i_start] down to 0 using Equation 3
+#     return clean_image</code></pre>
+  </div>
 
-<figure style="flex: 1 0 20%; margin:12px;">
-<figcaption style="margin-bottom:6px;">self_portrait.tif</figcaption>
-<img src="images/self_portrait.jpg" alt="self_portrait.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: B(-29, 3172), R(8, -3153)<br>3.446271s</figcaption>
-</figure>
+  <div class="subsection">
+    <h3>Denoising Loop Visualizations (i_start = 10)</h3>
 
-<figure style="flex: 1 0 20%; margin:12px;">
-<figcaption style="margin-bottom:6px;">siren.tif</figcaption>
-<img src="images/siren.jpg" alt="siren.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: B(6, 3201), R(-18, -3203)<br>3.37681s</figcaption>
-</figure>
+    <p>Noisy Campanile at t = timestep[10]:</p>
+    <figure>
+      <img src="images/part1_4_initial_noisy.png" alt="Initial noisy Campanile (i_start=10)" />
+      <figcaption>Initial noisy Campanile (i_start = 10)</figcaption>
+    </figure>
 
-<figure style="flex: 1 0 20%; margin:12px;">
-<figcaption style="margin-bottom:6px;">three_generations.tif</figcaption>
-<img src="images/three_generations.jpg" alt="three_generations.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: B(-14, 3157), R(-3, -3150)<br>3.285443s</figcaption>
-</figure>
+    <h4>Every 5th loop of iterative denoising</h4>
+    <div class="image-row">
+      <figure>
+        <img src="images/part1_4_step_0.png" alt="Iterative step 0" />
+        <figcaption>Step 0</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_4_step_5.png" alt="Iterative step 5" />
+        <figcaption>Step 5</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_4_step_10.png" alt="Iterative step 10" />
+        <figcaption>Step 10</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_4_step_15.png" alt="Iterative step 15" />
+        <figcaption>Step 15</figcaption>
+      </figure>
+      <!-- Add more if needed -->
+    </div>
 
-<figure style="flex: 1 0 20%; margin:12px;">
-<figcaption style="margin-bottom:6px;">tobolsk.jpg</figcaption>
-<img src="images/tobolsk.jpg" alt="tobolsk.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: B(-3, 338), R(1, -337)<br>0.031668s</figcaption>
-</figure>
+    <h4>Final predicted clean images</h4>
+    <div class="image-row">
+      <figure>
+        <img src="images/part1_4_iterative_clean.png" alt="Iterative clean estimate" />
+        <figcaption>Iterative denoising clean image</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_4_onestep_clean.png" alt="One-step clean estimate" />
+        <figcaption>One-step denoising (from part 1.3)</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_4_gaussian_clean.png" alt="Gaussian-blurred estimate" />
+        <figcaption>Gaussian blur baseline (from part 1.2)</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
 
-<figure style="flex: 1 0 20%; margin:12px;">
-<figcaption style="margin-bottom:6px;"><a href="https://www.loc.gov/item/2018681257">canal.tif</a></figcaption>
-<img src="images/canal.jpg" alt="canal.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: B(-18, 3156), R(6, -3147)<br>3.386601s</figcaption>
-</figure>
+<!-- ========================================================= -->
+<!-- Part 1.5: Unconditional Sampling                         -->
+<!-- ========================================================= -->
+<section id="part-1-5">
+  <h2>Part 1.5 – Unconditional Sampling</h2>
 
-<figure style="flex: 1 0 20%; margin:12px;">
-<figcaption style="margin-bottom:6px;"><a href="https://www.loc.gov/item/2018679143">capri.tif</a></figcaption>
-<img src="images/capri.jpg" alt="capri.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: B(16, 3206), R(-8, -3192)<br>3.325347s</figcaption>
-</figure>
+  <div class="subsection">
+    <h3>Code: Sampling from Stage 1</h3>
+    <pre><code># TODO
+# Example:
+# stage_1_output = stage_1(
+#     prompt_embeds=prompt_embeds_null,
+#     negative_prompt_embeds=...,
+#     num_inference_steps=...,
+#     output_type="pt",
+# ).images</code></pre>
+  </div>
 
-</div>
+  <div class="subsection">
+    <h3>5 Sampled Images</h3>
+    <div class="image-row">
+      <figure>
+        <img src="images/part1_5_sample_1.png" alt="Sample 1" />
+        <figcaption>Sample 1</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_5_sample_2.png" alt="Sample 2" />
+        <figcaption>Sample 2</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_5_sample_3.png" alt="Sample 3" />
+        <figcaption>Sample 3</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_5_sample_4.png" alt="Sample 4" />
+        <figcaption>Sample 4</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_5_sample_5.png" alt="Sample 5" />
+        <figcaption>Sample 5</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
 
-<p>
-Even for small images, the pyramid method achieved a speedup of over 100x due to a reduction in both size and number of NCC computations, while for large images, the computation time is still faster than what naive search takes on a single small image. More concretely, because the image is downscaled by 2x at each layer of the pyramid, the total image area is less than 1 + (1/2)<sup>2</sup> + (1/4)<sup>2</sup> + (1/8)<sup>2</sup> + ... = 1 + 1/4 + 1/16 + 1/64 + ... &lt; 4/3 of the original. Since the search at the lowest scale is limited to W &leq; 72, the total time complexity is only <i>4(3W)W / 3</i> + smaller terms = <i>O(W<sup>2</sup>)</i>, which matches with the actual factor of ~100 between the time it takes to align .jpg and .tif files.
-</p>
-<hr>
+<!-- ========================================================= -->
+<!-- Part 1.6: CFG Sampling                                   -->
+<!-- ========================================================= -->
+<section id="part-1-6">
+  <h2>Part 1.6 – Classifier-Free Guidance (CFG)</h2>
 
-<!-- Section 5 -->
-<h2>Cropping with Sobel</h2>
-<p>
-Although having a fixed cropping dimension worked for aligning the images, because the final result is simply the intersection of the translations, artifacts from the border still remain. Is there a way to automatically crop the borders? The answer is yes. We can start by convolving the sobel operator
-</p>
+  <div class="subsection">
+    <h3>Code: iterative_denoise_cfg</h3>
+    <pre><code># TODO
+# def iterative_denoise_cfg(im_noisy, i_start, timesteps, prompt_embeds, uncond_prompt_embeds, scale=7, ...):
+#     # Use CFG noise estimate:
+#     # noise_est_cfg = uncond_noise_est + scale * (noise_est - uncond_noise_est)
+#     return clean_image</code></pre>
+  </div>
 
-<div style="display:flex; flex-wrap:wrap; justify-content:center; text-align:center;">
+  <div class="subsection">
+    <h3>5 Images with Prompt "a high quality photo" (γ = 7)</h3>
+    <div class="image-row">
+      <figure>
+        <img src="images/part1_6_cfg_1.png" alt="CFG sample 1" />
+        <figcaption>CFG sample 1</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_6_cfg_2.png" alt="CFG sample 2" />
+        <figcaption>CFG sample 2</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_6_cfg_3.png" alt="CFG sample 3" />
+        <figcaption>CFG sample 3</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_6_cfg_4.png" alt="CFG sample 4" />
+        <figcaption>CFG sample 4</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_6_cfg_5.png" alt="CFG sample 5" />
+        <figcaption>CFG sample 5</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
 
-<figure style="flex: 1 0 20%; margin:12px;">
-<img src="images/equationX.png" alt="equationX.png" width="50%">
-</figure>
+<!-- ========================================================= -->
+<!-- Part 1.7: SDEdit-style Edits & Inpainting                -->
+<!-- ========================================================= -->
+<section id="part-1-7">
+  <h2>Part 1.7 – SDEdit-Style Edits and Inpainting</h2>
 
-<figure style="flex: 1 0 20%; margin:12px;">
-<img src="images/equationY.png" alt="equationY.png" width="50%">
-</figure>
+  <!-- 1.7: Edits of Campanile -->
+  <div class="subsection">
+    <h3>1.7.1 – Edits of the Campanile (Noise Levels [1, 3, 5, 7, 10, 20])</h3>
+    <p>Conditional text prompt: <strong>"a high quality photo"</strong></p>
 
-</div>
+    <div class="image-row">
+      <figure>
+        <img src="images/part1_7_campanile_edit_level1.png" alt="Campanile edit level 1" />
+        <figcaption>Noise level index 1</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_7_campanile_edit_level3.png" alt="Campanile edit level 3" />
+        <figcaption>Noise level index 3</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_7_campanile_edit_level5.png" alt="Campanile edit level 5" />
+        <figcaption>Noise level index 5</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_7_campanile_edit_level7.png" alt="Campanile edit level 7" />
+        <figcaption>Noise level index 7</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_7_campanile_edit_level10.png" alt="Campanile edit level 10" />
+        <figcaption>Noise level index 10</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_7_campanile_edit_level20.png" alt="Campanile edit level 20" />
+        <figcaption>Noise level index 20</figcaption>
+      </figure>
+    </div>
+  </div>
 
-<p>
-with the base image, and add the results together. This will produce a composite of the detected edges along the <i>x</i>- and <i>y</i>-axis. The next step is to reconstruct the borders of each plate from the image. Because Sobel is distance-invariant, we can convolve the kernel on only the valid patches, resulting in the new image having dimensions <i>(W - 1)</i> &times; <i>(H - 1)</i>.
-</p>
-<div align="center">
-<img src="images/edges.png" alt="edges.png" width="50%">
-<figcaption style="margin-bottom:6px;">sobelX &starf; img + sobelY &starf; img</figcaption>
-</div>
-<p>
-Now, we can take the average of each row, and those with the lowest and highest values will be the edges. By splitting the resulting array into 4 subarrays [0 : <i>H/8</i>], [<i>H/8</i> : <i>H/2</i>], [<i>H/2</i> : <i>7H / 8</i>], and [<i>H/8</i> : <i>H</i>], we can find the argmax and argmin in each subarray, which will be used as the horizontal borders of each plate image.
-</p>
-<div align="center">
-<img src="images/y.png" alt="y.png" width="50%">
-</div>
-<p>
-The vertical borders can be computed using a similar strategy, except that we need to split the column averages into 3 subsections based on the values found in the previous part. This will ensure that we are able to find the vertical edges of each plate image. Although the center/green plate is not used in the alignment process, its borders will be needed to compute the final crop of the composited image.
-</p>
+  <!-- 1.7: Edits of own test images -->
+  <div class="subsection">
+    <h3>1.7.2 – Edits of 2 Own Test Images</h3>
 
-<div style="display:flex; flex-wrap:wrap; justify-content:center; text-align:center;">
+    <h4>Test Image 1</h4>
+    <div class="image-row">
+      <figure>
+        <img src="images/part1_7_own1_original.png" alt="Own test image 1 original" />
+        <figcaption>Original image 1</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_7_own1_edit_level1.png" alt="Own image 1 edit level 1" />
+        <figcaption>Noise index 1</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_7_own1_edit_level3.png" alt="Own image 1 edit level 3" />
+        <figcaption>Noise index 3</figcaption>
+      </figure>
+      <!-- add 5, 7, 10, 20 -->
+    </div>
 
-<figure style="flex: 1 0 20%; margin:12px;">
-<img src="images/xb.png" alt="xb.png" width="100%">
-<figcaption style="margin-bottom:6px;">Blue plate</figcaption>
-</figure>
+    <h4>Test Image 2</h4>
+    <div class="image-row">
+      <figure>
+        <img src="images/part1_7_own2_original.png" alt="Own test image 2 original" />
+        <figcaption>Original image 2</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_7_own2_edit_level1.png" alt="Own image 2 edit level 1" />
+        <figcaption>Noise index 1</figcaption>
+      </figure>
+      <!-- add 3, 5, 7, 10, 20 -->
+    </div>
+  </div>
 
-<figure style="flex: 1 0 20%; margin:12px;">
-<img src="images/xg.png" alt="xg.png" width="100%">
-<figcaption style="margin-bottom:6px;">Green plate</figcaption>
-</figure>
+  <!-- 1.7: Web image edits -->
+  <div class="subsection">
+    <h3>1.7.3 – Edits of a Web Image</h3>
+    <p>Describe the source image: <!-- TODO --></p>
 
-<figure style="flex: 1 0 20%; margin:12px;">
-<img src="images/xr.png" alt="xr.png" width="100%">
-<figcaption style="margin-bottom:6px;">Red plate</figcaption>
-</figure>
+    <div class="image-row">
+      <figure>
+        <img src="images/part1_7_web_original.png" alt="Web image original" />
+        <figcaption>Original web image</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_7_web_edit_level1.png" alt="Web image edit level 1" />
+        <figcaption>Noise index 1</figcaption>
+      </figure>
+      <!-- add 3, 5, 7, 10, 20 (+ extras if any) -->
+    </div>
+  </div>
 
-</div>
+  <!-- 1.7: Hand-drawn image edits -->
+  <div class="subsection">
+    <h3>1.7.4 – Edits of 2 Hand-Drawn Images</h3>
 
-<div align="center">
-<img src="images/borders.png" alt="borders.png" width="50%">
-<figcaption style="margin-bottom:6px;">All computed borders & subarray boundries</figcaption>
-</div>
+    <h4>Hand Drawn Image 1</h4>
+    <div class="image-row">
+      <figure>
+        <img src="images/part1_7_hand1_original.png" alt="Hand-drawn 1 original" />
+        <figcaption>Original hand-drawn image 1</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_7_hand1_edit_level1.png" alt="Hand-drawn 1 edit level 1" />
+        <figcaption>Noise index 1</figcaption>
+      </figure>
+      <!-- add 3, 5, 7, 10, 20 -->
+    </div>
 
-<p>
-Once the best displacements for the blue and red plates are found, the final step is to find a way to merge the 3 crops, which can be done in the following steps: First, find the intersection of all shifted crops. Second, shift them back to their starting position using the inverse of the displacement. Finally, shift the pixels from the starting positions back to the center using the best displacement, and combine the 3 crops into their respective RGB channels. As a failsafe for bad starting crops, the normal overlap method (discussed in the NCC & Preprocessing section) will be used instead. At the cost of doubling the runtime due to convolution, the images are now much cleaner:
-</p>
+    <h4>Hand Drawn Image 2</h4>
+    <div class="image-row">
+      <figure>
+        <img src="images/part1_7_hand2_original.png" alt="Hand-drawn 2 original" />
+        <figcaption>Original hand-drawn image 2</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_7_hand2_edit_level1.png" alt="Hand-drawn 2 edit level 1" />
+        <figcaption>Noise index 1</figcaption>
+      </figure>
+      <!-- add 3, 5, 7, 10, 20 -->
+    </div>
+  </div>
 
-<div style="display:flex; flex-wrap:wrap; justify-content:center; text-align:center;">
+  <!-- 1.7: Inpainting -->
+  <div class="subsection">
+    <h3>1.7.5 – Inpainting</h3>
 
-<figure style="flex: 1 0 20%; margin:12px;">
-<figcaption style="margin-bottom:6px;">cathedral.jpg</figcaption>
-<img src="images/cathedralCrop.jpg" alt="cathedralCrop.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: B(-2, 336), R(1, -334)
-<br>0.054221s</figcaption>
-</figure>
+    <h4>Code: inpaint function</h4>
+    <pre><code># TODO
+# def inpaint(original_image, mask, prompt_embeds, uncond_prompt_embeds, timesteps, scale=7, ...):
+#     ...
+#     return inpainted_image</code></pre>
 
-<figure style="flex: 1 0 20%; margin:12px;">
-<figcaption style="margin-bottom:6px;">church.tif</figcaption>
-<img src="images/churchCrop.jpg" alt="churchCrop.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: B(-4, 3177), R(-8, -3169)<br>6.210625s</figcaption>
-</figure>
+    <h4>Campanile Inpainting</h4>
+    <div class="image-row">
+      <figure>
+        <img src="images/part1_7_campanile_inpaint_mask.png" alt="Campanile inpaint mask" />
+        <figcaption>Campanile with inpaint mask overlay</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_7_campanile_inpaint_result.png" alt="Campanile inpaint result" />
+        <figcaption>Inpainted Campanile</figcaption>
+      </figure>
+    </div>
 
-<figure style="flex: 1 0 20%; margin:12px;">
-<figcaption style="margin-bottom:6px;">canal.tif</figcaption>
-<img src="images/canalCrop.jpg" alt="canalCrop.jpg" width="50%">
-<figcaption style="margin-bottom:6px;">Best shift: B(-16, 3155), R(6, -3147)<br>6.660678s</figcaption>
-</figure>
+    <h4>Inpainting on 2 of Your Own Images</h4>
+    <h5>Own Image 1</h5>
+    <div class="image-row">
+      <figure>
+        <img src="images/part1_7_own1_inpaint_mask.png" alt="Own image 1 inpaint mask" />
+        <figcaption>Own image 1 – mask</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_7_own1_inpaint_result.png" alt="Own image 1 inpaint result" />
+        <figcaption>Own image 1 – inpainted</figcaption>
+      </figure>
+    </div>
 
-</div>
+    <h5>Own Image 2</h5>
+    <div class="image-row">
+      <figure>
+        <img src="images/part1_7_own2_inpaint_mask.png" alt="Own image 2 inpaint mask" />
+        <figcaption>Own image 2 – mask</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_7_own2_inpaint_result.png" alt="Own image 2 inpaint result" />
+        <figcaption>Own image 2 – inpainted</figcaption>
+      </figure>
+    </div>
+  </div>
 
-<p>
-The title image was computed with a best shift of B(-23, 3159), R(17, -3152) in 6.26317s.
-</p>
-<hr>
-
-<div align="center">
-<a href="https://cjxthecoder.github.io">cjxthecoder</a> | <a href="https://github.com/cjxthecoder">GitHub</a> | <a href="https://www.linkedin.com/in/daniel-cheng-71b475279">LinkedIn</a>
-</div>
+</section>
 
 </body>
 </html>
