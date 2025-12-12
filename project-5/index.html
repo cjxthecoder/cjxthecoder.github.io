@@ -79,7 +79,7 @@ margin-top: 0.25rem;
 <section id="part-0">
 <h2>Part 0 – Prompting and Sampling</h2>
 
-To demonstrate the usage of the DeepFloyd IF diffusion model, below are a few examples of different prompts using 20 inference steps with stage 1 of the model, which generates images at 64x64 resolution:
+To demonstrate the usage of the DeepFloyd IF diffusion model, below are a few examples of different prompts using 20 inference steps with stage 1 of the model, which generates images at 64x64 resolution. Using a seed value of 180:
 
 <div class="subsection" id="part-0-images">
 <h3>Images generated with num_inference_steps=20</h3>
@@ -335,7 +335,7 @@ Below are some visualizations for the iterative denoising process:
 <figcaption>Initial noisy Campanile (i_start = 10)</figcaption>
 </figure>
 
-<h4>Every 5th loop of iterative denoising</h4>
+<h4>The iterative denoising loop</h4>
 <div class="image-row">
 <figure>
 <img src="images/ddpm/DDPM_0x5.png" alt="DDPM_0x5.png" />
@@ -358,7 +358,7 @@ Below are some visualizations for the iterative denoising process:
 <figcaption>Step 20</figcaption>
 </figure>
 <figure>
-<img src="images/ddpm/final_ddpm.png" alt="DDPM_4x5.png" />
+<img src="images/ddpm/final_ddpm.png" alt="final_ddpm.png" />
 <figcaption>Step 23 (final)</figcaption>
 </figure>
 </div>
@@ -390,7 +390,6 @@ Below are some visualizations for the iterative denoising process:
 Starting with pure noise, we can obtain random denoise images by setting the starting index of <code>strided_timestamps</code> to 0, and using the prompt <code>'a high quality photo'</code>. Below are a few examples:
 
 <div class="subsection">
-<h3>5 Sampled Images</h3>
 <div class="image-row">
 <figure>
 <img src="images/ahqi/ahqi_1.png" alt="ahqi_1.png" />
@@ -429,10 +428,9 @@ To improve the quality of the images, we can compute both a noise estiamte condi
 </code></pre>
 </div>
 
-Using &gamma; = 7 and the conditional & unconditional prompts be <code>'a high quality photo'</code> and the null prompt, we the following sample images:
+By setting <code>scale = 7</code> (&gamma; = 7) and the conditional & unconditional prompts be <code>'a high quality photo'</code> & the null prompt <code>''</code>, we get the following sample images:
 
 <div class="subsection">
-<h3>5 Images with Prompt "a high quality photo" (γ = 7)</h3>
 <div class="image-row">
 <figure>
 <img src="images/ahqi/cfg_ahqi_1.png" alt="cfg_ahqi_1.png" />
@@ -462,7 +460,9 @@ Using &gamma; = 7 and the conditional & unconditional prompts be <code>'a high q
 <!-- Part 1.7: SDEdit-style Edits & Inpainting-->
 <!-- ========================================================= -->
 <section id="part-1-7">
-<h2>Part 1.7 – SDEdit-Style Edits and Inpainting</h2>
+<h2>Part 1.7 – Image-to-image Translation</h2>
+
+Similar to how we added noise to an existing image before denoising the result in part 1.4, we can use the <code>iterative_denoise_cfg</code> function to get a result that is of higher quality, as opposed to merely a prediction of the original. By adjusting the starting amount of noise to the Campanile with the timestamp index <code>i_start</code>, where a higher index means less noise, we get a series of edits to the that gradually go from entirely new to resembling the original image:
 
 <!-- 1.7: Edits of Campanile -->
 <div class="subsection">
@@ -470,6 +470,10 @@ Using &gamma; = 7 and the conditional & unconditional prompts be <code>'a high q
 <p>Conditional text prompt: <strong>"a high quality photo"</strong></p>
 
 <div class="image-row">
+<figure>
+<img src="images/campanile.png" alt="campanile.png" />
+<figcaption>Noise level index 1</figcaption>
+</figure>
 <figure>
 <img src="images/part1_7_campanile_edit_level1.png" alt="Campanile edit level 1" />
 <figcaption>Noise level index 1</figcaption>
