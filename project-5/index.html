@@ -230,7 +230,7 @@ In order to try to revert the image with noise, we can try the classical method 
 <section id="part-1-3">
 <h2>Part 1.3 – Implementing One Step Denoising</h2>
 
-A much more effective method is to use a pretrained diffusion model. Using <code>stage_1.unet</code>, we can estimate the amount of noise in the noisy image. With the forward equation, we can solve for x<sub>0</sub> (the original image) given the timestamp <code>t</code>:
+A much more effective method is to use a pretrained diffusion model. Using <code>stage_1.unet</code>, we can estimate the amount of noise in the noisy image. With the forward equation, we can solve for <code>x<sub>0</sub></code> (the original image) given the timestamp <code>t</code>:
 
 <div class="subsection">
 <pre><code>at_x0 = im_noisy_cpu - (1 - alpha_cumprod).sqrt() * noise_est
@@ -300,21 +300,31 @@ Below are a comparison the original, noisy, and the estimate of the original ima
 
 Instead of using one step, we can obtain better results by iterativly denoising from step <code>t</code> until step 0. However, this means running the diffusion model 1000 times in the worst case, which is slow and costly.<br>
 <br>
-Fortunately, we can speed up the computation by first defining series of strided timestamps, starting at close to 1000 and ending at 0. For the examples below, we will use <code>strided_timestamps = list(range(990, -1, -30))</code>. Then, we can use the formula
+Fortunately, we can speed up the computation by first defining series of strided timestamps, starting at close to 1000 and ending at 0. For the examples below, we will use <code>strided_timestamps = [990, 960, ..., 30, 0]</code>. Then, we can use the formula
 
 <div class="image-row">
 <figure>
-<img src="images/campanile.png" alt="campanile.png" />
+<img src="images/equation.png" alt="equation.png" />
 </figure>
 </div>
 
+to compute <code>x</code> at timestamp <code>T</code>, where <code>T</code> (or <code>prev_t</code>) is the next timestamp after the current timestamp <code>t</code> in <code>strided_timestamps</code>. First, we compute the constants:
+
 <div class="subsection">
-<h3>Code: iterative_denoise</h3>
-<pre><code># TODO
-# def iterative_denoise(im_noisy, i_start, timesteps, ...):
-# # Loop from timesteps[i_start] down to 0 using Equation 3
-# return clean_image</code></pre>
+<pre><code>alpha_cumprod = alphas_cumprod[t]
+alpha_cumprod_prev = alphas_cumprod[prev_t]
+alpha_t = alpha_cumprod / alpha_cumprod_prev
+beta_t = 1 - alpha_t</code></pre>
 </div>
+
+Then, we can compute <code>x<sub>T</sub></code> by using the one-step estimate of <code>x<sub>0</sub></code> as follows:
+
+<div class="subsection">
+<pre><code>x_0 = (image - (1 - alpha_cumprod).sqrt() * noise_est) / alpha_cumprod.sqrt()
+term_1 = alpha_cumprod_prev.sqrt() * beta_t
+term_2 = alpha_t.sqrt() * (1 - alpha_cumprod_prev)
+pred_pi_nonoise = (term_1 * x_0 + term_2 * image) / (1 - alpha_cumprod)
+pred_prev_image = add_variance(predicted_variance, t, pred_pi_nonoise)</code></pre></div>
 
 <div class="subsection">
 <h3>Denoising Loop Visualizations (i_start = 10)</h3>
