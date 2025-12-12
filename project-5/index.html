@@ -298,8 +298,10 @@ original_im = at_x0 / alpha_cumprod.sqrt()</code></pre>
 
   Instead of using one step, we can obtain better results by iterativly denoising from step <code>t</code> until step 0. However, this means running the diffusion model 1000 times in the worst case, which is slow and costly.
   
-  Fortunately, we can speed up the computation by iterating in steps. Due to
-
+  Fortunately, we can speed up the computation by first defining series of strided timestamps, starting at close to 1000 and ending at 0. For the examples below, we will use <code>strided_timestamps = list(range(990, -1, -30))</code>. Then, we can use the formula
+  
+  <
+  
   <div class="subsection">
     <h3>Code: iterative_denoise</h3>
     <pre><code># TODO
