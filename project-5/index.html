@@ -828,7 +828,163 @@ Finally, we can also change our conditional prompt, namely <code>'a high quality
 </figure>
 </div>
 </div>
+</section>
 
+<!-- ========================================================= -->
+<!-- Part 1.8: Visual Anagrams                                 -->
+<!-- ========================================================= -->
+<section id="part-1-8">
+  <h2>Part 1.8 – Visual Anagrams</h2>
+
+  <div class="subsection">
+    <h3>1.8.1 – Code: visual_anagrams</h3>
+    <pre><code># TODO
+# def visual_anagrams(
+#     prompt_embeds_p1,
+#     prompt_embeds_p2,
+#     uncond_prompt_embeds,
+#     timesteps,
+#     scale=7,
+#     num_inference_steps=...,
+# ):
+#     """
+#     Returns:
+#       image: torch.Tensor of shape (1, 3, 64, 64) in [-1, 1]
+#     """
+#     # TODO</code></pre>
+
+    <p class="note">
+      Notes: include your flipping operation (e.g., torch.flip(..., dims=[2])) and how you combine
+      noise / variance estimates (if applicable).
+    </p>
+  </div>
+
+  <div class="subsection">
+    <h3>1.8.2 – Two Visual Anagram Illusions</h3>
+    <p>
+      Each illusion should look like one concept normally, and another concept when flipped upside down.
+      Show both orientations.
+    </p>
+
+    <h4>Illusion 1</h4>
+    <p><strong>Prompt p1:</strong> <em><!-- TODO: prompt 1 --></em><br/>
+       <strong>Prompt p2:</strong> <em><!-- TODO: prompt 2 --></em>
+    </p>
+    <div class="image-row">
+      <figure>
+        <img src="images/part1_8_illusion1_original.png" alt="Visual anagram illusion 1 (original)" />
+        <figcaption>Illusion 1 – Original orientation</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_8_illusion1_flipped.png" alt="Visual anagram illusion 1 (flipped)" />
+        <figcaption>Illusion 1 – Flipped upside down</figcaption>
+      </figure>
+    </div>
+
+    <h4>Illusion 2</h4>
+    <p><strong>Prompt p1:</strong> <em><!-- TODO: prompt 1 --></em><br/>
+       <strong>Prompt p2:</strong> <em><!-- TODO: prompt 2 --></em>
+    </p>
+    <div class="image-row">
+      <figure>
+        <img src="images/part1_8_illusion2_original.png" alt="Visual anagram illusion 2 (original)" />
+        <figcaption>Illusion 2 – Original orientation</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_8_illusion2_flipped.png" alt="Visual anagram illusion 2 (flipped)" />
+        <figcaption>Illusion 2 – Flipped upside down</figcaption>
+      </figure>
+    </div>
+
+    <p class="note">
+      Brief discussion: what makes the illusion work? How sensitive is it to guidance scale / steps / noise schedule?
+      <!-- TODO -->
+    </p>
+  </div>
+</section>
+
+<!-- ========================================================= -->
+<!-- Part 1.9: Hybrid Images                                   -->
+<!-- ========================================================= -->
+<section id="part-1-9">
+  <h2>Part 1.9 – Hybrid Images</h2>
+
+  <div class="subsection">
+    <h3>1.9.1 – Code: make_hybrids</h3>
+    <pre><code># TODO
+# def make_hybrids(
+#     image_a,
+#     image_b,
+#     lowpass_sigma=...,
+#     highpass_sigma=...,
+#     blend_weight=...,
+# ):
+#     """
+#     Returns:
+#       hybrid: torch.Tensor or np.ndarray (document your format)
+#       low_freq: low-frequency component (optional)
+#       high_freq: high-frequency component (optional)
+#     """
+#     # TODO</code></pre>
+
+    <p class="note">
+      Notes: describe your filter choice (Gaussian blur / FFT), the cutoff frequencies (sigmas),
+      and how you combined low/high frequency components. <!-- TODO -->
+    </p>
+  </div>
+
+  <div class="subsection">
+    <h3>1.9.2 – Two Hybrid Images</h3>
+    <p>
+      Each hybrid image should look like Image A up close (high frequencies) and Image B from far away
+      (low frequencies), or vice versa. Include the two source images and the resulting hybrid.
+    </p>
+
+    <h4>Hybrid 1</h4>
+    <p>
+      <strong>Image A (high freq / close):</strong> <em><!-- TODO: describe A --></em><br/>
+      <strong>Image B (low freq / far):</strong> <em><!-- TODO: describe B --></em>
+    </p>
+    <div class="image-row">
+      <figure>
+        <img src="images/part1_9_hybrid1_sourceA.png" alt="Hybrid 1 source A" />
+        <figcaption>Hybrid 1 – Source A</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_9_hybrid1_sourceB.png" alt="Hybrid 1 source B" />
+        <figcaption>Hybrid 1 – Source B</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_9_hybrid1_result.png" alt="Hybrid 1 result" />
+        <figcaption>Hybrid 1 – Result</figcaption>
+      </figure>
+    </div>
+
+    <h4>Hybrid 2</h4>
+    <p>
+      <strong>Image A (high freq / close):</strong> <em><!-- TODO: describe A --></em><br/>
+      <strong>Image B (low freq / far):</strong> <em><!-- TODO: describe B --></em>
+    </p>
+    <div class="image-row">
+      <figure>
+        <img src="images/part1_9_hybrid2_sourceA.png" alt="Hybrid 2 source A" />
+        <figcaption>Hybrid 2 – Source A</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_9_hybrid2_sourceB.png" alt="Hybrid 2 source B" />
+        <figcaption>Hybrid 2 – Source B</figcaption>
+      </figure>
+      <figure>
+        <img src="images/part1_9_hybrid2_result.png" alt="Hybrid 2 result" />
+        <figcaption>Hybrid 2 – Result</figcaption>
+      </figure>
+    </div>
+
+    <p class="note">
+      Optional: include frequency visualizations or intermediate components (low/high pass) if you computed them.
+      <!-- TODO -->
+    </p>
+  </div>
 </section>
 
 </body>
