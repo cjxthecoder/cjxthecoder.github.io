@@ -100,7 +100,7 @@ To demonstrate the usage of the DeepFloyd IF diffusion model, below are a few ex
 </div>
 </div>
  
-Using stage 2, we can take the output of stage 1 and upscale them to 256x256 resolution:
+Using stage 2, we can take the output of stage 1 and upscale it to 256x256 resolution:
 
 <div class="subsection" id="part-0-images">
 <div class="image-row">
@@ -119,7 +119,7 @@ Using stage 2, we can take the output of stage 1 and upscale them to 256x256 res
 </div>
 </div>
 
-By increasing the inference steps, we can generate higher quality images at cost of more compute time. Below are the stage 2 outputs with the number of inference steps at 100:
+By increasing the inference steps, we can generate higher quality images at the cost of more compute time. Below are the stage 2 outputs with the number of inference steps at 100:
 
 <div class="subsection" id="part-0-images">
 <h3>Images generated with num_inference_steps=100</h3>
@@ -194,7 +194,7 @@ In order to try to revert the image with noise, we can try the classical method 
 </figure>
 <figure>
 <img src="images/250500750/campanile_250denoise_gaussian.png" alt="campanile_250denoise_gaussian.png" />
-<figcaption>Gaussian denoised (t = 250)</figcaption>
+<figcaption>5&times;5 Gaussian denoised (t = 250)</figcaption>
 </figure>
 </div>
 
@@ -206,7 +206,7 @@ In order to try to revert the image with noise, we can try the classical method 
 </figure>
 <figure>
 <img src="images/250500750/campanile_500denoise_gaussian.png" alt="campanile_500denoise_gaussian.png" />
-<figcaption>Gaussian denoised (t = 500)</figcaption>
+<figcaption>5&times;5 Gaussian denoised (t = 500)</figcaption>
 </figure>
 </div>
 
@@ -218,7 +218,7 @@ In order to try to revert the image with noise, we can try the classical method 
 </figure>
 <figure>
 <img src="images/250500750/campanile_750denoise_gaussian.png" alt="campanile_750denoise_gaussian.png" />
-<figcaption>Gaussian denoised (t = 750)</figcaption>
+<figcaption>5&times;5 Gaussian denoised (t = 750)</figcaption>
 </figure>
 </div>
 </div>
@@ -250,7 +250,7 @@ Below are a comparison the original, noisy, and the estimate of the original ima
 </figure>
 <figure>
 <img src="images/250500750/campanile_250noise.png" alt="campanile_250noise.png" />
-<figcaption>Noisy (t = 250)</figcaption>
+<figcaption>Noisy Campanile (t = 250)</figcaption>
 </figure>
 <figure>
 <img src="images/250500750/campanile_250denoise_onestep.png" alt="campanile_250denoise_onestep.png" />
@@ -266,7 +266,7 @@ Below are a comparison the original, noisy, and the estimate of the original ima
 </figure>
 <figure>
 <img src="images/250500750/campanile_500noise.png" alt="campanile_500noise.png" />
-<figcaption>Noisy (t = 500)</figcaption>
+<figcaption>Noisy Campanile (t = 500)</figcaption>
 </figure>
 <figure>
 <img src="images/250500750/campanile_500denoise_onestep.png" alt="campanile_500denoise_onestep.png" />
@@ -282,7 +282,7 @@ Below are a comparison the original, noisy, and the estimate of the original ima
 </figure>
 <figure>
 <img src="images/250500750/campanile_750noise.png" alt="campanile_750noise.png" />
-<figcaption>Noisy (t = 750)</figcaption>
+<figcaption>Noisy Campanile (t = 750)</figcaption>
 </figure>
 <figure>
 <img src="images/250500750/campanile_750denoise_onestep.png" alt="campanile_750denoise_onestep.png" />
@@ -298,7 +298,7 @@ Below are a comparison the original, noisy, and the estimate of the original ima
 <section id="part-1-4">
 <h2>Part 1.4 – Iterative Denoising</h2>
 
-Instead of using one step, we can obtain better results by iterativly denoising from step <code>t</code> until step 0. However, this means running the diffusion model 1000 times in the worst case, which is slow and costly. Fortunately, we can speed up the computation by first defining series of strided timestamps, starting at close to 1000 and ending at 0. For the examples below, we will use <code>strided_timestamps = [990, 960, ..., 30, 0]</code>. Then, we can use the formula
+Instead of using one step, we can obtain better results by iteratively denoising from step <code>t</code> until step 0. However, this means running the diffusion model 1000 times in the worst case, which is slow and costly. Fortunately, we can speed up the computation by first defining a series of strided timestamps, starting at close to 1000 and ending at 0. For the examples below, we will use <code>strided_timestamps = [990, 960, ..., 30, 0]</code>. Then, we can use the formula
 
 <div class="image-row">
 <figure>
@@ -572,7 +572,7 @@ Below are 2 other examples of editing similar images:
 <div class="subsection">
 <h3>1.7.1 – Editing Hand-Drawn and Web Images</h3>
 
-The same procedure can also be done for images that are hand-drawn or nonrealistic:
+The same procedure can also be done for images that are hand-drawn or non-realistic:
 
 <h4>Web Image (magic gauntlet from gdbrowser.com)</h4>
 <div class="image-row">
@@ -683,7 +683,7 @@ Using the techniques above, we can also modify our <code>iterative_denoise_cfg</
 
 <pre><code>masked_image = image * mask + forward(original_image, t).to(device).half() * (1 - mask)</code></pre>
 
-Once <code>image</code> is replaced by <code>masked_image</code>, we replace all further occurences of <code>image</code> except for the last instance, as the image at each step still needs to be updated. Finally, we let our starting noise be purely random and start with an timestamp index of 0, so that the patch we want to change can be sufficiently denoised. Below are the reuslts on the Campanile image:
+Once <code>image</code> is replaced by <code>masked_image</code>, we replace all further occurrences of <code>image</code> except for the last instance, as the image at each step still needs to be updated. Finally, we let our starting noise be purely random and start with a timestamp index of 0, so that the patch we want to change can be sufficiently denoised. Below are the results on the Campanile image:
 
 <h4>Campanile Inpainting</h4>
 <div class="image-row">
