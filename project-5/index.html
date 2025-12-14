@@ -827,97 +827,97 @@ Finally, we can also change our conditional prompt, namely <code>'a high quality
 </section>
 
 <!-- ========================================================= -->
-<!-- Part 1.8: Visual Anagrams                                 -->
+<!-- Part 1.8: Visual Anagrams -->
 <!-- ========================================================= -->
 <section id="part-1-8">
-  <h2>Part 1.8 – Visual Anagrams</h2>
-  
-  We now have the necessary tools to generate visual anagrams, or images that look like another different one when flipped/rotated. As an example for a vertical flip anagram, we would start with 2 prompt embeddings <code>p<sub>1</sub></code> and <code>p<sub>2</sub></code>. For <code>p<sub>1</sub></code>, we would compute the noise estimate &epsilon;<sub>1</sub> normally at each step, but for <code>p<sub>2</sub></code>, we flip the image <code>x<sub>t</sub></code> first before computing the noise estimate, then flip back the estimate to obtain &epsilon;<sub>2</sub>. Once this is done, we will use the average of &epsilon;<sub>1</sub> and &epsilon;<sub>2</sub> as the final noise estimate for each step. The variance can also be computed similarly, namely v<sub>1</sub> will be computed in the usual way, while v<sub>2</sub> will be the flipped variance estimate of the flipped <code>x<sub>t</sub></code>, and the final variance estimate will (v<sub>1</sub> + v<sub>2</sub>) / 2. Below are a few examples of such an effect, with <code>p<sub>1</sub></code> being the first prompt and <code>p<sub>2</sub></code> being the second:
+<h2>Part 1.8 – Visual Anagrams</h2>
 
-  <div class="subsection">
-    <h3>Prompts: <code>'an oil painting of an old man'</code> and <code>'an oil painting of people around a campfire'</code></h3>
-    <div class="image-row">
-      <figure>
-        <img src="images/anagram/anagram1_256.png" alt="anagram1_256.png" />
-        <figcaption>Original</figcaption>
-      </figure>
-      <figure>
-        <img src="images/anagram/anagram1_flip_256.png" alt="anagram1_256.png" />
-        <figcaption>Flipped</figcaption>
-      </figure>
-    </div>
+We now have the necessary tools to generate visual anagrams, or images that look like another different one when flipped/rotated. As an example for a vertical flip anagram, we would start with 2 prompt embeddings <code>p<sub>1</sub></code> and <code>p<sub>2</sub></code>. For <code>p<sub>1</sub></code>, we would compute the noise estimate &epsilon;<sub>1</sub> normally at each step, but for <code>p<sub>2</sub></code>, we flip the image <code>x<sub>t</sub></code> first before computing the noise estimate, then flip back the estimate to obtain &epsilon;<sub>2</sub>. Once this is done, we will use the average of &epsilon;<sub>1</sub> and &epsilon;<sub>2</sub> as the final noise estimate for each step. The variance can also be computed similarly, namely v<sub>1</sub> will be computed in the usual way, while v<sub>2</sub> will be the flipped variance estimate of the flipped <code>x<sub>t</sub></code>, and the final variance estimate will (v<sub>1</sub> + v<sub>2</sub>) / 2. Below are a few examples of such an effect, with <code>p<sub>1</sub></code> being the first prompt and <code>p<sub>2</sub></code> being the second:
 
-    <h3>Prompts: <code>'a lithograph of waterfalls'</code> and <code>'a man wearing a hat'</code></h3>
-    <div class="image-row">
-      <figure>
-        <img src="images/anagram/anagram2_256.png" alt="anagram2_256.png" />
-        <figcaption>Original</figcaption>
-      </figure>
-      <figure>
-        <img src="images/anagram/anagram2_flip_256.png" alt="anagram2_256.png" />
-        <figcaption>Flipped</figcaption>
-      </figure>
-    </div>
+<div class="subsection">
+<h3>Prompts: <code>'an oil painting of an old man'</code> and <code>'an oil painting of people around a campfire'</code></h3>
+<div class="image-row">
+<figure>
+<img src="images/anagram/anagram1_256.png" alt="anagram1_256.png" />
+<figcaption>Original</figcaption>
+</figure>
+<figure>
+<img src="images/anagram/anagram1_flip_256.png" alt="anagram1_256.png" />
+<figcaption>Flipped</figcaption>
+</figure>
+</div>
 
-    <h3>Prompts: <code>'an oil painting of a snowy mountain village'</code> and <code>'a photo of a dog'</code></h3>
-    <div class="image-row">
-      <figure>
-        <img src="images/anagram/anagram3_256.png" alt="anagram3_256.png" />
-        <figcaption>Original</figcaption>
-      </figure>
-      <figure>
-        <img src="images/anagram/anagram3_flip_256.png" alt="anagram3_256.png" />
-        <figcaption>Flipped</figcaption>
-      </figure>
-    </div>
-  </div>
+<h3>Prompts: <code>'a lithograph of waterfalls'</code> and <code>'a man wearing a hat'</code></h3>
+<div class="image-row">
+<figure>
+<img src="images/anagram/anagram2_256.png" alt="anagram2_256.png" />
+<figcaption>Original</figcaption>
+</figure>
+<figure>
+<img src="images/anagram/anagram2_flip_256.png" alt="anagram2_256.png" />
+<figcaption>Flipped</figcaption>
+</figure>
+</div>
+
+<h3>Prompts: <code>'an oil painting of a snowy mountain village'</code> and <code>'a photo of a dog'</code></h3>
+<div class="image-row">
+<figure>
+<img src="images/anagram/anagram3_256.png" alt="anagram3_256.png" />
+<figcaption>Original</figcaption>
+</figure>
+<figure>
+<img src="images/anagram/anagram3_flip_256.png" alt="anagram3_256.png" />
+<figcaption>Flipped</figcaption>
+</figure>
+</div>
+</div>
 </section>
 
 <!-- ========================================================= -->
-<!-- Part 1.9: Hybrid Images                                   -->
+<!-- Part 1.9: Hybrid Images -->
 <!-- ========================================================= -->
 <section id="part-1-9">
-  <h2>Part 1.9 – Hybrid Images</h2>
-  
-  With the technqiues above, we can now also create hybrid images, or images that look like different subjects depending on the viewing distance. The classical way to create a hybrid image is to transform the image you want to see at far range with a low-pass filter, the image you want to see at close range wiht a high-pass filter, and combine the 2 transformed images. We can use a similar algorithm in the denoising process, namely by passing the noise estimate from <code>p<sub>1</sub></code> and <code>p<sub>2</sub></code> through a low and high pass filter respectively. This will produce an image that when view close up, shows <code>p<sub>1</sub></code>, but when viewed far away, shows <code>p<sub>2</sub></code>. Unlike the anagram images, we don't need to flip or transform the image to be denoised, as both images should be viewed under the same orientation. Below are several examples:
+<h2>Part 1.9 – Hybrid Images</h2>
+ 
+With the techniques above, we can now also create hybrid images, or images that look like different subjects depending on the viewing distance. The classical way to create a hybrid image is to transform the image you want to see at a far range with a low-pass filter, the image you want to see at close range with a high-pass filter, and combine the 2 transformed images. We can use a similar algorithm in the denoising process, namely by passing the noise estimate from <code>p<sub>1</sub></code> and <code>p<sub>2</sub></code> through a low and high pass filter, respectively. This will produce an image that, when viewed close up, shows <code>p<sub>1</sub></code>, but when viewed far away, shows <code>p<sub>2</sub></code>. Unlike the anagram images, we don't need to flip or transform the image to be denoised, as both images should be viewed under the same orientation. Below are several examples:
 
-  <div class="subsection">
-    <h3>Prompts: <code>'an oil painting of an old man'</code> and <code>'an oil painting of people around a campfire'</code></h3>
-    <div class="image-row">
-      <figure>
-        <img src="images/anagram/anagram1_256.png" alt="anagram1_256.png" />
-        <figcaption>Original</figcaption>
-      </figure>
-      <figure>
-        <img src="images/anagram/anagram1_flip_256.png" alt="anagram1_256.png" />
-        <figcaption>Flipped</figcaption>
-      </figure>
-    </div>
+<div class="subsection">
+<h3>Prompts: <code>'an oil painting of an old man'</code> and <code>'an oil painting of people around a campfire'</code></h3>
+<div class="image-row">
+<figure>
+<img src="images/anagram/anagram1_256.png" alt="anagram1_256.png" />
+<figcaption>Original</figcaption>
+</figure>
+<figure>
+<img src="images/anagram/anagram1_flip_256.png" alt="anagram1_256.png" />
+<figcaption>Flipped</figcaption>
+</figure>
+</div>
 
-    <h3>Prompts: <code>'a lithograph of waterfalls'</code> and <code>'a man wearing a hat'</code></h3>
-    <div class="image-row">
-      <figure>
-        <img src="images/anagram/anagram2_256.png" alt="anagram2_256.png" />
-        <figcaption>Original</figcaption>
-      </figure>
-      <figure>
-        <img src="images/anagram/anagram2_flip_256.png" alt="anagram2_256.png" />
-        <figcaption>Flipped</figcaption>
-      </figure>
-    </div>
+<h3>Prompts: <code>'a lithograph of waterfalls'</code> and <code>'a man wearing a hat'</code></h3>
+<div class="image-row">
+<figure>
+<img src="images/anagram/anagram2_256.png" alt="anagram2_256.png" />
+<figcaption>Original</figcaption>
+</figure>
+<figure>
+<img src="images/anagram/anagram2_flip_256.png" alt="anagram2_256.png" />
+<figcaption>Flipped</figcaption>
+</figure>
+</div>
 
-    <h3>Prompts: <code>'an oil painting of a snowy mountain village'</code> and <code>'a photo of a dog'</code></h3>
-    <div class="image-row">
-      <figure>
-        <img src="images/anagram/anagram3_256.png" alt="anagram3_256.png" />
-        <figcaption>Original</figcaption>
-      </figure>
-      <figure>
-        <img src="images/anagram/anagram3_flip_256.png" alt="anagram3_256.png" />
-        <figcaption>Flipped</figcaption>
-      </figure>
-    </div>
-  </div>
+<h3>Prompts: <code>'an oil painting of a snowy mountain village'</code> and <code>'a photo of a dog'</code></h3>
+<div class="image-row">
+<figure>
+<img src="images/anagram/anagram3_256.png" alt="anagram3_256.png" />
+<figcaption>Original</figcaption>
+</figure>
+<figure>
+<img src="images/anagram/anagram3_flip_256.png" alt="anagram3_256.png" />
+<figcaption>Flipped</figcaption>
+</figure>
+</div>
+</div>
 </section>
 
 </body>
