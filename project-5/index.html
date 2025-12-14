@@ -689,11 +689,11 @@ Using the techniques above, we can also modify our <code>iterative_denoise_cfg</
 <figcaption>Original Campanile</figcaption>
 </figure>
 <figure>
-<img src="images/campanile_mask.png" alt="campanile_mask.png" />
+<img src="images/inpaint/campanile_mask.png" alt="campanile_mask.png" />
 <figcaption>Mask</figcaption>
 </figure>
 <figure>
-<img src="images/campanile_inpaint.png" alt="campanile_inpaint.png" />
+<img src="images/inpaint/campanile_inpaint.png" alt="campanile_inpaint.png" />
 <figcaption>Inpainted Campanile</figcaption>
 </figure>
 </div>
@@ -880,13 +880,13 @@ We now have the necessary tools to generate visual anagrams, or images that look
 <section id="part-1-9">
 <h2>Part 1.9 – Hybrid Images</h2>
  
-With the techniques above, we can now also create hybrid images, or images that look like different subjects depending on the viewing distance. The classical way to create a hybrid image is to transform the image you want to see at a far range with a low-pass filter, the image you want to see at close range with a high-pass filter, and combine the 2 transformed images. We can use a similar algorithm in the denoising process, namely by passing the noise estimate from <code>p<sub>1</sub></code> and <code>p<sub>2</sub></code> through a low and high pass filter, respectively. This will produce an image that, when viewed close up, shows <code>p<sub>1</sub></code>, but when viewed far away, shows <code>p<sub>2</sub></code>. Unlike the anagram images, we don't need to flip or transform the image to be denoised, as both images should be viewed under the same orientation. Below are several examples:
+With the techniques above, we can now also create hybrid images, or images that look like different subjects depending on the viewing distance. The classical way to create a hybrid image is to transform the image you want to see at a far range with a low-pass filter, the image you want to see at close range with a high-pass filter, and combine the 2 transformed images. We can use a similar algorithm in the denoising process, namely by passing the noise estimate from <code>p<sub>1</sub></code> and <code>p<sub>2</sub></code> through a low and high pass filter, respectively. After doing so, we will add the 2 filtered noises together to get the final noise estimate at each step. This will produce an image that, when viewed close up, shows <code>p<sub>1</sub></code>, but when viewed far away, shows <code>p<sub>2</sub></code>. Unlike the anagram images, we don't need to flip or transform the image to be denoised, as both images should be viewed under the same orientation. Below are several examples:
 
 <div class="subsection">
 <div class="image-row">
 <figure>
 <img src="images/hybrid/hybrid1_256.png" alt="hybrid1_256.png" />
-<figcaption>Prompts: <code></code> (low-pass) & <code></code> (high-pass)</figcaption>
+<figcaption>Prompts: <code>'a lithograph of a skull'</code> (low-pass) & <code>'a lithograph of waterfalls'</code> (high-pass)</figcaption>
 </figure>
 <figure>
 <img src="images/hybrid/hybrid2_256.png" alt="hybrid2_256.png" />
@@ -894,7 +894,7 @@ With the techniques above, we can now also create hybrid images, or images that 
 </figure>
 <figure>
 <img src="images/hybrid/hybrid3_256.png" alt="hybrid3_256.png" />
-<figcaption>Prompts: <code></code> (low-pass) & <code></code> (high-pass)</figcaption>
+<figcaption>Prompts: <code>'a lithograph of waterfalls'</code> (low-pass) & <code>'a photo of a dog'</code> (high-pass)</figcaption>
 </figure>
 </div>
 </div>
