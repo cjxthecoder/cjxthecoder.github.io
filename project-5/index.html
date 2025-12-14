@@ -324,7 +324,7 @@ alpha_cumprod_prev = alphas_cumprod[prev_t]
 alpha_t = alpha_cumprod_t / alpha_cumprod_prev
 beta_t = 1 - alpha_t</code></pre>
 
-Then, we can get an approximation of <code>x<sub>0</sub></code> by using the one-step estimate, The estimated variance will be computed along with the noise estimate, so we can now compute <code>x<sub>T</sub></code> by using the formula above and obtain the image estimate for the next step. Below are some visualizations for the iterative denoising process:
+Then, we can get an approximation of <code>x<sub>0</sub></code> by using the one-step estimate. The estimated variance will be computed along with the noise estimate, so we can now compute <code>x<sub>T</sub></code> by using the formula above and obtain the image estimate for the next step. Below are some visualizations for the iterative denoising process:
 
 <div class="subsection">
 <h3>Denoising Loop Visualizations (i_start = 10)</h3>
