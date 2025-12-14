@@ -422,12 +422,7 @@ Starting with pure noise, we can obtain random denoise images by setting the sta
 <section id="part-1-6">
 <h2>Part 1.6 – Classifier-Free Guidance (CFG)</h2>
 
-To improve the quality of the images, we can compute both a noise estimate conditioned on the text prompt and the unconditional noise estimate based on the null prompt <code>''</code>. Denoting the conditional noise estimate as &epsilon;<sub>c</sub> and the unconditional noise estimate as &epsilon;<sub>u</sub>, we let our noise estimate be &epsilon; = &epsilon;<sub>u</sub> + &gamma;(&epsilon;<sub>c</sub> - &epsilon;<sub>u</sub>). Note that we have &epsilon; = &epsilon;<sub>u</sub> and &epsilon; = &epsilon;<sub>c</sub> for &gamma; = 0 and &gamma; = 1 respectively. However, when &gamma; > 1, we can get much higher equality images for reasons still discussed today. This technique is known as <strong>classifier-free guidance</strong>, and we can calculate the noise estimate as follows:
-
-<pre><code>noise_est_cfg = uncond_noise_est + scale * (noise_est - uncond_noise_est)
-</code></pre>
-
-By setting <code>scale = 7</code> (&gamma; = 7) and the conditional & unconditional prompts be <code>'a high quality photo'</code> & the null prompt <code>''</code>, we get the following sample images:
+To improve the quality of the images, we can compute both a noise estimate conditioned on the text prompt and the unconditional noise estimate based on the null prompt <code>''</code>. Denoting the conditional noise estimate as &epsilon;<sub>c</sub> and the unconditional noise estimate as &epsilon;<sub>u</sub>, we let our noise estimate be &epsilon; = &epsilon;<sub>u</sub> + &gamma;(&epsilon;<sub>c</sub> - &epsilon;<sub>u</sub>). Note that we have &epsilon; = &epsilon;<sub>u</sub> and &epsilon; = &epsilon;<sub>c</sub> for &gamma; = 0 and &gamma; = 1 respectively. However, when &gamma; > 1, we can get much higher equality images for reasons still discussed today. This technique is known as <strong>classifier-free guidance</strong>. By using &gamma; = 7 and the conditional & unconditional prompts be <code>'a high quality photo'</code> & the null prompt <code>''</code>, we get the following sample images:
 
 <div class="subsection">
 <div class="image-row">
@@ -453,6 +448,8 @@ By setting <code>scale = 7</code> (&gamma; = 7) and the conditional & unconditio
 </figure>
 </div>
 </div>
+
+These settings (&gamma; = 7 and the uncondtional prompt being <code>''</code>) will be used in all future usage of the CFG iterative denoise function.
 </section>
 
 <!-- ========================================================= -->
