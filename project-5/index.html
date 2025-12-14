@@ -833,7 +833,9 @@ Finally, we can also change our conditional prompt, namely <code>'a high quality
 <section id="part-1-8">
 <h2>Part 1.8 – Visual Anagrams</h2>
 
-We now have the necessary tools to generate visual anagrams, or images that look like another different one when flipped/rotated. As an example for a vertical flip anagram, we would start with 2 prompt embeddings <code>p<sub>1</sub></code> and <code>p<sub>2</sub></code>. For <code>p<sub>1</sub></code>, we would compute the noise estimate &epsilon;<sub>1</sub> normally at each step, but for <code>p<sub>2</sub></code>, we flip the image <code>x<sub>t</sub></code> first before computing the noise estimate, then flip back the estimate to obtain &epsilon;<sub>2</sub>. Once this is done, we will use the average of &epsilon;<sub>1</sub> and &epsilon;<sub>2</sub> as the final noise estimate for each step. The variance can also be computed similarly, namely v<sub>1</sub> will be computed in the usual way, while v<sub>2</sub> will be the flipped variance estimate of the flipped <code>x<sub>t</sub></code>, and the final variance estimate will (v<sub>1</sub> + v<sub>2</sub>) / 2. Below are a few examples of such an effect, with <code>p<sub>1</sub></code> being the first prompt and <code>p<sub>2</sub></code> being the second:
+We now have the necessary tools to generate visual anagrams, or images that look like another different one when flipped/rotated. As an example for a vertical flip anagram, we would start with 2 prompt embeddings <code>p<sub>1</sub></code> and <code>p<sub>2</sub></code>. For <code>p<sub>1</sub></code>, we would compute the noise estimate &epsilon;<sub>1</sub> normally at each step, but for <code>p<sub>2</sub></code>, we flip the image <code>x<sub>t</sub></code> first before computing the noise estimate, then flip back the estimate to obtain &epsilon;<sub>2</sub>, which would be the noise estimate of the flipped image.<br>
+
+<br>Once this is done, we will use the average of &epsilon;<sub>1</sub> and &epsilon;<sub>2</sub> as the final noise estimate for each step. The variance can also be computed similarly, namely v<sub>1</sub> will be computed in the usual way, while v<sub>2</sub> will be the flipped variance estimate of the flipped <code>x<sub>t</sub></code>, and the final variance estimate will (v<sub>1</sub> + v<sub>2</sub>) / 2. Below are a few examples of such an effect, with <code>p<sub>1</sub></code> being the first prompt and <code>p<sub>2</sub></code> being the second:
 
 <div class="subsection">
 <h3>Prompts: <code>'an oil painting of an old man'</code> & <code>'an oil painting of people around a campfire'</code></h3>
@@ -880,7 +882,9 @@ We now have the necessary tools to generate visual anagrams, or images that look
 <section id="part-1-9">
 <h2>Part 1.9 – Hybrid Images</h2>
  
-With the techniques above, we can now also create hybrid images, or images that look like different subjects depending on the viewing distance. The classical way to create a hybrid image is to transform the image you want to see at a far range with a low-pass filter, the image you want to see at close range with a high-pass filter, and combine the 2 transformed images. We can use a similar algorithm in the denoising process, namely by passing the noise estimate from <code>p<sub>1</sub></code> and <code>p<sub>2</sub></code> through a low and high pass filter, respectively. After doing so, we will add the 2 filtered noises together to get the final noise estimate at each step. This will produce an image that, when viewed close up, shows <code>p<sub>1</sub></code>, but when viewed far away, shows <code>p<sub>2</sub></code>. Unlike the anagram images, we don't need to flip or transform the image to be denoised, as both images should be viewed under the same orientation. Below are several examples:
+With the techniques above, we can now also create hybrid images, or images that look like different subjects depending on the viewing distance. The classical way to create a hybrid image is to transform the image you want to see at a far range with a low-pass filter, the image you want to see at close range with a high-pass filter, and combine the 2 transformed images. We can use a similar algorithm in the denoising process, namely by passing the noise estimate from <code>p<sub>1</sub></code> and <code>p<sub>2</sub></code> through a low and high pass filter, respectively.<br>
+
+<br>After doing so, we will add the 2 filtered noises together to get the final noise estimate at each step. This will produce an image that, when viewed close up, shows <code>p<sub>1</sub></code>, but when viewed far away, shows <code>p<sub>2</sub></code>. Unlike the anagram images, we don't need to flip or transform the image to be denoised, as both images should be viewed under the same orientation. Below are several examples:
 
 <div class="subsection">
 <div class="image-row">
@@ -890,7 +894,7 @@ With the techniques above, we can now also create hybrid images, or images that 
 </figure>
 <figure>
 <img src="images/hybrid/hybrid2_256.png" alt="hybrid2_256.png" />
-<figcaption>Prompts: <code></code> (low-pass) & <code></code> (high-pass)</figcaption>
+<figcaption>Prompts: <code>'a pencil'</code> (low-pass) & <code>'a rocket ship'</code> (high-pass)</figcaption>
 </figure>
 <figure>
 <img src="images/hybrid/hybrid3_256.png" alt="hybrid3_256.png" />
