@@ -139,6 +139,8 @@ By increasing the inference steps, we can generate higher quality images at the 
 </figure>
 </div>
 </div>
+
+From the above, we can see that with longer prompts, we can generate images with more specific details.
 </section>
 
 <!-- ========================================================= -->
@@ -199,7 +201,6 @@ In order to try to revert the image with noise, we can try the classical method 
 <div class="subsection">
 <h3>Noisy vs Gaussian-Denoised Campanile</h3>
 
-<h4>t = 250</h4>
 <div class="image-row">
 <figure>
 <img src="images/250500750/campanile_250noise.png" alt="campanile_250noise.png" />
@@ -207,11 +208,10 @@ In order to try to revert the image with noise, we can try the classical method 
 </figure>
 <figure>
 <img src="images/250500750/campanile_250denoise_gaussian.png" alt="campanile_250denoise_gaussian.png" />
-<figcaption>5&times;5 Gaussian denoised (t = 250)</figcaption>
+<figcaption>5&times;5 Gaussian denoised</figcaption>
 </figure>
 </div>
 
-<h4>t = 500</h4>
 <div class="image-row">
 <figure>
 <img src="images/250500750/campanile_500noise.png" alt="campanile_500noise.png" />
@@ -219,11 +219,10 @@ In order to try to revert the image with noise, we can try the classical method 
 </figure>
 <figure>
 <img src="images/250500750/campanile_500denoise_gaussian.png" alt="campanile_500denoise_gaussian.png" />
-<figcaption>5&times;5 Gaussian denoised (t = 500)</figcaption>
+<figcaption>5&times;5 Gaussian denoised</figcaption>
 </figure>
 </div>
 
-<h4>t = 750</h4>
 <div class="image-row">
 <figure>
 <img src="images/250500750/campanile_750noise.png" alt="campanile_750noise.png" />
@@ -231,7 +230,7 @@ In order to try to revert the image with noise, we can try the classical method 
 </figure>
 <figure>
 <img src="images/250500750/campanile_750denoise_gaussian.png" alt="campanile_750denoise_gaussian.png" />
-<figcaption>5&times;5 Gaussian denoised (t = 750)</figcaption>
+<figcaption>5&times;5 Gaussian denoised</figcaption>
 </figure>
 </div>
 </div>
@@ -379,6 +378,8 @@ Then, we can get an approximation of <code>x<sub>0</sub></code> by using the one
 </figure>
 </div>
 </div>
+
+As we can see, the iterative denoising process produced a more detailed image.
 </section>
 
 <!-- ========================================================= -->
@@ -882,39 +883,18 @@ We now have the necessary tools to generate visual anagrams, or images that look
 With the techniques above, we can now also create hybrid images, or images that look like different subjects depending on the viewing distance. The classical way to create a hybrid image is to transform the image you want to see at a far range with a low-pass filter, the image you want to see at close range with a high-pass filter, and combine the 2 transformed images. We can use a similar algorithm in the denoising process, namely by passing the noise estimate from <code>p<sub>1</sub></code> and <code>p<sub>2</sub></code> through a low and high pass filter, respectively. This will produce an image that, when viewed close up, shows <code>p<sub>1</sub></code>, but when viewed far away, shows <code>p<sub>2</sub></code>. Unlike the anagram images, we don't need to flip or transform the image to be denoised, as both images should be viewed under the same orientation. Below are several examples:
 
 <div class="subsection">
-<h3>Prompts: <code>'an oil painting of an old man'</code> and <code>'an oil painting of people around a campfire'</code></h3>
 <div class="image-row">
 <figure>
-<img src="images/anagram/anagram1_256.png" alt="anagram1_256.png" />
-<figcaption>Original</figcaption>
+<img src="images/hybrid/hybrid1_256.png" alt="hybrid1_256.png" />
+<figcaption>Prompts: (low-pass) and (high-pass)</figcaption>
 </figure>
 <figure>
-<img src="images/anagram/anagram1_flip_256.png" alt="anagram1_256.png" />
-<figcaption>Flipped</figcaption>
-</figure>
-</div>
-
-<h3>Prompts: <code>'a lithograph of waterfalls'</code> and <code>'a man wearing a hat'</code></h3>
-<div class="image-row">
-<figure>
-<img src="images/anagram/anagram2_256.png" alt="anagram2_256.png" />
-<figcaption>Original</figcaption>
+<img src="images/hybrid/hybrid2_256.png" alt="hybrid2_256.png" />
+<figcaption>Prompts: (low-pass) and (high-pass)</figcaption>
 </figure>
 <figure>
-<img src="images/anagram/anagram2_flip_256.png" alt="anagram2_256.png" />
-<figcaption>Flipped</figcaption>
-</figure>
-</div>
-
-<h3>Prompts: <code>'an oil painting of a snowy mountain village'</code> and <code>'a photo of a dog'</code></h3>
-<div class="image-row">
-<figure>
-<img src="images/anagram/anagram3_256.png" alt="anagram3_256.png" />
-<figcaption>Original</figcaption>
-</figure>
-<figure>
-<img src="images/anagram/anagram3_flip_256.png" alt="anagram3_256.png" />
-<figcaption>Flipped</figcaption>
+<img src="images/hybrid/hybrid3_256.png" alt="hybrid3_256.png" />
+<figcaption>Prompts: (low-pass) and (high-pass)</figcaption>
 </figure>
 </div>
 </div>
