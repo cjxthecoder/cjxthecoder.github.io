@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>Project 5: Fun with Diffusion Models</title>
+<title>CS180 Project 5</title>
 <style>
 body {
 font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -150,14 +150,14 @@ From the above, we can see that with longer prompts, we can generate images with
 <h2>Part 1.1 – The forward process</h2>
 
 To start, we have the original Campanile image at 64px:
-<div class="image-row">
+<div align="center">
 <figure>
 <img src="images/campanile.png" alt="campanile.png" />
 </figure>
 </div>
 
 To add noise to an image <code>x<sub>0</sub></code>, we can use the forward process and compute
-<div class="image-row">
+<div align="center">
 <figure>
 <img src="images/forward.png" alt="forward.png" />
 </figure>
@@ -310,7 +310,7 @@ Below are a comparison the original, noisy, and the estimate of the original ima
 
 Instead of using one step, we can obtain better results by iteratively denoising from step <code>t</code> until step 0. However, this means running the diffusion model 1000 times in the worst case, which is slow and costly. Fortunately, we can speed up the computation by first defining a series of strided timestamps, starting at close to 1000 and ending at 0. For the examples below, we will use <code>strided_timestamps = [990, 960, ..., 30, 0]</code>. Then, we can use the formula
 
-<div class="image-row">
+<div align="center">
 <figure>
 <img src="images/equation.png" alt="equation.png" />
 </figure>
@@ -887,15 +887,19 @@ With the techniques above, we can now also create hybrid images, or images that 
 <br>After doing so, we will add the 2 filtered noises together to get the final noise estimate at each step. This will produce an image that, when viewed close up, shows <code>p<sub>1</sub></code>, but when viewed far away, shows <code>p<sub>2</sub></code>. Unlike the anagram images, we don't need to flip or transform the image to be denoised, as both images should be viewed under the same orientation. Below are several examples:
 
 <div class="subsection">
-<div class="image-row">
+<div align="center">
 <figure>
 <img src="images/hybrid/hybrid1_256.png" alt="hybrid1_256.png" />
 <figcaption>Prompts: <code>'a lithograph of a skull'</code> (low-pass) & <code>'a lithograph of waterfalls'</code> (high-pass)</figcaption>
 </figure>
+</div>
+<div align="center">
 <figure>
 <img src="images/hybrid/hybrid2_256.png" alt="hybrid2_256.png" />
 <figcaption>Prompts: <code>'a pencil'</code> (low-pass) & <code>'a rocket ship'</code> (high-pass)</figcaption>
 </figure>
+</div>
+<div align="center">
 <figure>
 <img src="images/hybrid/hybrid3_256.png" alt="hybrid3_256.png" />
 <figcaption>Prompts: <code>'a lithograph of waterfalls'</code> (low-pass) & <code>'a photo of a dog'</code> (high-pass)</figcaption>
