@@ -422,7 +422,7 @@ Starting with pure noise, we can obtain random denoise images by setting the sta
 <section id="part-1-6">
 <h2>Part 1.6 – Classifier-Free Guidance (CFG)</h2>
 
-To improve the quality of the images, we can compute both a noise estiamte conditioned on the text prompt, and the unconditional noise estimate, based on the null prompt <code>''</code>. Denoting the conditional noise estimate as &epsilon;<sub>c</sub> and the unconditional noise estimate as &epsilon;<sub>u</sub>, we let our noise estimate be &epsilon; = &epsilon;<sub>u</sub> + &gamma;(&epsilon;<sub>c</sub> - &epsilon;<sub>u</sub>). Note that we have &epsilon; = &epsilon;<sub>u</sub> and &epsilon; = &epsilon;<sub>c</sub> for &gamma; = 0 and &gamma; = 1 respectively. However, when &gamma; > 1, we can get much higher equality images for reasons still dicussed today. This technique is known as <strong>classifier-free guidance</strong>, and we can calculate the noise estimate as follows:
+To improve the quality of the images, we can compute both a noise estimate conditioned on the text prompt and the unconditional noise estimate based on the null prompt <code>''</code>. Denoting the conditional noise estimate as &epsilon;<sub>c</sub> and the unconditional noise estimate as &epsilon;<sub>u</sub>, we let our noise estimate be &epsilon; = &epsilon;<sub>u</sub> + &gamma;(&epsilon;<sub>c</sub> - &epsilon;<sub>u</sub>). Note that we have &epsilon; = &epsilon;<sub>u</sub> and &epsilon; = &epsilon;<sub>c</sub> for &gamma; = 0 and &gamma; = 1 respectively. However, when &gamma; > 1, we can get much higher equality images for reasons still discussed today. This technique is known as <strong>classifier-free guidance</strong>, and we can calculate the noise estimate as follows:
 
 <pre><code>noise_est_cfg = uncond_noise_est + scale * (noise_est - uncond_noise_est)
 </code></pre>
@@ -461,7 +461,7 @@ By setting <code>scale = 7</code> (&gamma; = 7) and the conditional & unconditio
 <section id="part-1-7">
 <h2>Part 1.7 – Image-to-image Translation</h2>
 
-Similar to how we added noise to an existing image before denoising the result in part 1.4, we can use the <code>iterative_denoise_cfg</code> function to get a result that is of higher quality, as opposed to merely a prediction of the original. By adjusting the starting amount of noise to the Campanile with the timestamp index <code>i_start</code>, where a higher index means less noise, we get a series of edits to the that gradually go from entirely new to resembling the original image:
+Similar to how we added noise to an existing image before denoising the result in part 1.4, we can use the <code>iterative_denoise_cfg</code> function to get a result that is of higher quality, as opposed to merely a prediction of the original. By adjusting the starting amount of noise to the Campanile with the timestamp index <code>i_start</code>, where a higher index means less noise, we get a series of edits that gradually go from entirely new to resembling the original image:
 
 <!-- 1.7: Edits of Campanile -->
 <div class="subsection">
@@ -726,7 +726,7 @@ Using the techniques above, we can also modify our <code>iterative_denoise_cfg</
 
 <h3>1.7.3 – Text-Conditioned Image-to-image Translation</h3>
 
-Finally, we can also change our conditional prompt, namely <code>'a high quality photo'</code>, to any other. This will give control to what the noise is projected to, resulting in a series of images that look more like the original image, but also similar to the conditional prompt.
+Finally, we can also change our conditional prompt, namely <code>'a high quality photo'</code>, to any other. This will give control over what the noise is projected to, resulting in a series of images that look more like the original image, but also similar to the conditional prompt.
 
 <div class="subsection">
 <h4>Campanile with prompt <code>'a pencil'</code></h4>
