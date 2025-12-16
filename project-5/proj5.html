@@ -928,7 +928,7 @@ Now that we know how we can generate images with the help of a UNet in a denoisi
 
 <h3>Training an Unconditioned UNet</h3>
 
-The most basic denoiser is a one-step denoiser. Formally, given a noisy image <code>z</code>, we aim to train a denoiser <code>D<sub>&theta;</sub>(z)</code> that can map it to a clean image <code>x</code>. To do this, we can optimize over the L<sup>2</sup> loss E<sub>z,x</sub>||z - x||<sup>2</sup> while training.<br>
+The most basic denoiser is a one-step denoiser. Formally, given a noisy image <code>z</code>, we aim to train a denoiser D<sub>&theta;</sub>(z) that can map it to a clean image <code>x</code>. To do this, we can optimize over the L<sup>2</sup> loss E<sub>z,x</sub>||D<sub>&theta;</sub>(z)||<sup>2</sup> while training.<br>
 
 <br>To create a noisy image, we can use the process z = x + &sigma;&epsilon; where &sigma; &isin; [0, 1] and &epsilon; ~ &Nscr;(0, 1). Here, &Nscr; is the standard normal distribution. To visualize the kind of images this process will result in below is an example of an MNIST digit with progressively more noise as &sigma; gradually increases from 0 to 1:
 
@@ -999,7 +999,7 @@ We can see that the model performs decently well. To illustrate its effectivenes
 </div>
 
 <h4>Limitations on pure noise</h4>
-Although the model is decent at removing noise from images, our goal is to generate digits from pure noise. This proves to be an issue because with MSE loss, the model will learn to predict the image that minimizes the sum of its squared distance to all other training images. Because pure noise is the input to the model for any given training image, the result is an average of all digits in training set. This is illustrated in the following inputs and the output of the model after the 1st and 5th epoch:
+Although the model is decent at removing noise from images, our goal is to generate digits from pure noise. This proves to be an issue because with MSE loss, the model will learn to predict the image that minimizes the sum of its squared distance to all other training images. Because pure noise is the input to the model for any given training image, the result is an average of all digits in the training set. This is illustrated in the following inputs and the output of the model after the 1st and 5th epoch:
 <div align="center">
 <figure>
 <img src="images/unet/123_visualization.png" alt="123_visualization.png" />
