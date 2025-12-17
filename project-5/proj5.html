@@ -1020,9 +1020,9 @@ The following inputs and the output of the model after the 1st and 5th epoch dis
 To generate plausible-looking digits, we need a different approach than one-step denoising.
 
 <h4>The Flow Matching Model</h4>
-Instead of trying to denoise the image in a single step, we aim to iteratively denoise the image, similar to how we do so in the sampling loops using DeepFloyd's noise coefficients. To do this, we will start by interpolating how intermediate noise samples are constructed. The simplest approrach is to use linear interpolation, namely let the intermediate sample be <code>x<sub>t</sub></code> = (1 - <code>t</code>)x<sub>0</sub> + <code>tx<sub>1</sub></code> for a given <code>t</code> &isin; [0, 1], where <code>x<sub>0</sub></code> is the noise and <code>x<sub>1</sub></code> is the clean image.<br>
+Instead of trying to denoise the image in a single step, we aim to iteratively denoise the image. To do this, we will start by interpolating how intermediate noise samples are constructed. The simplest approrach is to use linear interpolation, namely let the intermediate sample be <code>x<sub>t</sub></code> = (1 - <code>t</code>)x<sub>0</sub> + <code>tx<sub>1</sub></code> for a given <code>t</code> &isin; [0, 1], where <code>x<sub>0</sub></code> is the noise and <code>x<sub>1</sub></code> is the clean image.<br>
 
-<br>Now that we have an equation relating a clean image with any pure noise sample, we can train our model to learn the <strong>flow</strong>, or the change with respect to <code>t</code> for any given <code>x<sub>t</sub></code>. This produces a vector field across all images, where the velocity for each is d/dt <code>x<sub>t</sub></code> = <code>x<sub>1</sub></code> - <code>x<sub>0</sub></code>. Therefore, if we can predict <code>x<sub>1</sub></code> - <code>x<sub>0</sub></code> for any given <code>t</code> and <code>x<sub>t</sub></code>, we can go along the path traced out by the vector field and arrived at somewhere near the manifold of clean images. This technique is known as a <strong>flow matching model</strong>, and with the model trained, we can numerically integrate a random noise sample <code>x<sub>0</sub></code> with a set number of iterations using Euler's method, and get a clean image <code>x<sub>1</sub></code>.
+<br>Now that we have an equation relating a clean image with any pure noise sample, we can train our model to learn the <strong>flow</strong>, or the change with respect to <code>t</code> for any given <code>x<sub>t</sub></code>. This produces a vector field across all images, where the velocity at time <code>t</code> for each is d/dt <code>x<sub>t</sub></code> = <code>x<sub>1</sub></code> - <code>x<sub>0</sub></code>. Therefore, if we can predict <code>x<sub>1</sub></code> - <code>x<sub>0</sub></code> for any given <code>t</code> and <code>x<sub>t</sub></code>, we can go along the path traced out by the vector field and arrived at somewhere near the manifold of clean images. This technique is known as a <strong>flow matching model</strong>, and with the model trained, we can numerically integrate a random noise sample <code>x<sub>0</sub></code> with a set number of iterations using Euler's method, and get a clean image <code>x<sub>1</sub></code>.
 
 <h4>Training a Time-Conditioned UNet</h4>
 To add time conditioning to our UNet, we will make the following changes to our model architecture:
@@ -1034,9 +1034,14 @@ To add time conditioning to our UNet, we will make the following changes to our 
 </div>
 
 <h4>Flow Matching Hyperparameters</h4>
-For the hyperparameters, we will be using a batch size of 64, a learning rate of <code>1e-2</code>, a hidden dimension of 64, the Adam optimizer with the given learning rate, a exponential learning rate decay scheduler with &gamma; = 0.1<sup>(1.0 / <code>num_epochs</code>)</sup>, a sampling iteration count of <code>T</code> = 50, and a training time of 10 epochs. To advance the scheduler, we will call <code>scheduler.step()</code> at the end of each training epoch.
+For the hyperparameters, we will be using a batch size of 64, a learning rate of <code>1e-2</code>, a hidden dimension of 64, the Adam optimizer with the given learning rate, a exponential learning rate decay scheduler with &gamma; = 0.1<sup>(1.0 / <code>num_epochs</code>)</sup>, a sampling iteration count of <code>T</code> = 300, and a training time of 10 epochs. To advance the scheduler, we will call <code>scheduler.step()</code> at the end of each training epoch.
 
-<h4>Forward and Sampling Operations</h4>
+<h4>Embedding <code>t</code> in the UNet</h4>
+To embed <code>t</code> in the UNet, we will multiply the <code>unflat</code> and <code>firstUpBlock</code> tensors (the result after applying the <strong>Unflatten</strong> and the first <strong>UpConv</strong> operations respectively) by <code>fc1_t</code> and <code>fc2_t</code>. <code>fc1_t</code> and <code>fc2_t</code> are the result of passing <code>t</code> through the first and second FCBlock, where the first produces a tensor with twice the number of hidden dimensions, while the second has the same number of hidden dimensions as the first and last ConvBlock (i.e. the first and second result each has 2D and D channels). In pesudocode:
+<pre><code>unflat_cond = unflat * fc1_t
+firstUpBlock_cond = firstUpBlock * fc2_t</code></pre>
+
+<h4>Time-Conditioned Forward and Sampling Operations</h4>
 To train our model, for each clean image <code>x<sub>1</sub></code> we will generate <code>x<sub>0</sub></code> &isin; &Nscr;(0, &#119816;) and <code>t</code> &isin; U([0, 1]), where U is the uniform distribution. After computing <code>x<sub>t</sub></code> = (1 - <code>t</code>)x<sub>0</sub> + <code>tx<sub>1</sub></code>, we will feed <code>x<sub>t</sub></code> and <code>t</code> into our UNet and compute the loss of u<sub>&theta;</sub>(<code>x<sub>t</sub></code>, <code>t</code>) and <code>x<sub>1</sub></code> - <code>x<sub>0</sub></code>. Below is the new model's training loss curve:
 <div align="center">
 <figure>
@@ -1054,9 +1059,34 @@ When sampling from the model, we will simply generate a random <code>x<sub>0</su
 Although the results are not perfect, the improvements starting from the 1st epoch up to the 10th are already noticeable.
 
 <h4>Adding Class-Conditioning to Time-Conditioned UNet</h4>
-To make more improvements to our image generation, we can condition our UNet on the class of digits 0-9. This require adding an additional FCBlock for each time condition, where the class vector <code>c</code> is a one-hot vector.
+To make more improvements to our image generation, we can condition our UNet on the class of digits 0-9. This require adding an additional FCBlock for each time condition, where the class vector <code>c</code> is a one-hot vector. To ensure that the UNet would still work without conditioning on the class (in order to implement CFG later), we will set a dropout rate <code>p<sub>uncond</sub></code> of 0.1, in which we set the one-hot vector of <code>c</code> to all 0s.
+
+<h4>Embedding <code>c</code> and <code>t</code> in the UNet</h4>
+To embed <code>c</code> <code>t</code> in the UNet, we will use 2 additional FCBlocks to convert the label (<code>c</code>) into 2 tensors <code>fc1_c</code> and <code>fc2_c</code>, each with the same number of hidden dimensions as <code>fc1_t</code> and <code>fc2_t</code> respectively. Then, instead of multiplying the intermediate blocks by the time tensor, we will instead do:
+<pre><code>unflat_cond_class = unflat * fc1_c + fc1_t
+firstUpBlock_cond = firstUpBlock * fc2_c + fc2_t</code></pre>
+
+The last step is to zero out the class one-hot vectors at the dropout rate, which we can implement efficiently by using a mask of the same length as the batch size. We can than multiply it with the batch of one-hot vectors to zero out any vector that is the <code>i</code>-th in the batch if <code>mask[i] = 0</code>.
+
+<h4>Class Conditioning Hyperparameters</h4>
+Because class conditioning converges fast, we will use the same number of training epochs as time conditioning, which is 10. A guidance scale of &gamma; = 5 will be used in the CFG part. The same hyperparamters as the Time-Conditioned UNet will be used for the relevant parts.
 
 <h4>Class-Conditioned Forward and Sampling Operations</h4>
+The forward will be very similar to the Time-Conditioned UNet, except to compute the loss, we will also input the training image's label into the model, along with a mask of 1s and 0s with 0 probability <code>p<sub>uncond</sub></code>. The training loss curve is as follows:
+<div align="center">
+<figure>
+<img src="images/unet/26_training_curve.png" alt="26_visualization.png" />
+</figure>
+</div>
+
+For the sampling operation, we will compute the unconditional estimate <code>u<sub>uncond</sub></code> in velcoity using a mask of all 0s in the model, as well as the conditional estimate <code>u<sub>cond</sub></code> of a given digit using a mask of all 1s. Once we have <code>u<sub>uncond</sub></code> and <code>u<sub>uncond</sub></code>, we will let our final estimate be <code>u<sub>cfg</sub></code> = <code>u<sub>uncond</sub></code> + &gamma;(<code>u<sub>cond</sub></code> - <code>u<sub>uncond</sub></code>) before updating each iteration with <code>x<sub>0</sub></code> = (1 / <code>T</code>)<code>u<sub>cfg</sub></code>. Below is a visualization of generating the digits 0-9 4 times for epochs 1, 5, and 10:
+<div align="center">
+<figure>
+<img src="images/unet/26_visualization.png" alt="26_visualization.png" />
+</figure>
+</div>
+
+Even compared to the Time-Conditioned UNet, the improvements are clear and sizable.
 </section>
 
 <!-- ========================================================= -->
