@@ -930,7 +930,7 @@ Now that we know how we can generate images with the help of a UNet in a denoisi
 
 The most basic denoiser is a one-step denoiser. Formally, given a noisy image <code>z</code>, we aim to train a denoiser D<sub>&theta;</sub>(z) that can map it to a clean image <code>x</code>. To do this, we can optimize over the L<sup>2</sup> loss E<sub>z,x</sub>||D<sub>&theta;</sub>(z)||<sup>2</sup> while training.<br>
 
-<br>To create a noisy image, we can use the process z = x + &sigma;&epsilon; where &sigma; &isin; [0, 1] and &epsilon; ~ &Nscr;(0, 1). Here, &Nscr; is the standard normal distribution. To visualize the kind of images this process will result in below is an example of an MNIST digit with progressively more noise as &sigma; gradually increases from 0 to 1:
+<br>To create a noisy image, we can use the process z = x + &sigma;&epsilon; where &sigma; &isin; [0, 1] and &epsilon; ~ &Nscr;(0, &#119816;). Here, &Nscr; is the standard normal distribution. To visualize the kind of images this process will result in, below is an example of an MNIST digit with progressively more noise as &sigma; gradually increases from 0 to 1:
 
 <div class="image-row">
 <figure>
@@ -974,7 +974,7 @@ To start building the model, we will be using the following architecture:
 where <code>D</code> is the number of hidden dimensions.
 
 <h4>Training hyperparameters</h4>
-For the hyperparameters, we will be using a batch size of 256, a learning rate of 1e-4, a hidden dimension of 128, the Adam optimizer with the given learning rate, and a training time of 5 epochs. A fixed noise level of &sigma; = 0.5 will be used to noise the training images.
+For the hyperparameters, we will be using a batch size of 256, a learning rate of <code>1e-4</code>, a hidden dimension of 128, the Adam optimizer with the given learning rate, and a training time of 5 epochs. A fixed noise level of &sigma; = 0.5 will be used to noise the training images.
 
 <h4>Evaluation results</h4>
 After the model is trained, below is the training loss curve, where the loss of the model is plotted for every batch processed:
@@ -991,29 +991,53 @@ The following are the performance of the model after the 1st and 5th epoch on sa
 </figure>
 </div>
 
-We can see that the model performs decently well. To illustrate its effectiveness on images noised with different levels of &sigma; below is the model after the 5th epoch denoising the same image with different levels of noise for &sigma; &isin; [0.0, 0.2, 0.4, 0.5, 0.6, 0.8, 1.0]:
+We can see that the model performs decently on different digits. To illustrate its effectiveness on images noised with different levels of &sigma; below is the model after the 5th epoch denoising the same image with different levels of noise for &sigma; &isin; [0.0, 0.2, 0.4, 0.5, 0.6, 0.8, 1.0]:
 <div align="center">
 <figure>
 <img src="images/unet/122_visualization.png" alt="122_visualization.png" />
 </figure>
 </div>
 
-<h4>Limitations on pure noise</h4>
-Although the model is decent at removing noise from images, our goal is to generate digits from pure noise. This proves to be an issue because with MSE loss, the model will learn to predict the image that minimizes the sum of its squared distance to all other training images. Because pure noise is the input to the model for any given training image, the result is an average of all digits in the training set. This is illustrated in the following inputs and the output of the model after the 1st and 5th epoch:
-<div align="center">
-<figure>
-<img src="images/unet/123_visualization.png" alt="123_visualization.png" />
-</figure>
-</div>
+Although the model works well for images with small amounts of noise, the more noise the image has, the less quality of the model's prediction.
 
-The training loss curve also tells a similar story, as the loss ends up stuck at a certain level:
+<h4>Limitations on pure noise</h4>
+Although the model is decent at removing noise from images, our goal is to generate digits from pure noise. This proves to be an issue because with MSE loss, the model will learn to predict the image that minimizes the sum of its squared distance to all other training images. To illustrate this issue, we will feed the model a pure noise sample <code>z</code> ~ &Nscr;(0, &#119816;) on all training inputs <code>x</code>, and because <code>z</code> contains no information about <code>x</code>, the result is an average of all digits in the training set.
+
+As a result, while the training loss curve shows not much difference:
 <div align="center">
 <figure>
 <img src="images/unet/123_training_curve.png" alt="123_training_curve.png" />
 </figure>
 </div>
 
+The following inputs and the output of the model after the 1st and 5th epoch display the average-like output of the model:
+<div align="center">
+<figure>
+<img src="images/unet/123_visualization.png" alt="123_visualization.png" />
+</figure>
+</div>
+
 To generate plausible-looking digits, we need a different approach than one-step denoising.
+
+<h4>The Flow Matching Model</h4>
+Instead of trying to denoise the image in a single step, we aim to iteratively denoise the image, similar to how we do so in the sampling loops using DeepFloyd's noise coefficients. To do this, we will start by interpolating how intermediate noise samples are constructed. The simplest approrach is to use linear interpolation, namely let the intermediate sample be <code>x<sub>t</sub></code> = (1 - <code>t</code>)x<sub>0</sub> + <code>tx<sub>1</sub></code> for a given <code>t</code> &isin; [0, 1], where <code>x<sub>0</sub></code> is the noise and <code>x<sub>1</sub></code> is the clean image.<br>
+
+<br>Now that we have an equation relating a clean image with any pure noise sample, we can train our model to learn the <strong>flow</strong>, or the change with respect to <code>t</code> for any given <code>x<sub>t</sub></code>. This produces a vector field across all images, where the velocity for each is d/dt <code>x<sub>t</sub></code> = <code>x<sub>1</sub></code> - <code>x<sub>0</sub></code>. Therefore, if we can predict <code>x<sub>1</sub></code> - <code>x<sub>0</sub></code> for any given <code>t</code> and <code>x<sub>t</sub></code>, we can go along the path traced out by the vector field and arrived at somewhere near the manifold of clean images. This technique is known as a <strong>flow matching model</strong>, and with the model trained, we can numerically integrate a random noise sample <code>x<sub>0</sub></code> with a set number of iterations, and get our clean image <code>x<sub>1</sub></code>.
+
+<h4>Training a Time-Conditioned UNet</h4>
+To add time conditioning to our UNet, we will make the following changes to our model architecture:
+<div align="center">
+<figure>
+<img src="images/unet/time_conditioned_arch.png" alt="time_conditioned_arch.png" />
+<figcaption>Source: <a href="https://cal-cs180.github.io/fa25/hw/proj5/partb.html">CS180</a></figcaption>
+</figure>
+</div>
+
+<h4>Flow Matching Hyperparameters</h4>
+For the hyperparameters, we will be using a batch size of 64, a learning rate of <code>1e-2</code>, a hidden dimension of 64, the Adam optimizer with the given learning rate, a exponential learning rate decay scheduler with &gamma; = 0.1<sup>(1.0 / <code>num_epochs</code>)</sup>, and a training time of 10 epochs. To advance the scheduler, we will call <code>scheduler.step()</code> at the end of each training epoch.
+
+<h4>Forward and Sampling Operations</h4>
+To train our model, for each clean image <code>x<sub>1</sub></code> we will generate <code>x<sub>0</sub></code> &isin; &Nscr;(0, &#119816;) and <code>t</code> &isin; U([0, 1]), where U is the uniform distribution. After computing <code>x<sub>t</sub></code> = (1 - <code>t</code>)x<sub>0</sub> + <code>tx<sub>1</sub></code>, we will feed <code>x<sub>t</sub></code> and <code>t</code> into our UNet and compute the loss of unet(<code>x<sub>t</sub></code>, <code>t</code>) and <code>x<sub>1</sub></code> - <code>x<sub>0</sub></code>. Below is its loss curve:
 </section>
 
 </body>
