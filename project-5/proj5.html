@@ -74,7 +74,7 @@ margin-top: 0.25rem;
 <h1>Project 5: Fun with Diffusion Models</h1>
 <div align="center">
 <p>
-by Daniel Cheng | December 13, 2025
+by Daniel Cheng | December 16, 2025
 </p>
 </div>
 
@@ -1079,7 +1079,7 @@ The forward will be very similar to the Time-Conditioned UNet, except to compute
 </figure>
 </div>
 
-For the sampling operation, we will compute the unconditional estimate <code>u<sub>uncond</sub></code> in velcoity using a mask of all 0s in the model, as well as the conditional estimate <code>u<sub>cond</sub></code> of a given digit using a mask of all 1s. Once we have <code>u<sub>uncond</sub></code> and <code>u<sub>uncond</sub></code>, we will let our final estimate be <code>u<sub>cfg</sub></code> = <code>u<sub>uncond</sub></code> + &gamma;(<code>u<sub>cond</sub></code> - <code>u<sub>uncond</sub></code>) before updating each iteration with <code>x<sub>0</sub></code> = (1 / <code>T</code>)<code>u<sub>cfg</sub></code>. Below is a visualization of generating the digits 0-9 4 times for epochs 1, 5, and 10:
+For the sampling operation, we will compute the unconditional estimate <code>u<sub>uncond</sub></code> in velcoity using a mask of all 0s in the model, as well as the conditional estimate <code>u<sub>cond</sub></code> of a given digit using a mask of all 1s. Once we have <code>u<sub>cond</sub></code> and <code>u<sub>uncond</sub></code>, we will let our final estimate be <code>u<sub>cfg</sub></code> = <code>u<sub>uncond</sub></code> + &gamma;(<code>u<sub>cond</sub></code> - <code>u<sub>uncond</sub></code>) before updating each iteration with <code>x<sub>0</sub></code> = <code>x<sub>0</sub></code> + (1 / <code>T</code>)<code>u<sub>cfg</sub></code>. Below is a visualization of generating the digits 0-9 4 times for epochs 1, 5, and 10:
 <div align="center">
 <figure>
 <img src="images/unet/26_visualization.png" alt="26_visualization.png" />
