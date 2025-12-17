@@ -919,9 +919,9 @@ With the techniques above, we can now also create hybrid images, or images that 
 </section>
 
 <!-- ========================================================= -->
-<!-- Part 2.0: Flow Matching from Scratch -->
+<!-- Part 2: Flow Matching from Scratch -->
 <!-- ========================================================= -->
-<section id="part-2-1">
+<section id="part-2">
 <h2>Part 2 – Implementing the UNet from scratch</h2>
 
 Now that we know how we can generate images with the help of a UNet in a denoising model, we will go through implementing one from scratch. More specifically, we will be attempting to generate digits similar to those in the MNIST dataset from pure noise using a denoising UNet that we will create.
@@ -932,7 +932,7 @@ The most basic denoiser is a one-step denoiser. Formally, given a noisy image <c
 
 <br>To create a noisy image, we can use the process z = x + &sigma;&epsilon; where &sigma; &isin; [0, 1] and &epsilon; ~ &Nscr;(0, &#119816;). Here, &Nscr; is the standard normal distribution. To visualize the kind of images this process will result in, below is an example of an MNIST digit with progressively more noise as &sigma; gradually increases from 0 to 1:
 
-<div class="image-row">
+<div align="center">
 <figure>
 <img src="images/unet/00.png" alt="00.png" />
 <figcaption>&sigma; = 0.0</figcaption>
@@ -1052,7 +1052,52 @@ When sampling from the model, we will simply generate a random <code>x<sub>0</su
 </div>
 
 Although the results are not perfect, the improvements starting from the 1st epoch up to the 10th are already noticeable.
+
+<h4>Adding Class-Conditioning to Time-Conditioned UNet</h4>
+To make more improvements to our image generation, we can condition our UNet on the class of digits 0-9. This require adding an additional FCBlock for each time condition, where the class vector <code>c</code> is a one-hot vector.
+
+<h4>Class-Conditioned Forward and Sampling Operations</h4>
 </section>
+
+<!-- ========================================================= -->
+<!-- Part 3: Appendix -->
+<!-- ========================================================= -->
+<section id="part-2">
+<h2>Part 3 – Appendix</h2>
+The standard UNet operations are defined as follows:
+<div align="center">
+<figure>
+<img src="images/unet/standard_op.png" alt="standard_op.png" />
+<figcaption>Source: <a href="https://cal-cs180.github.io/fa25/hw/proj5/partb.html">CS180</a></figcaption>
+</figure>
+</div>
+
+where
+<ul>
+  <li><strong>Conv2d(kernel_size, stride, padding)</strong> is <code>nn.Conv2d()</code>;</li>
+  <li><strong>BN</strong> is <code>nn.BatchNorm2d()</code>;</li>
+  <li><strong>GELU</strong> is <code>nn.GELU()</code>;</li>
+  <li><strong>ConvTranspose2d(kernel_size, stride, padding)</strong> is <code>nn.ConvTranspose2d()</code>;</li>
+  <li><strong>AvgPool(kernel_size)</strong> is <code>nn.AvgPool2d()</code>;</li>
+  <li><strong>+</strong> represents function composition, e.g. <code>f</code> + <code>g</code> = <code>f</code>(<code>g</code>(<code>x</code>)).</li>
+</ul>
+
+The <strong>FCBlock</strong> operation is defined as follows:
+<div align="center">
+<figure>
+<img src="images/unet/fcblock_op.png" alt="fcblock_op.png" />
+<figcaption>Source: <a href="https://cal-cs180.github.io/fa25/hw/proj5/partb.html">CS180</a></figcaption>
+</figure>
+</div>
+
+where <strong>Linear</strong> is <code>nn.Linear()</code>.
+</section>
+
+<div align="center">
+<p>
+<a href="https://cjxthecoder.github.io">cjxthecoder</a> | <a href="https://github.com/cjxthecoder">GitHub</a> | <a href="https://www.linkedin.com/in/daniel-cheng-71b475279">LinkedIn</a>
+</p>
+</div>
 
 </body>
 </html>
