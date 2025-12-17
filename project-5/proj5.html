@@ -1062,7 +1062,7 @@ Although the results are not perfect, the improvements starting from the 1st epo
 To make more improvements to our image generation, we can condition our UNet on the class of digits 0-9. This requires adding an additional FCBlock for the <code>unflat</code> and <code>firstUpBlock</code> tensor, where we convert the class vector <code>c</code> into a one-hot vector before passing it through FCBlock. To ensure that the UNet would still work without conditioning on the class (in order to implement CFG later), we will set a dropout rate <code>p<sub>uncond</sub></code> of 0.1, in which we set the one-hot vector of <code>c</code> to all 0s.
 
 <h4>Embedding <code>c</code> and <code>t</code> in the UNet</h4>
-To embed <code>c</code> <code>t</code> in the UNet, we will use 2 additional FCBlocks to convert the label (<code>c</code>) into 2 tensors <code>fc1_c</code> and <code>fc2_c</code>, each with the same number of hidden dimensions as <code>fc1_t</code> and <code>fc2_t</code> respectively. Then, instead of multiplying the intermediate blocks by the time tensor, we will instead do:
+To embed <code>c</code> and <code>t</code> in the UNet, we will use the 2 additional FCBlocks to convert the label (<code>c</code>) into 2 tensors <code>fc1_c</code> and <code>fc2_c</code>, each with the same number of hidden dimensions as <code>fc1_t</code> and <code>fc2_t</code> respectively. Then, instead of multiplying the intermediate blocks by the time tensor, we will instead do:
 <pre><code>unflat_cond_class = unflat * fc1_c + fc1_t
 firstUpBlock_cond_class = firstUpBlock * fc2_c + fc2_t</code></pre>
 
