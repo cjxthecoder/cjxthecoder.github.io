@@ -919,7 +919,7 @@ With the techniques above, we can now also create hybrid images, or images that 
 </section>
 
 <!-- ========================================================= -->
-<!-- Part 2.0: Noising Process Visualization -->
+<!-- Part 2.0: Flow Matching from Scratch -->
 <!-- ========================================================= -->
 <section id="part-2-1">
 <h2>Part 2 – Implementing the UNet from scratch</h2>
@@ -1003,7 +1003,7 @@ Although the model works well for images with small amounts of noise, the more n
 <h4>Limitations on pure noise</h4>
 Although the model is decent at removing noise from images, our goal is to generate digits from pure noise. This proves to be an issue because with MSE loss, the model will learn to predict the image that minimizes the sum of its squared distance to all other training images. To illustrate this issue, we will feed the model a pure noise sample <code>z</code> ~ &Nscr;(0, &#119816;) on all training inputs <code>x</code>, and because <code>z</code> contains no information about <code>x</code>, the result is an average of all digits in the training set.
 
-As a result, while the training loss curve shows not much difference:
+As a result, while the training loss curve shows not much suspect:
 <div align="center">
 <figure>
 <img src="images/unet/123_training_curve.png" alt="123_training_curve.png" />
@@ -1022,7 +1022,7 @@ To generate plausible-looking digits, we need a different approach than one-step
 <h4>The Flow Matching Model</h4>
 Instead of trying to denoise the image in a single step, we aim to iteratively denoise the image, similar to how we do so in the sampling loops using DeepFloyd's noise coefficients. To do this, we will start by interpolating how intermediate noise samples are constructed. The simplest approrach is to use linear interpolation, namely let the intermediate sample be <code>x<sub>t</sub></code> = (1 - <code>t</code>)x<sub>0</sub> + <code>tx<sub>1</sub></code> for a given <code>t</code> &isin; [0, 1], where <code>x<sub>0</sub></code> is the noise and <code>x<sub>1</sub></code> is the clean image.<br>
 
-<br>Now that we have an equation relating a clean image with any pure noise sample, we can train our model to learn the <strong>flow</strong>, or the change with respect to <code>t</code> for any given <code>x<sub>t</sub></code>. This produces a vector field across all images, where the velocity for each is d/dt <code>x<sub>t</sub></code> = <code>x<sub>1</sub></code> - <code>x<sub>0</sub></code>. Therefore, if we can predict <code>x<sub>1</sub></code> - <code>x<sub>0</sub></code> for any given <code>t</code> and <code>x<sub>t</sub></code>, we can go along the path traced out by the vector field and arrived at somewhere near the manifold of clean images. This technique is known as a <strong>flow matching model</strong>, and with the model trained, we can numerically integrate a random noise sample <code>x<sub>0</sub></code> with a set number of iterations, and get our clean image <code>x<sub>1</sub></code>.
+<br>Now that we have an equation relating a clean image with any pure noise sample, we can train our model to learn the <strong>flow</strong>, or the change with respect to <code>t</code> for any given <code>x<sub>t</sub></code>. This produces a vector field across all images, where the velocity for each is d/dt <code>x<sub>t</sub></code> = <code>x<sub>1</sub></code> - <code>x<sub>0</sub></code>. Therefore, if we can predict <code>x<sub>1</sub></code> - <code>x<sub>0</sub></code> for any given <code>t</code> and <code>x<sub>t</sub></code>, we can go along the path traced out by the vector field and arrived at somewhere near the manifold of clean images. This technique is known as a <strong>flow matching model</strong>, and with the model trained, we can numerically integrate a random noise sample <code>x<sub>0</sub></code> with a set number of iterations using Euler's method, and get a clean image <code>x<sub>1</sub></code>.
 
 <h4>Training a Time-Conditioned UNet</h4>
 To add time conditioning to our UNet, we will make the following changes to our model architecture:
@@ -1034,10 +1034,24 @@ To add time conditioning to our UNet, we will make the following changes to our 
 </div>
 
 <h4>Flow Matching Hyperparameters</h4>
-For the hyperparameters, we will be using a batch size of 64, a learning rate of <code>1e-2</code>, a hidden dimension of 64, the Adam optimizer with the given learning rate, a exponential learning rate decay scheduler with &gamma; = 0.1<sup>(1.0 / <code>num_epochs</code>)</sup>, and a training time of 10 epochs. To advance the scheduler, we will call <code>scheduler.step()</code> at the end of each training epoch.
+For the hyperparameters, we will be using a batch size of 64, a learning rate of <code>1e-2</code>, a hidden dimension of 64, the Adam optimizer with the given learning rate, a exponential learning rate decay scheduler with &gamma; = 0.1<sup>(1.0 / <code>num_epochs</code>)</sup>, a sampling iteration count of <code>T</code> = 50, and a training time of 10 epochs. To advance the scheduler, we will call <code>scheduler.step()</code> at the end of each training epoch.
 
 <h4>Forward and Sampling Operations</h4>
-To train our model, for each clean image <code>x<sub>1</sub></code> we will generate <code>x<sub>0</sub></code> &isin; &Nscr;(0, &#119816;) and <code>t</code> &isin; U([0, 1]), where U is the uniform distribution. After computing <code>x<sub>t</sub></code> = (1 - <code>t</code>)x<sub>0</sub> + <code>tx<sub>1</sub></code>, we will feed <code>x<sub>t</sub></code> and <code>t</code> into our UNet and compute the loss of unet(<code>x<sub>t</sub></code>, <code>t</code>) and <code>x<sub>1</sub></code> - <code>x<sub>0</sub></code>. Below is its loss curve:
+To train our model, for each clean image <code>x<sub>1</sub></code> we will generate <code>x<sub>0</sub></code> &isin; &Nscr;(0, &#119816;) and <code>t</code> &isin; U([0, 1]), where U is the uniform distribution. After computing <code>x<sub>t</sub></code> = (1 - <code>t</code>)x<sub>0</sub> + <code>tx<sub>1</sub></code>, we will feed <code>x<sub>t</sub></code> and <code>t</code> into our UNet and compute the loss of u<sub>&theta;</sub>(<code>x<sub>t</sub></code>, <code>t</code>) and <code>x<sub>1</sub></code> - <code>x<sub>0</sub></code>. Below is the new model's training loss curve:
+<div align="center">
+<figure>
+<img src="images/unet/21_training_curve.png" alt="21_training_curve.png" />
+</figure>
+</div>
+
+When sampling from the model, we will simply generate a random <code>x<sub>0</sub></code> &isin; &Nscr;(0, &#119816;), and for every iteration <code>i</code> from 1 to <code>T</code>, we will compute <code>x<sub>0</sub></code> = <code>x<sub>0</sub></code> + (1 / <code>T</code>)u<sub>&theta;</sub>(<code>x<sub>t</sub></code>, <code>t</code>), where <code>t</code> = <code>i</code> / <code>T</code>. The following are the results ofthe 1st, 5th, and 10th epoch:
+<div align="center">
+<figure>
+<img src="images/unet/21_visualization.png" alt="21_visualization.png" />
+</figure>
+</div>
+
+Although the results are not perfect, the improvements starting from the 1st epoch up to the 10th are already noticeable.
 </section>
 
 </body>
