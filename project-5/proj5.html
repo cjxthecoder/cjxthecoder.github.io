@@ -1104,12 +1104,13 @@ The standard UNet operations are defined as follows:
 
 where
 <ul>
-  <li><strong>Conv2d(kernel_size, stride, padding)</strong> is <code>nn.Conv2d()</code>;</li>
-  <li><strong>BN</strong> is <code>nn.BatchNorm2d()</code>;</li>
-  <li><strong>GELU</strong> is <code>nn.GELU()</code>;</li>
-  <li><strong>ConvTranspose2d(kernel_size, stride, padding)</strong> is <code>nn.ConvTranspose2d()</code>;</li>
-  <li><strong>AvgPool(kernel_size)</strong> is <code>nn.AvgPool2d()</code>;</li>
-  <li><strong>+</strong> represents function composition, e.g. <code>f</code> + <code>g</code> = <code>f</code>(<code>g</code>(<code>x</code>)).</li>
+<li><strong>Conv2d(kernel_size, stride, padding)</strong> is <code>nn.Conv2d()</code>;</li>
+<li><strong>BN</strong> is <code>nn.BatchNorm2d()</code>;</li>
+<li><strong>GELU</strong> is <code>nn.GELU()</code>;</li>
+<li><strong>ConvTranspose2d(kernel_size, stride, padding)</strong> is <code>nn.ConvTranspose2d()</code>;</li>
+<li><strong>AvgPool(kernel_size)</strong> is <code>nn.AvgPool2d()</code>;</li>
+<li><strong>Concat</strong> is <code>torch.cat()</code>;</li>
+<li><strong>+</strong> represents function composition, e.g. <code>f</code> + <code>g</code> = <code>f</code>(<code>g</code>(<code>x</code>)).</li>
 </ul>
 
 The <strong>FCBlock</strong> operation is defined as follows:
