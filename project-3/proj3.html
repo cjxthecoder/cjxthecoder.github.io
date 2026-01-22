@@ -166,6 +166,46 @@ We can also perform image rectification using this tool by transforming a non-re
 </div>
 <hr>
 
+<h3>Part 4</h3>
+<p>With these tools, we can create a panoramic mosaic of multiple images. Take 3 images below:</p>
+
+<div style="display:flex; flex-wrap:wrap; justify-content:center; text-align:center;">
+
+<figure style="flex: 1 0 30%; margin:12px;">
+<img src="images/img_left.png" alt="img_left.png" width="50%">
+</figure>
+
+<figure style="flex: 1 0 30%; margin:12px;">
+<img src="images/img_center.png" alt="img_center.png" width="50%">
+</figure>
+
+<figure style="flex: 1 0 30%; margin:12px;">
+<img src="images/img_right.png" alt="img_right.png" width="50%">
+</figure>
+</div>
+
+<p>We can first compute the homography of the right image and warp & stitch it with the center image. Once this is done, we will compute the pixel offests of the stitched center-right image with the original center image, so that the center image pixels matches with the center image the homography of the left and center image is computed with.</p>
+<div style="display:flex; flex-wrap:wrap; justify-content:center; text-align:center;">
+
+<figure style="flex: 1 0 40%; margin:12px;">
+<figcaption style="margin-bottom:6px;">Warped left image</figcaption>
+<img src="images/imwraped_bilinearL.jpg" alt="imwraped_bilinearL.jpg" width="50%">
+</figure>
+
+<figure style="flex: 1 0 40%; margin:12px;">
+<figcaption style="margin-bottom:6px;">Center-right stitch</figcaption>
+<img src="images/centerright.png" alt="centerright.png" width="50%">
+</figure>
+</div>
+
+<p>Because we have already warped the left image, we can simply stitch it with the stitched center-right image, creating the following 3-image mosaic:</p>
+<div align="center">
+<figure style="flex: 1 0 30%; margin:12px;">
+<img src="images/mosaic.png" alt="mosaic.png" width="50%">
+</figure>
+</div>
+<hr>
+
 <div align="center">
 <a href="https://cjxthecoder.github.io">cjxthecoder</a> | <a href="https://github.com/cjxthecoder">GitHub</a> | <a href="https://www.linkedin.com/in/daniel-cheng-71b475279">LinkedIn</a>
 </div>
